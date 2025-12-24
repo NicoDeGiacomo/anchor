@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet } from 'react-native';
 
 import { Text, View } from '@/components/Themed';
@@ -34,6 +34,21 @@ export default function PanicScreen() {
     const handleScroll = () => {
         nextPhrase();
     };
+
+    // Add keyboard support for web browsers
+    useEffect(() => {
+        const handleKeyPress = (event: KeyboardEvent) => {
+            nextPhrase();
+        };
+
+        // Only add keyboard listener on web
+        if (typeof window !== 'undefined') {
+            window.addEventListener('keydown', handleKeyPress);
+            return () => {
+                window.removeEventListener('keydown', handleKeyPress);
+            };
+        }
+    }, [phrases.length]); // Re-attach when phrases change
 
     return (
         <View style={styles.container}>
