@@ -1,23 +1,34 @@
 import { ScrollView, StyleSheet } from 'react-native';
 
 import { Text, View } from '@/components/Themed';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-const GROUNDING_PHRASES = [
-    "Panic attacks are uncomfortable, but not dangerous.",
-    "This feeling will pass.",
-    "You have been through this before.",
-];
+// Import all language files
+import phrasesEN from '@/content/anchors.en.json';
+import phrasesES from '@/content/anchors.es.json';
+import phrasesPT from '@/content/anchors.pt.json';
+
+const PHRASES_BY_LANGUAGE = {
+    en: phrasesEN,
+    es: phrasesES,
+    pt: phrasesPT,
+};
 
 export default function PanicScreen() {
+    const { language } = useLanguage();
+
+    // Get phrases for current language, fallback to English if missing
+    const phrases = PHRASES_BY_LANGUAGE[language] || PHRASES_BY_LANGUAGE.en;
+
     return (
         <View style={styles.container}>
             <ScrollView
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
-                {GROUNDING_PHRASES.map((phrase, index) => (
-                    <View key={index} style={styles.phraseContainer}>
-                        <Text style={styles.phraseText}>{phrase}</Text>
+                {phrases.map((phrase) => (
+                    <View key={phrase.id} style={styles.phraseContainer}>
+                        <Text style={styles.phraseText}>{phrase.text}</Text>
                     </View>
                 ))}
             </ScrollView>
