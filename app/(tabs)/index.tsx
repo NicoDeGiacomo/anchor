@@ -1,14 +1,26 @@
-import { StyleSheet } from 'react-native';
+import { Link } from 'expo-router';
+import { Pressable, StyleSheet } from 'react-native';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 
-export default function TabOneScreen() {
+export default function MainScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+      <Text style={styles.title}>Anchor</Text>
+
+      <View style={styles.buttonContainer}>
+        <Link href="/panic" asChild>
+          <Pressable style={styles.button}>
+            <Text style={styles.buttonText}>Panic Attack</Text>
+          </Pressable>
+        </Link>
+
+        <Link href="/about" asChild>
+          <Pressable style={styles.button}>
+            <Text style={styles.buttonText}>About</Text>
+          </Pressable>
+        </Link>
+      </View>
     </View>
   );
 }
@@ -18,14 +30,28 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 20,
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 36,
+    fontWeight: '300',
+    marginBottom: 60,
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  buttonContainer: {
+    width: '100%',
+    maxWidth: 300,
+    gap: 24,
+  },
+  button: {
+    paddingVertical: 20,
+    paddingHorizontal: 40,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontSize: 20,
+    fontWeight: '400',
   },
 });
