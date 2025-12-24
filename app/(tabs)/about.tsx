@@ -1,29 +1,59 @@
-import { ScrollView, StyleSheet } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet } from 'react-native';
 
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const TRANSLATIONS = {
     en: {
-        description: 'Anchor is a simple app with gentle reminders for overwhelming moments.',
-        disclaimerTitle: 'Disclaimer',
-        disclaimer1: 'This app does not provide medical advice, diagnosis, or treatment.',
-        disclaimer2: 'Not a substitute for professional care.',
-        disclaimer3: 'If you are in immediate danger, contact local emergency services.',
+        title: 'Anchor',
+        intentionTitle: 'Intention',
+        intention: 'Anchor is a simple app with gentle reminders for overwhelming moments.\n\nI created it based on my own experience with anxiety and panic attacks, as a small, predictable tool to read when things feel too intense. The goal is not to fix anything — just to help you stay grounded until the moment passes.',
+        importantTitle: 'Important note',
+        important: 'This app does not provide medical advice, diagnosis, or treatment.\nIt is not a substitute for professional care.\n\nIf you are in immediate danger or experiencing a crisis, please contact local emergency services or a trusted professional.',
+        privacyTitle: 'Privacy',
+        privacy: 'Anchor does not collect, store, or share any personal data.\nThere are no accounts, no tracking, no analytics, and no ads.\nEverything runs locally on your device.',
+        openSourceTitle: 'Open source',
+        openSource: 'Anchor is fully open source.',
+        github: 'GitHub',
+        supportTitle: 'Support',
+        support: 'If this app has been helpful and you want to support its development, you can do so here. This is completely optional.',
+        kofi: 'Ko-fi',
+        authorTitle: 'Author',
+        linkedin: 'LinkedIn',
     },
     es: {
-        description: 'Anchor es una aplicación simple con recordatorios suaves para momentos abrumadores.',
-        disclaimerTitle: 'Descargo de responsabilidad',
-        disclaimer1: 'Esta aplicación no proporciona consejos médicos, diagnósticos ni tratamientos.',
-        disclaimer2: 'No sustituye la atención profesional.',
-        disclaimer3: 'Si está en peligro inmediato, comuníquese con los servicios de emergencia locales.',
+        title: 'Anchor',
+        intentionTitle: 'Intención',
+        intention: 'Anchor es una aplicación simple con recordatorios suaves para momentos abrumadores.\n\nLa creé basándome en mi propia experiencia con la ansiedad y los ataques de pánico, como una pequeña herramienta predecible para leer cuando las cosas se sienten demasiado intensas. El objetivo no es arreglar nada, solo ayudarte a mantenerte conectado hasta que el momento pase.',
+        importantTitle: 'Nota importante',
+        important: 'Esta aplicación no proporciona consejos médicos, diagnósticos ni tratamientos.\nNo sustituye la atención profesional.\n\nSi está en peligro inmediato o experimenta una crisis, comuníquese con los servicios de emergencia locales o un profesional de confianza.',
+        privacyTitle: 'Privacidad',
+        privacy: 'Anchor no recopila, almacena ni comparte datos personales.\nNo hay cuentas, ni seguimiento, ni análisis, ni anuncios.\nTodo se ejecuta localmente en su dispositivo.',
+        openSourceTitle: 'Código abierto',
+        openSource: 'Anchor es completamente de código abierto.',
+        github: 'GitHub',
+        supportTitle: 'Apoyo',
+        support: 'Si esta aplicación te ha sido útil y quieres apoyar su desarrollo, puedes hacerlo aquí. Esto es completamente opcional.',
+        kofi: 'Ko-fi',
+        authorTitle: 'Autor',
+        linkedin: 'LinkedIn',
     },
     pt: {
-        description: 'Anchor é um aplicativo simples com lembretes suaves para momentos difíceis.',
-        disclaimerTitle: 'Aviso legal',
-        disclaimer1: 'Este aplicativo não fornece aconselhamento médico, diagnóstico ou tratamento.',
-        disclaimer2: 'Não substitui cuidados profissionais.',
-        disclaimer3: 'Se você estiver em perigo imediato, entre em contato com os serviços de emergência locais.',
+        title: 'Anchor',
+        intentionTitle: 'Intenção',
+        intention: 'Anchor é um aplicativo simples com lembretes suaves para momentos difíceis.\n\nEu o criei com base na minha própria experiência com ansiedade e ataques de pânico, como uma pequena ferramenta previsível para ler quando as coisas parecem muito intensas. O objetivo não é consertar nada — apenas ajudá-lo a permanecer fundamentado até que o momento passe.',
+        importantTitle: 'Nota importante',
+        important: 'Este aplicativo não fornece aconselhamento médico, diagnóstico ou tratamento.\nNão substitui cuidados profissionais.\n\nSe você estiver em perigo imediato ou passando por uma crise, entre em contato com os serviços de emergência locais ou um profissional de confiança.',
+        privacyTitle: 'Privacidade',
+        privacy: 'Anchor não coleta, armazena ou compartilha dados pessoais.\nNão há contas, rastreamento, análises ou anúncios.\nTudo funciona localmente no seu dispositivo.',
+        openSourceTitle: 'Código aberto',
+        openSource: 'Anchor é totalmente de código aberto.',
+        github: 'GitHub',
+        supportTitle: 'Apoio',
+        support: 'Se este aplicativo foi útil e você deseja apoiar seu desenvolvimento, pode fazê-lo aqui. Isso é completamente opcional.',
+        kofi: 'Ko-fi',
+        authorTitle: 'Autor',
+        linkedin: 'LinkedIn',
     },
 };
 
@@ -31,27 +61,51 @@ export default function AboutScreen() {
     const { language } = useLanguage();
     const t = TRANSLATIONS[language];
 
+    const openURL = (url: string) => {
+        Linking.openURL(url);
+    };
+
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContent}>
-                <Text style={styles.description}>
-                    {t.description}
-                </Text>
+                <Text style={styles.title}>{t.title}</Text>
 
-                <View style={styles.disclaimerSection}>
-                    <Text style={styles.disclaimerTitle}>{t.disclaimerTitle}</Text>
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>{t.intentionTitle}</Text>
+                    <Text style={styles.sectionText}>{t.intention}</Text>
+                </View>
 
-                    <Text style={styles.disclaimerText}>
-                        {t.disclaimer1}
-                    </Text>
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>{t.importantTitle}</Text>
+                    <Text style={styles.sectionText}>{t.important}</Text>
+                </View>
 
-                    <Text style={styles.disclaimerText}>
-                        {t.disclaimer2}
-                    </Text>
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>{t.privacyTitle}</Text>
+                    <Text style={styles.sectionText}>{t.privacy}</Text>
+                </View>
 
-                    <Text style={styles.disclaimerText}>
-                        {t.disclaimer3}
-                    </Text>
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>{t.openSourceTitle}</Text>
+                    <Text style={styles.sectionText}>{t.openSource}</Text>
+                    <Pressable onPress={() => openURL('https://github.com/NicoDeGiacomo/anchor')}>
+                        <Text style={styles.link}>{t.github}: github.com/NicoDeGiacomo/anchor</Text>
+                    </Pressable>
+                </View>
+
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>{t.supportTitle}</Text>
+                    <Text style={styles.sectionText}>{t.support}</Text>
+                    <Pressable onPress={() => openURL('https://ko-fi.com/nicodegiacomo')}>
+                        <Text style={styles.link}>{t.kofi}: ko-fi.com/nicodegiacomo</Text>
+                    </Pressable>
+                </View>
+
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>{t.authorTitle}</Text>
+                    <Pressable onPress={() => openURL('https://www.linkedin.com/in/nicolasdegiacomo/')}>
+                        <Text style={styles.link}>{t.linkedin}: linkedin.com/in/nicolasdegiacomo</Text>
+                    </Pressable>
                 </View>
             </ScrollView>
         </View>
@@ -65,24 +119,31 @@ const styles = StyleSheet.create({
     scrollContent: {
         padding: 32,
     },
-    description: {
-        fontSize: 20,
+    title: {
+        fontSize: 36,
         fontWeight: '300',
-        lineHeight: 30,
         marginBottom: 48,
     },
-    disclaimerSection: {
-        gap: 16,
+    section: {
+        marginBottom: 40,
+        gap: 12,
     },
-    disclaimerTitle: {
+    sectionTitle: {
         fontSize: 18,
         fontWeight: '500',
-        marginBottom: 8,
+        marginBottom: 4,
     },
-    disclaimerText: {
+    sectionText: {
         fontSize: 16,
         fontWeight: '300',
         lineHeight: 24,
-        opacity: 0.8,
+        opacity: 0.85,
+    },
+    link: {
+        fontSize: 16,
+        fontWeight: '300',
+        lineHeight: 24,
+        opacity: 0.7,
+        textDecorationLine: 'underline',
     },
 });

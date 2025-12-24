@@ -17,12 +17,14 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Anchor',
+          headerShown: false,
         }}
       />
       <Tabs.Screen
         name="panic"
         options={{
-          title: 'Panic Attack',
+          title: 'Panic',
+          headerShown: false,
         }}
       />
       <Tabs.Screen

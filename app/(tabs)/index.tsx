@@ -7,19 +7,19 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const TRANSLATIONS = {
   en: {
     title: 'Anchor',
-    panicButton: 'Panic Attack',
+    panicButton: 'Panic',
     settingsButton: 'Settings',
     aboutButton: 'About',
   },
   es: {
     title: 'Anchor',
-    panicButton: 'Ataque de Pánico',
+    panicButton: 'Pánico',
     settingsButton: 'Configuración',
     aboutButton: 'Acerca de',
   },
   pt: {
     title: 'Anchor',
-    panicButton: 'Ataque de Pânico',
+    panicButton: 'Pânico',
     settingsButton: 'Configurações',
     aboutButton: 'Sobre',
   },
