@@ -32,6 +32,15 @@ export default function TabLayout() {
         options={{
           title: 'Panic',
           headerShown: false,
+          headerLeft: () => (
+            <TouchableOpacity 
+              onPress={() => router.push('/')} 
+              style={{ marginLeft: 16 }}
+              activeOpacity={0.6}
+            >
+              <Ionicons name="chevron-back" size={24} color="#666" />
+            </TouchableOpacity>
+          ),
         }}
       />
       <Tabs.Screen
@@ -45,7 +54,7 @@ export default function TabLayout() {
               style={{ marginLeft: 16 }}
               activeOpacity={0.6}
             >
-              <Ionicons name="chevron-back" size={24} color="#000" />
+              <Ionicons name="chevron-back" size={24} color="#666" />
             </TouchableOpacity>
           ),
         }}
@@ -61,7 +70,7 @@ export default function TabLayout() {
               style={{ marginLeft: 16 }}
               activeOpacity={0.6}
             >
-              <Ionicons name="chevron-back" size={24} color="#000" />
+              <Ionicons name="chevron-back" size={24} color="#666" />
             </TouchableOpacity>
           ),
         }}

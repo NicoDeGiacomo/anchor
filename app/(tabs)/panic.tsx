@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
@@ -52,15 +51,6 @@ export default function PanicScreen() {
 
     return (
         <View style={styles.container}>
-            {/* Back arrow to main menu */}
-            <Pressable
-                style={styles.backButton}
-                onPress={() => router.push('/')}
-                hitSlop={20}
-            >
-                <Ionicons name="chevron-back" size={28} color="#666" />
-            </Pressable>
-
             {/* Scrollable wrapper for scroll-to-advance */}
             <ScrollView
                 contentContainerStyle={styles.scrollContainer}
@@ -82,13 +72,6 @@ export default function PanicScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    backButton: {
-        position: 'absolute',
-        top: 60,
-        left: 20,
-        zIndex: 10,
-        padding: 8,
     },
     scrollContainer: {
         flexGrow: 1,
