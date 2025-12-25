@@ -1,11 +1,13 @@
 import { Linking, Pressable, ScrollView, StyleSheet } from 'react-native';
 
 import { Text, View } from '@/components/Themed';
+import { Logo } from '@/components/Logo';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const TRANSLATIONS = {
     en: {
         title: 'Anchor',
+        tagline: 'Gentle reminders for overwhelming moments',
         intentionTitle: 'Intention',
         intention: 'Anchor is a simple app with gentle reminders for overwhelming moments.\n\nI created it based on my own experience with anxiety and panic attacks, as a small, predictable tool to read when things feel too intense. The goal is not to fix anything — just to help you stay grounded until the moment passes.',
         importantTitle: 'Important note',
@@ -23,6 +25,7 @@ const TRANSLATIONS = {
     },
     es: {
         title: 'Anchor',
+        tagline: 'Recordatorios suaves para momentos abrumadores',
         intentionTitle: 'Intención',
         intention: 'Anchor es una aplicación simple con recordatorios suaves para momentos abrumadores.\n\nLa creé basándome en mi propia experiencia con la ansiedad y los ataques de pánico, como una pequeña herramienta predecible para leer cuando las cosas se sienten demasiado intensas. El objetivo no es arreglar nada, solo ayudarte a mantenerte conectado hasta que el momento pase.',
         importantTitle: 'Nota importante',
@@ -40,6 +43,7 @@ const TRANSLATIONS = {
     },
     pt: {
         title: 'Anchor',
+        tagline: 'Lembretes suaves para momentos difíceis',
         intentionTitle: 'Intenção',
         intention: 'Anchor é um aplicativo simples com lembretes suaves para momentos difíceis.\n\nEu o criei com base na minha própria experiência com ansiedade e ataques de pânico, como uma pequena ferramenta previsível para ler quando as coisas parecem muito intensas. O objetivo não é consertar nada — apenas ajudá-lo a permanecer fundamentado até que o momento passe.',
         importantTitle: 'Nota importante',
@@ -68,7 +72,11 @@ export default function AboutScreen() {
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContent}>
-                <Text style={styles.title}>{t.title}</Text>
+                <View style={styles.header}>
+                    <Logo size={80} />
+                    <Text style={styles.title}>{t.title}</Text>
+                    <Text style={styles.tagline}>{t.tagline}</Text>
+                </View>
 
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>{t.intentionTitle}</Text>
@@ -119,10 +127,22 @@ const styles = StyleSheet.create({
     scrollContent: {
         padding: 32,
     },
+    header: {
+        alignItems: 'center',
+        marginBottom: 48,
+        gap: 16,
+    },
     title: {
         fontSize: 36,
         fontWeight: '300',
-        marginBottom: 48,
+        marginTop: 8,
+    },
+    tagline: {
+        fontSize: 16,
+        fontWeight: '300',
+        opacity: 0.7,
+        textAlign: 'center',
+        marginBottom: 16,
     },
     section: {
         marginBottom: 40,

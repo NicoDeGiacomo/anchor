@@ -7,9 +7,9 @@ import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
 
-export default function TabLayout() {
+export default function TabLayout() { 
   const colorScheme = useColorScheme();
-  const iconColor = Colors[colorScheme ?? 'light'].text;
+  const iconColor = Colors[colorScheme ?? 'light'].icon;
 
   return (
     <Tabs
@@ -30,15 +30,17 @@ export default function TabLayout() {
       <Tabs.Screen
         name="panic"
         options={{
-          title: 'Panic',
-          headerShown: false,
+          title: '',
+          headerShown: true,
+          headerTransparent: true,
+          headerShadowVisible: false,
           headerLeft: () => (
             <TouchableOpacity 
               onPress={() => router.push('/')} 
               style={{ marginLeft: 16 }}
               activeOpacity={0.6}
             >
-              <Ionicons name="chevron-back" size={24} color="#666" />
+              <Ionicons name="chevron-back" size={24} color={iconColor} />
             </TouchableOpacity>
           ),
         }}
@@ -54,7 +56,7 @@ export default function TabLayout() {
               style={{ marginLeft: 16 }}
               activeOpacity={0.6}
             >
-              <Ionicons name="chevron-back" size={24} color="#666" />
+              <Ionicons name="chevron-back" size={24} color={iconColor} />
             </TouchableOpacity>
           ),
         }}
@@ -70,7 +72,7 @@ export default function TabLayout() {
               style={{ marginLeft: 16 }}
               activeOpacity={0.6}
             >
-              <Ionicons name="chevron-back" size={24} color="#666" />
+              <Ionicons name="chevron-back" size={24} color={iconColor} />
             </TouchableOpacity>
           ),
         }}
