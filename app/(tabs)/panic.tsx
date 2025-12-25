@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
 
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -42,7 +42,7 @@ export default function PanicScreen() {
         };
 
         // Only add keyboard listener on web
-        if (typeof window !== 'undefined') {
+        if (Platform.OS === 'web') {
             window.addEventListener('keydown', handleKeyPress);
             return () => {
                 window.removeEventListener('keydown', handleKeyPress);
