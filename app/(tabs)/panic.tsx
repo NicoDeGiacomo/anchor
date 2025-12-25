@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Platform, Pressable, StyleSheet } from 'react-native';
 
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -29,15 +29,19 @@ export default function PanicScreen() {
         setCurrentIndex((prev) => (prev + 1) % phrases.length);
     };
 
-    // Handle scroll event to advance phrase
-    const handleScroll = () => {
-        nextPhrase();
-    };
-
-    // Add keyboard support for web browsers
+    // Add keyboard support for web browsers (specific keys only)
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
-            nextPhrase();
+            // Only advance on Space, Enter, or Arrow keys
+            if (
+                event.key === ' ' ||
+                event.key === 'Enter' ||
+                event.key === 'ArrowRight' ||
+                event.key === 'ArrowDown'
+            ) {
+                event.preventDefault(); // Prevent default scrolling behavior
+                nextPhrase();
+            }
         };
 
         // Only add keyboard listener on web
@@ -51,20 +55,12 @@ export default function PanicScreen() {
 
     return (
         <View style={styles.container}>
-            {/* Scrollable wrapper for scroll-to-advance */}
-            <ScrollView
-                contentContainerStyle={styles.scrollContainer}
-                showsVerticalScrollIndicator={false}
-                onScroll={handleScroll}
-                scrollEventThrottle={400}
-            >
-                {/* Tap-to-advance wrapper */}
-                <Pressable style={styles.phraseWrapper} onPress={nextPhrase}>
-                    <Text style={styles.phraseText}>
-                        {phrases[currentIndex].text}
-                    </Text>
-                </Pressable>
-            </ScrollView>
+            {/* Tap-to-advance wrapper */}
+            <Pressable style={styles.phraseWrapper} onPress={nextPhrase}>
+                <Text style={styles.phraseText}>
+                    {phrases[currentIndex].text}
+                </Text>
+            </Pressable>
         </View>
     );
 }
@@ -72,9 +68,6 @@ export default function PanicScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    scrollContainer: {
-        flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 32,
