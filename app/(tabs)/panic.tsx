@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Platform, Pressable, StyleSheet } from 'react-native';
 
-import { Text, View } from '@/components/Themed';
+import { Text, View, useThemeColor } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Import all language files
@@ -20,6 +20,7 @@ export default function PanicScreen() {
     const { language } = useLanguage();
     const router = useRouter();
     const [currentIndex, setCurrentIndex] = useState(0);
+    const secondaryTextColor = useThemeColor({}, 'textSecondary' as any);
 
     // Get phrases for current language, fallback to English if missing
     const phrases = PHRASES_BY_LANGUAGE[language] || PHRASES_BY_LANGUAGE.en;
@@ -53,13 +54,20 @@ export default function PanicScreen() {
         }
     }, [phrases.length]); // Re-attach when phrases change
 
+    const currentPhrase = phrases[currentIndex];
+
     return (
         <View style={styles.container}>
             {/* Tap-to-advance wrapper */}
             <Pressable style={styles.phraseWrapper} onPress={nextPhrase}>
                 <Text style={styles.phraseText}>
-                    {phrases[currentIndex].text}
+                    {currentPhrase.text}
                 </Text>
+                {currentPhrase.subphrase && (
+                    <Text style={[styles.subphraseText, { color: secondaryTextColor }]}>
+                        {currentPhrase.subphrase}
+                    </Text>
+                )}
             </Pressable>
         </View>
     );
@@ -83,5 +91,12 @@ const styles = StyleSheet.create({
         fontWeight: '300',
         lineHeight: 40,
         textAlign: 'center',
+    },
+    subphraseText: {
+        fontSize: 18,
+        fontWeight: '300',
+        lineHeight: 28,
+        textAlign: 'center',
+        marginTop: 16,
     },
 });

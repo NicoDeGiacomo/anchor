@@ -1,7 +1,8 @@
 [
     {
         "id": "phrase1",
-        "text": "Ataques de pânico são desconfortáveis, mas não perigosos."
+        "text": "Ataques de pânico são desconfortáveis, mas não perigosos.",
+        "subphrase": "Inspire"
     },
     {
         "id": "phrase2",

@@ -1,7 +1,8 @@
 [
     {
         "id": "phrase1",
-        "text": "Panic attacks are uncomfortable, but not dangerous."
+        "text": "Panic attacks are uncomfortable, but not dangerous.",
+        "subphrase": "Breathe in"
     },
     {
         "id": "phrase2",

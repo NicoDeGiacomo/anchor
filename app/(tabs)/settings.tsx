@@ -2,6 +2,7 @@ import { Pressable, ScrollView, StyleSheet } from 'react-native';
 
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const LANGUAGES = [
     { code: 'en' as const, name: 'English' },
@@ -9,44 +10,100 @@ const LANGUAGES = [
     { code: 'pt' as const, name: 'Português' },
 ];
 
+const THEMES = [
+    { mode: 'auto' as const, nameKey: 'auto' },
+    { mode: 'light' as const, nameKey: 'light' },
+    { mode: 'dark' as const, nameKey: 'dark' },
+];
+
 const TRANSLATIONS = {
     en: {
         title: 'Settings',
         languageSection: 'Language',
+        themeSection: 'Theme',
+        themeAuto: 'Auto (System)',
+        themeLight: 'Light',
+        themeDark: 'Dark',
     },
     es: {
         title: 'Configuración',
         languageSection: 'Idioma',
+        themeSection: 'Tema',
+        themeAuto: 'Automático (Sistema)',
+        themeLight: 'Claro',
+        themeDark: 'Oscuro',
     },
     pt: {
         title: 'Configurações',
         languageSection: 'Idioma',
+        themeSection: 'Tema',
+        themeAuto: 'Automático (Sistema)',
+        themeLight: 'Claro',
+        themeDark: 'Escuro',
     },
 };
 
 export default function SettingsScreen() {
     const { language, setLanguage } = useLanguage();
+    const { themeMode, setThemeMode } = useTheme();
     const t = TRANSLATIONS[language];
+
+    const getThemeName = (themeKey: string) => {
+        switch (themeKey) {
+            case 'auto':
+                return t.themeAuto;
+            case 'light':
+                return t.themeLight;
+            case 'dark':
+                return t.themeDark;
+            default:
+                return themeKey;
+        }
+    };
 
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContent}>
-                <Text style={styles.sectionTitle}>{t.languageSection}</Text>
+                <Text style={styles.sectionTitle}>{t.themeSection}</Text>
 
-                <View style={styles.languageList}>
+                <View style={styles.optionList}>
+                    {THEMES.map((theme) => (
+                        <Pressable
+                            key={theme.mode}
+                            style={[
+                                styles.optionItem,
+                                themeMode === theme.mode && styles.optionItemSelected,
+                            ]}
+                            onPress={() => setThemeMode(theme.mode)}
+                        >
+                            <Text
+                                style={[
+                                    styles.optionText,
+                                    themeMode === theme.mode && styles.optionTextSelected,
+                                ]}
+                            >
+                                {getThemeName(theme.nameKey)}
+                            </Text>
+                        </Pressable>
+                    ))}
+                </View>
+
+                <Text style={[styles.sectionTitle, styles.sectionSpacing]}>{t.languageSection}</Text>
+
+                <View style={styles.optionList}>
                     {LANGUAGES.map((lang) => (
                         <Pressable
                             key={lang.code}
                             style={[
-                                styles.languageItem,
-                                language === lang.code && styles.languageItemSelected,
+                                styles.optionItem,
+                                language === lang.code && styles.optionItemSelected,
                             ]}
                             onPress={() => setLanguage(lang.code)}
                         >
                             <Text
                                 style={[
-                                    styles.languageText,
-                                    language === lang.code && styles.languageTextSelected,
+                                    styles.optionText,
+                                    language === lang.code && styles.optionTextSelected,
                                 ]}
                             >
                                 {lang.name}
@@ -71,25 +128,28 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         marginBottom: 16,
     },
-    languageList: {
+    sectionSpacing: {
+        marginTop: 32,
+    },
+    optionList: {
         gap: 12,
     },
-    languageItem: {
+    optionItem: {
         paddingVertical: 16,
         paddingHorizontal: 20,
         borderRadius: 8,
         borderWidth: 1,
         borderColor: '#ccc',
     },
-    languageItemSelected: {
+    optionItemSelected: {
         borderColor: '#666',
         borderWidth: 2,
     },
-    languageText: {
+    optionText: {
         fontSize: 18,
         fontWeight: '300',
     },
-    languageTextSelected: {
+    optionTextSelected: {
         fontWeight: '400',
     },
 });
