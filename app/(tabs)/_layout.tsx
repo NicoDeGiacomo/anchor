@@ -31,7 +31,7 @@ export default function TabLayout() {
         name="panic"
         options={{
           title: '',
-          headerShown: true,
+          headerShown: false,
           headerTransparent: true,
           headerShadowVisible: false,
           headerLeft: () => (

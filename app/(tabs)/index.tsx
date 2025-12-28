@@ -7,19 +7,31 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const TRANSLATIONS = {
   en: {
     title: 'Anchor',
-    panicButton: 'Panic',
+    panic: 'Panic',
+    anxiety: 'Anxiety',
+    sadness: 'Sadness',
+    anger: 'Anger',
+    grounding: 'Grounding',
     settingsButton: 'Settings',
     aboutButton: 'About',
   },
   es: {
     title: 'Anchor',
-    panicButton: 'Pánico',
+    panic: 'Pánico',
+    anxiety: 'Ansiedad',
+    sadness: 'Tristeza',
+    anger: 'Ira',
+    grounding: 'Conexión',
     settingsButton: 'Configuración',
     aboutButton: 'Acerca de',
   },
   pt: {
     title: 'Anchor',
-    panicButton: 'Pânico',
+    panic: 'Pânico',
+    anxiety: 'Ansiedade',
+    sadness: 'Tristeza',
+    anger: 'Raiva',
+    grounding: 'Aterramento',
     settingsButton: 'Configurações',
     aboutButton: 'Sobre',
   },
@@ -34,11 +46,37 @@ export default function MainScreen() {
       <Text style={styles.title}>{t.title}</Text>
 
       <View style={styles.buttonContainer}>
-        <Link href="/panic" asChild>
-          <Pressable style={styles.primaryButton}>
-            <Text style={styles.primaryButtonText}>{t.panicButton}</Text>
-          </Pressable>
-        </Link>
+        <View style={styles.modeButtons}>
+          <Link href="/mode/panic" asChild>
+            <Pressable style={styles.modeButton}>
+              <Text style={styles.modeButtonText}>{t.panic}</Text>
+            </Pressable>
+          </Link>
+
+          <Link href="/mode/anxiety" asChild>
+            <Pressable style={styles.modeButton}>
+              <Text style={styles.modeButtonText}>{t.anxiety}</Text>
+            </Pressable>
+          </Link>
+
+          <Link href="/mode/sadness" asChild>
+            <Pressable style={styles.modeButton}>
+              <Text style={styles.modeButtonText}>{t.sadness}</Text>
+            </Pressable>
+          </Link>
+
+          <Link href="/mode/anger" asChild>
+            <Pressable style={styles.modeButton}>
+              <Text style={styles.modeButtonText}>{t.anger}</Text>
+            </Pressable>
+          </Link>
+
+          <Link href="/mode/grounding" asChild>
+            <Pressable style={styles.modeButton}>
+              <Text style={styles.modeButtonText}>{t.grounding}</Text>
+            </Pressable>
+          </Link>
+        </View>
 
         <View style={styles.secondaryButtons}>
           <Link href="/settings" asChild>
@@ -75,17 +113,20 @@ const styles = StyleSheet.create({
     maxWidth: 300,
     gap: 32,
   },
-  primaryButton: {
-    paddingVertical: 20,
-    paddingHorizontal: 40,
+  modeButtons: {
+    gap: 16,
+  },
+  modeButton: {
+    paddingVertical: 18,
+    paddingHorizontal: 32,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ccc',
     alignItems: 'center',
   },
-  primaryButtonText: {
-    fontSize: 20,
-    fontWeight: '400',
+  modeButtonText: {
+    fontSize: 18,
+    fontWeight: '300',
   },
   secondaryButtons: {
     flexDirection: 'row',
