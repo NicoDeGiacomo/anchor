@@ -1,7 +1,7 @@
 import { Linking, Pressable, ScrollView, StyleSheet } from 'react-native';
 
-import { Text, View } from '@/components/Themed';
 import { Logo } from '@/components/Logo';
+import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const TRANSLATIONS = {
