@@ -1,3 +1,4 @@
+import { Link } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet } from 'react-native';
 
 import { Text, View } from '@/components/Themed';
@@ -24,6 +25,13 @@ const TRANSLATIONS = {
         themeAuto: 'Auto (System)',
         themeLight: 'Light',
         themeDark: 'Dark',
+        phrasesSection: 'Customize phrases',
+        phrasesDescription: 'Add, remove, or hide phrases for each mode',
+        panic: 'Panic',
+        anxiety: 'Anxiety',
+        sadness: 'Sadness',
+        anger: 'Anger',
+        grounding: 'Grounding',
     },
     es: {
         title: 'Configuración',
@@ -32,6 +40,13 @@ const TRANSLATIONS = {
         themeAuto: 'Automático (Sistema)',
         themeLight: 'Claro',
         themeDark: 'Oscuro',
+        phrasesSection: 'Personalizar frases',
+        phrasesDescription: 'Agregar, eliminar u ocultar frases para cada modo',
+        panic: 'Pánico',
+        anxiety: 'Ansiedad',
+        sadness: 'Tristeza',
+        anger: 'Ira',
+        grounding: 'Conexión',
     },
     pt: {
         title: 'Configurações',
@@ -40,6 +55,13 @@ const TRANSLATIONS = {
         themeAuto: 'Automático (Sistema)',
         themeLight: 'Claro',
         themeDark: 'Escuro',
+        phrasesSection: 'Personalizar frases',
+        phrasesDescription: 'Adicionar, excluir ou ocultar frases para cada modo',
+        panic: 'Pânico',
+        anxiety: 'Ansiedade',
+        sadness: 'Tristeza',
+        anger: 'Raiva',
+        grounding: 'Aterramento',
     },
 };
 
@@ -111,6 +133,37 @@ export default function SettingsScreen() {
                         </Pressable>
                     ))}
                 </View>
+
+                <Text style={[styles.sectionTitle, styles.sectionSpacing]}>{t.phrasesSection}</Text>
+                <Text style={styles.sectionDescription}>{t.phrasesDescription}</Text>
+
+                <View style={styles.optionList}>
+                    <Link href="/edit-phrases/panic" asChild>
+                        <Pressable style={styles.optionItem}>
+                            <Text style={styles.optionText}>{t.panic}</Text>
+                        </Pressable>
+                    </Link>
+                    <Link href="/edit-phrases/anxiety" asChild>
+                        <Pressable style={styles.optionItem}>
+                            <Text style={styles.optionText}>{t.anxiety}</Text>
+                        </Pressable>
+                    </Link>
+                    <Link href="/edit-phrases/sadness" asChild>
+                        <Pressable style={styles.optionItem}>
+                            <Text style={styles.optionText}>{t.sadness}</Text>
+                        </Pressable>
+                    </Link>
+                    <Link href="/edit-phrases/anger" asChild>
+                        <Pressable style={styles.optionItem}>
+                            <Text style={styles.optionText}>{t.anger}</Text>
+                        </Pressable>
+                    </Link>
+                    <Link href="/edit-phrases/grounding" asChild>
+                        <Pressable style={styles.optionItem}>
+                            <Text style={styles.optionText}>{t.grounding}</Text>
+                        </Pressable>
+                    </Link>
+                </View>
             </ScrollView>
         </View>
     );
@@ -130,6 +183,13 @@ const styles = StyleSheet.create({
     },
     sectionSpacing: {
         marginTop: 32,
+    },
+    sectionDescription: {
+        fontSize: 14,
+        fontWeight: '300',
+        opacity: 0.7,
+        marginBottom: 12,
+        marginTop: -8,
     },
     optionList: {
         gap: 12,

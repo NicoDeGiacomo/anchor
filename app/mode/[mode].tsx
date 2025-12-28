@@ -4,15 +4,7 @@ import { Platform, Pressable, StyleSheet } from 'react-native';
 
 import { Text, View, useThemeColor } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
-
-type Mode = 'panic' | 'anxiety' | 'sadness' | 'anger' | 'grounding';
-type Language = 'en' | 'es' | 'pt';
-
-interface Phrase {
-    id: string;
-    text: string;
-    subphrase?: string;
-}
+import { getActivePhrases, Mode, Language, Phrase } from '@/utils/phraseStorage';
 
 // Dynamic imports for all mode/language combinations
 const PHRASES_MAP: Record<Mode, Record<Language, Phrase[]>> = {
@@ -62,6 +54,8 @@ export default function ModeScreen() {
     const { mode } = useLocalSearchParams<{ mode: string }>();
     const { language } = useLanguage();
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [phrases, setPhrases] = useState<Phrase[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const secondaryTextColor = useThemeColor({}, 'textSecondary' as any);
 
     // Validate mode parameter
@@ -69,19 +63,37 @@ export default function ModeScreen() {
         ? mode as Mode 
         : 'panic';
 
-    // Get phrases for current mode and language
-    let phrases: Phrase[] = [];
-    try {
-        phrases = PHRASES_MAP[validMode]?.[language] || [];
-        
-        // Fallback to English if current language has no content
-        if (phrases.length === 0 && language !== 'en') {
-            phrases = PHRASES_MAP[validMode]?.en || [];
-        }
-    } catch (error) {
-        console.warn('Failed to load phrases:', error);
-        phrases = [];
-    }
+    // Load phrases (built-in + user, excluding hidden)
+    useEffect(() => {
+        const loadPhrases = async () => {
+            setIsLoading(true);
+            try {
+                // Get built-in phrases
+                let builtInPhrases: Phrase[] = [];
+                try {
+                    builtInPhrases = PHRASES_MAP[validMode]?.[language] || [];
+                    
+                    // Fallback to English if current language has no content
+                    if (builtInPhrases.length === 0 && language !== 'en') {
+                        builtInPhrases = PHRASES_MAP[validMode]?.en || [];
+                    }
+                } catch (error) {
+                    console.warn('Failed to load built-in phrases:', error);
+                }
+
+                // Get active phrases (built-in + user, excluding hidden)
+                const activePhrases = await getActivePhrases(validMode, language, builtInPhrases);
+                setPhrases(activePhrases);
+            } catch (error) {
+                console.warn('Failed to load phrases:', error);
+                setPhrases([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadPhrases();
+    }, [validMode, language]);
 
     // Reset index when mode or language changes
     useEffect(() => {
@@ -119,14 +131,14 @@ export default function ModeScreen() {
         }
     }, [phrases.length]); // Re-attach when phrases change
 
-    // Show fallback if no phrases available
-    if (phrases.length === 0) {
+    // Show fallback if loading or no phrases available
+    if (isLoading || phrases.length === 0) {
         const fallback = FALLBACK_TRANSLATIONS[language];
         return (
             <View style={styles.container}>
                 <View style={styles.phraseWrapper}>
                     <Text style={[styles.phraseText, { opacity: 0.5 }]}>
-                        {fallback.notAvailable}
+                        {isLoading ? '' : fallback.notAvailable}
                     </Text>
                 </View>
             </View>

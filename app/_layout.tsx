@@ -86,6 +86,21 @@ function NavigationTheme() {
             ),
           }}
         />
+        <Stack.Screen 
+          name="edit-phrases/[mode]" 
+          options={{
+            title: 'Edit phrases',
+            headerLeft: () => (
+              <TouchableOpacity 
+                onPress={() => router.push('/settings')} 
+                style={{ marginLeft: 16 }}
+                activeOpacity={0.6}
+              >
+                <Ionicons name="chevron-back" size={24} color={iconColor} />
+              </TouchableOpacity>
+            ),
+          }}
+        />
       </Stack>
     </NavigationThemeProvider>
   );
