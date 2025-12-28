@@ -1,2 +1,14 @@
-[]
-
+[
+    {
+        "id": "phrase1",
+        "text": "Você não precisa resolver isso agora."
+    },
+    {
+        "id": "phrase2",
+        "text": "Isso pode esperar."
+    },
+    {
+        "id": "phrase3",
+        "text": "Tudo bem pausar."
+    }
+]

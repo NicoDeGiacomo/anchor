@@ -1,2 +1,14 @@
-[]
-
+[
+    {
+        "id": "phrase1",
+        "text": "Você pode sentir isso."
+    },
+    {
+        "id": "phrase2",
+        "text": "Nada precisa ser decidido agora."
+    },
+    {
+        "id": "phrase3",
+        "text": "Você pode ser gentil consigo mesmo."
+    }
+]

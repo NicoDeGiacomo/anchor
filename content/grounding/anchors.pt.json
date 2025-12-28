@@ -1,2 +1,14 @@
-[]
-
+[
+    {
+        "id": "phrase1",
+        "text": "Perceba onde você está."
+    },
+    {
+        "id": "phrase2",
+        "text": "Sinta seus pés no chão."
+    },
+    {
+        "id": "phrase3",
+        "text": "Você está aqui."
+    }
+]

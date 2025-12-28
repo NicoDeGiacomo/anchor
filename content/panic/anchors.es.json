@@ -1,2 +1,22 @@
-[]
-
+[
+    {
+        "id": "phrase1",
+        "text": "Esto es incómodo, no peligroso.",
+        "subphrase": "Inhala"
+    },
+    {
+        "id": "phrase2",
+        "text": "Has pasado por esto antes.",
+        "subphrase": "Sostén la respiración"
+    },
+    {
+        "id": "phrase3",
+        "text": "Tu cuerpo sabe cómo calmarse.",
+        "subphrase": "Exhala"
+    },
+    {
+        "id": "phrase3",
+        "text": "Estás a salvo.",
+        "subphrase": "Sostén la respiración"
+    }
+]

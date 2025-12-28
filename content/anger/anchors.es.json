@@ -1,2 +1,14 @@
-[]
-
+[
+    {
+        "id": "phrase1",
+        "text": "Los sentimientos fuertes no requieren acción inmediata."
+    },
+    {
+        "id": "phrase2",
+        "text": "Puedes hacer una pausa."
+    },
+    {
+        "id": "phrase3",
+        "text": "No tienes que actuar sobre esto."
+    }
+]
