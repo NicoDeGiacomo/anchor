@@ -10,6 +10,7 @@ import Colors from '@/constants/Colors';
 export default function TabLayout() { 
   const colorScheme = useColorScheme();
   const iconColor = Colors[colorScheme ?? 'light'].icon;
+  const textColor = Colors[colorScheme ?? 'light'].text;
 
   return (
     <Tabs
@@ -31,7 +32,7 @@ export default function TabLayout() {
         name="settings"
         options={{
           title: 'Settings',
-          headerTintColor: '#000',
+          headerTintColor: textColor,
           headerLeft: () => (
             <TouchableOpacity 
               onPress={() => router.push('/')} 
@@ -47,7 +48,7 @@ export default function TabLayout() {
         name="about"
         options={{
           title: 'About',
-          headerTintColor: '#000',
+          headerTintColor: textColor,
           headerLeft: () => (
             <TouchableOpacity 
               onPress={() => router.push('/')} 
