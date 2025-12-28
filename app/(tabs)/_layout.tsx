@@ -28,24 +28,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="panic"
-        options={{
-          title: '',
-          headerShown: false,
-          headerTransparent: true,
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <TouchableOpacity 
-              onPress={() => router.push('/')} 
-              style={{ marginLeft: 16 }}
-              activeOpacity={0.6}
-            >
-              <Ionicons name="chevron-back" size={24} color={iconColor} />
-            </TouchableOpacity>
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',
