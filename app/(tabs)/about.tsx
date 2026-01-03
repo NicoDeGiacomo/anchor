@@ -97,7 +97,7 @@ export default function AboutScreen() {
                     <Text style={styles.sectionTitle}>{t.openSourceTitle}</Text>
                     <Text style={styles.sectionText}>{t.openSource}</Text>
                     <Pressable onPress={() => openURL('https://github.com/NicoDeGiacomo/anchor')}>
-                        <Text style={styles.link}>{t.github}: github.com/NicoDeGiacomo/anchor</Text>
+                        <Text style={styles.link}>github.com/NicoDeGiacomo/anchor</Text>
                     </Pressable>
                 </View>
 
@@ -105,14 +105,14 @@ export default function AboutScreen() {
                     <Text style={styles.sectionTitle}>{t.supportTitle}</Text>
                     <Text style={styles.sectionText}>{t.support}</Text>
                     <Pressable onPress={() => openURL('https://ko-fi.com/nicodegiacomo')}>
-                        <Text style={styles.link}>{t.kofi}: ko-fi.com/nicodegiacomo</Text>
+                        <Text style={styles.link}>ko-fi.com/nicodegiacomo</Text>
                     </Pressable>
                 </View>
 
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>{t.authorTitle}</Text>
                     <Pressable onPress={() => openURL('https://www.linkedin.com/in/nicolasdegiacomo/')}>
-                        <Text style={styles.link}>{t.linkedin}: linkedin.com/in/nicolasdegiacomo</Text>
+                        <Text style={styles.link}>linkedin.com/in/nicolasdegiacomo</Text>
                     </Pressable>
                 </View>
             </ScrollView>
