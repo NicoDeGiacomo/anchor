@@ -1,6 +1,7 @@
 import { Link } from 'expo-router';
-import { Pressable, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
+import PressableFeedback from '@/components/PressableFeedback';
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -48,47 +49,47 @@ export default function MainScreen() {
       <View style={styles.buttonContainer}>
         <View style={styles.modeButtons}>
           <Link href="/mode/panic" asChild>
-            <Pressable style={styles.modeButton}>
+            <PressableFeedback style={styles.modeButton}>
               <Text style={styles.modeButtonText}>{t.panic}</Text>
-            </Pressable>
+            </PressableFeedback>
           </Link>
 
           <Link href="/mode/anxiety" asChild>
-            <Pressable style={styles.modeButton}>
+            <PressableFeedback style={styles.modeButton}>
               <Text style={styles.modeButtonText}>{t.anxiety}</Text>
-            </Pressable>
+            </PressableFeedback>
           </Link>
 
           {/* <Link href="/mode/sadness" asChild>
-            <Pressable style={styles.modeButton}>
+            <PressableFeedback style={styles.modeButton}>
               <Text style={styles.modeButtonText}>{t.sadness}</Text>
-            </Pressable>
+            </PressableFeedback>
           </Link> */}
 
           <Link href="/mode/anger" asChild>
-            <Pressable style={styles.modeButton}>
+            <PressableFeedback style={styles.modeButton}>
               <Text style={styles.modeButtonText}>{t.anger}</Text>
-            </Pressable>
+            </PressableFeedback>
           </Link>
 
           <Link href="/mode/grounding" asChild>
-            <Pressable style={styles.modeButton}>
+            <PressableFeedback style={styles.modeButton}>
               <Text style={styles.modeButtonText}>{t.grounding}</Text>
-            </Pressable>
+            </PressableFeedback>
           </Link>
         </View>
 
         <View style={styles.secondaryButtons}>
           <Link href="/settings" asChild>
-            <Pressable style={styles.secondaryButton}>
+            <PressableFeedback style={styles.secondaryButton}>
               <Text style={styles.secondaryButtonText}>{t.settingsButton}</Text>
-            </Pressable>
+            </PressableFeedback>
           </Link>
 
           <Link href="/about" asChild>
-            <Pressable style={styles.secondaryButton}>
+            <PressableFeedback style={styles.secondaryButton}>
               <Text style={styles.secondaryButtonText}>{t.aboutButton}</Text>
-            </Pressable>
+            </PressableFeedback>
           </Link>
         </View>
       </View>

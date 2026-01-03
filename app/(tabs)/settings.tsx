@@ -1,6 +1,7 @@
 import { Link } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 
+import PressableFeedback from '@/components/PressableFeedback';
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -90,7 +91,7 @@ export default function SettingsScreen() {
 
                 <View style={styles.optionList}>
                     {THEMES.map((theme) => (
-                        <Pressable
+                        <PressableFeedback
                             key={theme.mode}
                             style={[
                                 styles.optionItem,
@@ -106,7 +107,7 @@ export default function SettingsScreen() {
                             >
                                 {getThemeName(theme.nameKey)}
                             </Text>
-                        </Pressable>
+                        </PressableFeedback>
                     ))}
                 </View>
 
@@ -114,7 +115,7 @@ export default function SettingsScreen() {
 
                 <View style={styles.optionList}>
                     {LANGUAGES.map((lang) => (
-                        <Pressable
+                        <PressableFeedback
                             key={lang.code}
                             style={[
                                 styles.optionItem,
@@ -130,7 +131,7 @@ export default function SettingsScreen() {
                             >
                                 {lang.name}
                             </Text>
-                        </Pressable>
+                        </PressableFeedback>
                     ))}
                 </View>
 
@@ -139,29 +140,29 @@ export default function SettingsScreen() {
 
                 <View style={styles.optionList}>
                     <Link href="/edit-phrases/panic" asChild>
-                        <Pressable style={styles.optionItem}>
+                        <PressableFeedback style={styles.optionItem}>
                             <Text style={styles.optionText}>{t.panic}</Text>
-                        </Pressable>
+                        </PressableFeedback>
                     </Link>
                     <Link href="/edit-phrases/anxiety" asChild>
-                        <Pressable style={styles.optionItem}>
+                        <PressableFeedback style={styles.optionItem}>
                             <Text style={styles.optionText}>{t.anxiety}</Text>
-                        </Pressable>
+                        </PressableFeedback>
                     </Link>
                     <Link href="/edit-phrases/sadness" asChild>
-                        <Pressable style={styles.optionItem}>
+                        <PressableFeedback style={styles.optionItem}>
                             <Text style={styles.optionText}>{t.sadness}</Text>
-                        </Pressable>
+                        </PressableFeedback>
                     </Link>
                     <Link href="/edit-phrases/anger" asChild>
-                        <Pressable style={styles.optionItem}>
+                        <PressableFeedback style={styles.optionItem}>
                             <Text style={styles.optionText}>{t.anger}</Text>
-                        </Pressable>
+                        </PressableFeedback>
                     </Link>
                     <Link href="/edit-phrases/grounding" asChild>
-                        <Pressable style={styles.optionItem}>
+                        <PressableFeedback style={styles.optionItem}>
                             <Text style={styles.optionText}>{t.grounding}</Text>
-                        </Pressable>
+                        </PressableFeedback>
                     </Link>
                 </View>
             </ScrollView>
