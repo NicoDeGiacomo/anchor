@@ -1,14 +1,17 @@
 [
     {
         "id": "phrase1",
-        "text": "Você não precisa resolver isso agora."
+        "text": "A ansiedade vai subir e descer por conta própria.",
+        "subphrase": "Respire profundamente por 4 segundos, depois expire por 6 segundos."
     },
     {
         "id": "phrase2",
-        "text": "Isso pode esperar."
+        "text": "Os cenários que você imagina não refletem necessariamente a realidade.",
+        "subphrase": "Nomeie 5 coisas que você possa ver, 4 que possa ouvir, 3 que possa tocar."
     },
     {
         "id": "phrase3",
-        "text": "Tudo bem pausar."
+        "text": "Não tente lutar contra seus pensamentos, apenas deixe-os passar.",
+        "subphrase": "Nomeie 2 coisas que você possa tocar e 1 coisa que possa saborear."
     }
 ]

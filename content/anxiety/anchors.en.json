@@ -1,15 +1,18 @@
 [
     {
         "id": "phrase1",
-        "text": "You don't need to solve this right now."
+        "text": "Anxiety will raise and fall on its own.",
+        "subphrase": "Breathe deeply in 4 seconds, then exhale for 6 seconds."
     },
     {
         "id": "phrase2",
-        "text": "This can wait."
+        "text": "The scenarios you imagine do not necessarily reflect reality.",
+        "subphrase": "Name 5 things you can see, 4 things you can hear, 3 things you can touch."
     },
     {
         "id": "phrase3",
-        "text": "It's okay to pause."
+        "text": "Dont try to fight your thoughts, just let them pass.",
+        "subphrase": "Name 2 things you can touch, and 1 thing you can taste."
     }
 ]
 

@@ -11,12 +11,12 @@
     },
     {
         "id": "phrase3",
-        "text": "Tu cuerpo sabe cómo calmarse.",
+        "text": "Estás a salvo.",
         "subphrase": "Exhala"
     },
     {
         "id": "phrase4",
-        "text": "Estás a salvo.",
+        "text": "Este sentimiento pasará.",
         "subphrase": "Sostén la respiración"
     }
 ]

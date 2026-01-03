@@ -59,11 +59,11 @@ export default function MainScreen() {
             </Pressable>
           </Link>
 
-          <Link href="/mode/sadness" asChild>
+          {/* <Link href="/mode/sadness" asChild>
             <Pressable style={styles.modeButton}>
               <Text style={styles.modeButtonText}>{t.sadness}</Text>
             </Pressable>
-          </Link>
+          </Link> */}
 
           <Link href="/mode/anger" asChild>
             <Pressable style={styles.modeButton}>

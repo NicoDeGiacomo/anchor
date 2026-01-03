@@ -1,14 +1,12 @@
 [
     {
         "id": "phrase1",
-        "text": "Los sentimientos fuertes no requieren acción inmediata."
+        "text": "Los sentimientos fuertes no requieren acción inmediata.",
+        "subphrase": "Puedes sostener algo frío contra tu piel."
     },
     {
         "id": "phrase2",
-        "text": "Puedes hacer una pausa."
-    },
-    {
-        "id": "phrase3",
-        "text": "No tienes que actuar sobre esto."
+        "text": "Lo que estás sintiendo es un sentimiento normal.",
+        "subphrase": "Puedes agarrar una almohada para gritar en ella."
     }
 ]

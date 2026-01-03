@@ -11,12 +11,12 @@
     },
     {
         "id": "phrase3",
-        "text": "Seu corpo sabe se acalmar.",
+        "text": "Você está seguro.",
         "subphrase": "Expire"
     },
     {
         "id": "phrase4",
-        "text": "Você está seguro.",
+        "text": "Este sentimento vai passar.",
         "subphrase": "Segure a respiração"
     }
 ]

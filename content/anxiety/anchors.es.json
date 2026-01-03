@@ -1,14 +1,17 @@
 [
     {
         "id": "phrase1",
-        "text": "No necesitas resolver esto ahora mismo."
+        "text": "La ansiedad es un ciclo, subirá y bajará por sí sola.",
+        "subphrase": "Inhala profundamente por 4 segundos, luego exhala por 6 segundos."
     },
     {
         "id": "phrase2",
-        "text": "Esto puede esperar."
+        "text": "Los escenarios que imaginas no reflejan necesariamente la realidad.",
+        "subphrase": "Nombra 5 cosas que puedas ver, 4 que puedas oír, 3 que puedas tocar."
     },
     {
         "id": "phrase3",
-        "text": "Está bien hacer una pausa."
+        "text": "No intentes luchar contra tus pensamientos, solo déjalos pasar.",
+        "subphrase": "Nombra 2 cosas que puedas tocar y 1 cosa que puedas saborear."
     }
 ]

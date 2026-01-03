@@ -11,12 +11,12 @@
     },
     {
         "id": "phrase3",
-        "text": "Your body knows how to calm itself.",
+        "text": "You are safe.",
         "subphrase": "Breathe out"
     },
     {
         "id": "phrase4",
-        "text": "You are safe.",
+        "text": "This feeling will pass.",
         "subphrase": "Hold your breath"
     }
 ]
