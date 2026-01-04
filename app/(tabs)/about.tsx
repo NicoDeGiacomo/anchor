@@ -1,7 +1,7 @@
 import { Linking, ScrollView, StyleSheet } from 'react-native';
 
-import PressableFeedback from '@/components/PressableFeedback';
 import { Logo } from '@/components/Logo';
+import PressableFeedback from '@/components/PressableFeedback';
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -12,7 +12,7 @@ const TRANSLATIONS = {
         intentionTitle: 'Intention',
         intention: 'Anchor is a simple app with gentle reminders for overwhelming moments.\n\nI created it based on my own experience with anxiety and panic attacks, as a small, predictable tool to read when things feel too intense. The goal is not to fix anything — just to help you stay grounded until the moment passes.',
         importantTitle: 'Important note',
-        important: 'This app does not provide medical advice, diagnosis, or treatment.\nIt is not a substitute for professional care.\n\nIf you are in immediate danger or experiencing a crisis, please contact local emergency services or a trusted professional.',
+        important: 'This app does not provide medical, psychological, professional, diagnosis, or treatment.\nIt is not a substitute for professional care.\n\nIf you are in immediate danger or experiencing a crisis, please contact local emergency services or a trusted professional.',
         privacyTitle: 'Privacy',
         privacy: 'Anchor does not collect, store, or share any personal data.\nThere are no accounts, no tracking, no analytics, and no ads.\nEverything runs locally on your device.\n\nYour custom phrases are stored only on this device. No content is sent anywhere. If you uninstall the app, your custom phrases will be lost.',
         openSourceTitle: 'Open source',
@@ -30,7 +30,7 @@ const TRANSLATIONS = {
         intentionTitle: 'Intención',
         intention: 'Anchor es una aplicación simple con recordatorios suaves para momentos abrumadores.\n\nLa creé basándome en mi propia experiencia con la ansiedad y los ataques de pánico, como una pequeña herramienta predecible para leer cuando las cosas se sienten demasiado intensas. El objetivo no es arreglar nada, solo ayudarte a mantenerte conectado hasta que el momento pase.',
         importantTitle: 'Nota importante',
-        important: 'Esta aplicación no proporciona consejos médicos, diagnósticos ni tratamientos.\nNo sustituye la atención profesional.\n\nSi está en peligro inmediato o experimenta una crisis, comuníquese con los servicios de emergencia locales o un profesional de confianza.',
+        important: 'Esta aplicación no proporciona consejos médicos, psicológicos, profesionales, diagnósticos, ni tratamientos.\nNo sustituye la atención profesional.\n\nSi está en peligro inmediato o experimenta una crisis, comuníquese con los servicios de emergencia locales o un profesional de confianza.',
         privacyTitle: 'Privacidad',
         privacy: 'Anchor no recopila, almacena ni comparte datos personales.\nNo hay cuentas, ni seguimiento, ni análisis, ni anuncios.\nTodo se ejecuta localmente en su dispositivo.\n\nSus frases personalizadas se almacenan solo en este dispositivo. Ningún contenido se envía a ninguna parte. Si desinstala la aplicación, se perderán sus frases personalizadas.',
         openSourceTitle: 'Código abierto',
@@ -48,7 +48,7 @@ const TRANSLATIONS = {
         intentionTitle: 'Intenção',
         intention: 'Anchor é um aplicativo simples com lembretes suaves para momentos difíceis.\n\nEu o criei com base na minha própria experiência com ansiedade e ataques de pânico, como uma pequena ferramenta previsível para ler quando as coisas parecem muito intensas. O objetivo não é consertar nada — apenas ajudá-lo a permanecer fundamentado até que o momento passe.',
         importantTitle: 'Nota importante',
-        important: 'Este aplicativo não fornece aconselhamento médico, diagnóstico ou tratamento.\nNão substitui cuidados profissionais.\n\nSe você estiver em perigo imediato ou passando por uma crise, entre em contato com os serviços de emergência locais ou um profissional de confiança.',
+        important: 'Este aplicativo não fornece aconselhamento médico, psicológico, profissional, diagnóstico, ou tratamento.\nNão substitui cuidados profissionais.\n\nSe você estiver em perigo imediato ou passando por uma crise, entre em contato com os serviços de emergência locais ou um profissional de confiança.',
         privacyTitle: 'Privacidade',
         privacy: 'Anchor não coleta, armazena ou compartilha dados pessoais.\nNão há contas, rastreamento, análises ou anúncios.\nTudo funciona localmente no seu dispositivo.\n\nSuas frases personalizadas são armazenadas apenas neste dispositivo. Nenhum conteúdo é enviado para lugar nenhum. Se você desinstalar o aplicativo, suas frases personalizadas serão perdidas.',
         openSourceTitle: 'Código aberto',
@@ -89,6 +89,7 @@ export default function AboutScreen() {
                     <Text style={styles.sectionText}>{t.important}</Text>
                 </View>
 
+
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>{t.privacyTitle}</Text>
                     <Text style={styles.sectionText}>{t.privacy}</Text>
@@ -113,6 +114,12 @@ export default function AboutScreen() {
                         onPress={() => openURL('https://ko-fi.com/nicodegiacomo')}
                     >
                         <Text style={styles.link}>ko-fi.com/nicodegiacomo</Text>
+                    </PressableFeedback>
+                    <PressableFeedback
+                        style={styles.linkWrapper}
+                        onPress={() => openURL('https://cafecito.app/nicodegiacomo')}
+                    >
+                        <Text style={styles.link}>cafecito.app/nicodegiacomo</Text>
                     </PressableFeedback>
                 </View>
 
