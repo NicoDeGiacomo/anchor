@@ -5,7 +5,7 @@ import { useFonts } from 'expo-font';
 import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { TouchableOpacity } from 'react-native';
+import { Platform, TouchableOpacity } from 'react-native';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
@@ -73,11 +73,14 @@ function NavigationTheme() {
           name="mode/[mode]" 
           options={{
             title: '',
-            headerTransparent: true,
+            // Transparent header looks good on iOS, but on Android it can sit
+            // behind the status bar and block touches; keep it opaque there.
+            headerTransparent: Platform.OS === 'ios',
             headerShadowVisible: false,
             headerLeft: () => (
               <TouchableOpacity 
-                onPress={() => router.push('/')} 
+                onPress={() => router.back()} 
+                hitSlop={{ top: 12, right: 12, bottom: 12, left: 12 }}
                 style={{ marginLeft: 16 }}
                 activeOpacity={0.6}
               >

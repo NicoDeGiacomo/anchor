@@ -1,3 +1,4 @@
+import { useHeaderHeight } from '@react-navigation/elements';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Platform, Pressable, StyleSheet } from 'react-native';
@@ -57,6 +58,12 @@ export default function ModeScreen() {
     const [phrases, setPhrases] = useState<Phrase[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const secondaryTextColor = useThemeColor({}, 'textSecondary' as any);
+    const headerHeight = useHeaderHeight();
+    const containerStyle = [
+        styles.container,
+        // Only add extra top padding when the header is transparent (iOS)
+        { paddingTop: Platform.OS === 'ios' ? headerHeight + 32 : 32 },
+    ];
 
     // Validate mode parameter
     const validMode = (mode && ['panic', 'anxiety', 'sadness', 'anger', 'grounding'].includes(mode)) 
@@ -135,7 +142,7 @@ export default function ModeScreen() {
     if (isLoading || phrases.length === 0) {
         const fallback = FALLBACK_TRANSLATIONS[language];
         return (
-            <View style={styles.container}>
+            <View style={containerStyle}>
                 <View style={styles.phraseWrapper}>
                     <Text style={[styles.phraseText, { opacity: 0.5 }]}>
                         {isLoading ? '' : fallback.notAvailable}
@@ -148,7 +155,7 @@ export default function ModeScreen() {
     const currentPhrase = phrases[currentIndex];
 
     return (
-        <View style={styles.container}>
+        <View style={containerStyle}>
             {/* Tap-to-advance wrapper */}
             <Pressable style={styles.phraseWrapper} onPress={nextPhrase}>
                 <Text style={styles.phraseText}>
