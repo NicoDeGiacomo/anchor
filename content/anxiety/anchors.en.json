@@ -2,17 +2,17 @@
     {
         "id": "phrase1",
         "text": "Anxiety will raise and fall on its own.",
-        "subphrase": "Breathe in."
+        "subphrase": "Breathe in"
     },
     {
         "id": "phrase2",
         "text": "The scenarios you imagine do not necessarily reflect reality.",
-        "subphrase": "Hold your breath."
+        "subphrase": "Hold your breath"
     },
     {
         "id": "phrase3",
         "text": "Dont try to fight your thoughts, just let them pass.",
-        "subphrase": "Breathe out."
+        "subphrase": "Breathe out"
     }
 ]
 
