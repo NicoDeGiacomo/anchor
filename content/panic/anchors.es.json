@@ -6,7 +6,7 @@
     },
     {
         "id": "phrase2",
-        "text": "Has pasado por esto antes.",
+        "text": "Lo estás haciendo bien.",
         "subphrase": "Sostén la respiración"
     },
     {
@@ -16,7 +16,7 @@
     },
     {
         "id": "phrase4",
-        "text": "Este sentimiento pasará.",
+        "text": "Esta emoción pasará.",
         "subphrase": "Sostén la respiración"
     }
 ]

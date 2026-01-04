@@ -2,16 +2,16 @@
     {
         "id": "phrase1",
         "text": "La ansiedad es un ciclo, subirá y bajará por sí sola.",
-        "subphrase": "Inhala profundamente por 4 segundos, luego exhala por 6 segundos."
+        "subphrase": "Inhala."
     },
     {
         "id": "phrase2",
         "text": "Los escenarios que imaginas no reflejan necesariamente la realidad.",
-        "subphrase": "Nombra 5 cosas que puedas ver, 4 que puedas oír, 3 que puedas tocar."
+        "subphrase": "Mantén la respiración."
     },
     {
         "id": "phrase3",
         "text": "No intentes luchar contra tus pensamientos, solo déjalos pasar.",
-        "subphrase": "Nombra 2 cosas que puedas tocar y 1 cosa que puedas saborear."
+        "subphrase": "Exhala."
     }
 ]

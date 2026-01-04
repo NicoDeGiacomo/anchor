@@ -6,7 +6,7 @@
     },
     {
         "id": "phrase2",
-        "text": "You have been through this before.",
+        "text": "You are doing fine.",
         "subphrase": "Hold your breath"
     },
     {
@@ -16,7 +16,7 @@
     },
     {
         "id": "phrase4",
-        "text": "This feeling will pass.",
+        "text": "This emotion will pass.",
         "subphrase": "Hold your breath"
     }
 ]
