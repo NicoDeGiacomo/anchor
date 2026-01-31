@@ -4,6 +4,7 @@ import { StyleSheet } from 'react-native';
 import PressableFeedback from '@/components/PressableFeedback';
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useColor } from '@/hooks/useColor';
 
 const TRANSLATIONS = {
   en: {
@@ -41,6 +42,7 @@ const TRANSLATIONS = {
 export default function MainScreen() {
   const { language } = useLanguage();
   const t = TRANSLATIONS[language];
+  const borderColor = useColor('border');
 
   return (
     <View style={styles.container}>
@@ -49,31 +51,31 @@ export default function MainScreen() {
       <View style={styles.buttonContainer}>
         <View style={styles.modeButtons}>
           <Link href="/mode/panic" asChild>
-            <PressableFeedback style={styles.modeButton}>
+            <PressableFeedback style={{...styles.modeButton, borderColor}}>
               <Text style={styles.modeButtonText}>{t.panic}</Text>
             </PressableFeedback>
           </Link>
 
           <Link href="/mode/anxiety" asChild>
-            <PressableFeedback style={styles.modeButton}>
+            <PressableFeedback style={{...styles.modeButton, borderColor}}>
               <Text style={styles.modeButtonText}>{t.anxiety}</Text>
             </PressableFeedback>
           </Link>
 
           {/* <Link href="/mode/sadness" asChild>
-            <PressableFeedback style={styles.modeButton}>
+            <PressableFeedback style={{...styles.modeButton, borderColor}}>
               <Text style={styles.modeButtonText}>{t.sadness}</Text>
             </PressableFeedback>
           </Link> */}
 
           <Link href="/mode/anger" asChild>
-            <PressableFeedback style={styles.modeButton}>
+            <PressableFeedback style={{...styles.modeButton, borderColor}}>
               <Text style={styles.modeButtonText}>{t.anger}</Text>
             </PressableFeedback>
           </Link>
 
           <Link href="/mode/grounding" asChild>
-            <PressableFeedback style={styles.modeButton}>
+            <PressableFeedback style={{...styles.modeButton, borderColor}}>
               <Text style={styles.modeButtonText}>{t.grounding}</Text>
             </PressableFeedback>
           </Link>
@@ -81,13 +83,13 @@ export default function MainScreen() {
 
         <View style={styles.secondaryButtons}>
           <Link href="/settings" asChild>
-            <PressableFeedback style={styles.secondaryButton}>
+            <PressableFeedback style={{...styles.secondaryButton, borderColor}}>
               <Text style={styles.secondaryButtonText}>{t.settingsButton}</Text>
             </PressableFeedback>
           </Link>
 
           <Link href="/about" asChild>
-            <PressableFeedback style={styles.secondaryButton}>
+            <PressableFeedback style={{...styles.secondaryButton, borderColor}}>
               <Text style={styles.secondaryButtonText}>{t.aboutButton}</Text>
             </PressableFeedback>
           </Link>
@@ -122,7 +124,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ccc',
     alignItems: 'center',
   },
   modeButtonText: {
@@ -139,7 +140,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#ccc',
     alignItems: 'center',
     opacity: 0.7,
   },

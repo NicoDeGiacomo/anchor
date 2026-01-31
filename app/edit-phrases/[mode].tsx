@@ -8,8 +8,9 @@ import {
     TextInput,
 } from 'react-native';
 
-import { Text, useThemeColor, View } from '@/components/Themed';
+import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useColors } from '@/hooks/useColor';
 import {
     addUserPhrase,
     getHiddenPhrases,
@@ -158,10 +159,14 @@ export default function EditPhrasesScreen() {
         confirmText: '',
     });
     
-    const backgroundColor = useThemeColor({}, 'background');
-    const textColor = useThemeColor({}, 'text');
-    const secondaryTextColor = useThemeColor({}, 'textSecondary' as any);
-    const borderColor = useThemeColor({}, 'border' as any);
+    const {
+        background: backgroundColor,
+        text: textColor,
+        textSecondary: secondaryTextColor,
+        border: borderColor,
+        danger: dangerColor,
+        overlay: overlayColor,
+    } = useColors('background', 'text', 'textSecondary', 'border', 'danger', 'overlay');
 
     const t = TRANSLATIONS[language];
 
@@ -376,7 +381,7 @@ export default function EditPhrasesScreen() {
                                     style={styles.actionButton}
                                     onPress={() => handleDeletePhrase(phrase.id)}
                                 >
-                                    <Text style={[styles.actionButtonText, styles.deleteText]}>
+                                    <Text style={[styles.actionButtonText, { color: dangerColor }]}>
                                         {t.deleteButton}
                                     </Text>
                                 </Pressable>
@@ -411,7 +416,7 @@ export default function EditPhrasesScreen() {
                 animationType="fade"
                 onRequestClose={() => setShowAddModal(false)}
             >
-                <View style={styles.modalOverlay}>
+                <View style={[styles.modalOverlay, { backgroundColor: overlayColor }]}>
                     <View style={[styles.modalContent, { backgroundColor }]}>
                         <Text style={styles.modalTitle}>{t.modalTitle}</Text>
 
@@ -481,7 +486,7 @@ export default function EditPhrasesScreen() {
                 animationType="fade"
                 onRequestClose={() => setConfirmDialog(prev => ({ ...prev, visible: false }))}
             >
-                <View style={styles.modalOverlay}>
+                <View style={[styles.modalOverlay, { backgroundColor: overlayColor }]}>
                     <View style={[styles.modalContent, { backgroundColor }]}>
                         <Text style={styles.modalTitle}>{confirmDialog.title}</Text>
                         {confirmDialog.message ? (
@@ -505,14 +510,15 @@ export default function EditPhrasesScreen() {
                                 style={[
                                     styles.modalButton,
                                     confirmDialog.isDanger ? styles.modalButtonDanger : styles.modalButtonPrimary,
-                                    { borderColor: confirmDialog.isDanger ? '#d32f2f' : borderColor },
+                                    { borderColor: confirmDialog.isDanger ? dangerColor : borderColor },
                                     !confirmDialog.message && { flex: 1 },
                                 ]}
                                 onPress={confirmDialog.onConfirm}
                             >
                                 <Text style={[
                                     styles.modalButtonText,
-                                    confirmDialog.isDanger ? styles.modalButtonTextDanger : styles.modalButtonTextPrimary,
+                                    confirmDialog.isDanger && { color: dangerColor },
+                                    !confirmDialog.isDanger && styles.modalButtonTextPrimary,
                                 ]}>
                                     {confirmDialog.confirmText}
                                 </Text>
@@ -597,12 +603,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '400',
     },
-    deleteText: {
-        color: '#d32f2f',
-    },
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -650,10 +652,6 @@ const styles = StyleSheet.create({
     },
     modalButtonDanger: {
         borderWidth: 2,
-    },
-    modalButtonTextDanger: {
-        fontWeight: '400',
-        color: '#d32f2f',
     },
     confirmMessage: {
         fontSize: 16,

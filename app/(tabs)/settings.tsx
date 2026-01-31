@@ -5,6 +5,7 @@ import PressableFeedback from '@/components/PressableFeedback';
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useColors } from '@/hooks/useColor';
 
 const LANGUAGES = [
     { code: 'en' as const, name: 'English' },
@@ -70,6 +71,7 @@ export default function SettingsScreen() {
     const { language, setLanguage } = useLanguage();
     const { themeMode, setThemeMode } = useTheme();
     const t = TRANSLATIONS[language];
+    const { border: borderColor, borderSelected: borderSelectedColor } = useColors('border', 'borderSelected');
 
     const getThemeName = (themeKey: string) => {
         switch (themeKey) {
@@ -90,49 +92,57 @@ export default function SettingsScreen() {
                 <Text style={styles.sectionTitle}>{t.themeSection}</Text>
 
                 <View style={styles.optionList}>
-                    {THEMES.map((theme) => (
-                        <PressableFeedback
-                            key={theme.mode}
-                            style={[
-                                styles.optionItem,
-                                themeMode === theme.mode && styles.optionItemSelected,
-                            ]}
-                            onPress={() => setThemeMode(theme.mode)}
-                        >
-                            <Text
-                                style={[
-                                    styles.optionText,
-                                    themeMode === theme.mode && styles.optionTextSelected,
-                                ]}
+                    {THEMES.map((theme) => {
+                        const isSelected = themeMode === theme.mode;
+                        return (
+                            <PressableFeedback
+                                key={theme.mode}
+                                style={{
+                                    ...styles.optionItem,
+                                    borderColor: isSelected ? borderSelectedColor : borderColor,
+                                    ...(isSelected && styles.optionItemSelected),
+                                }}
+                                onPress={() => setThemeMode(theme.mode)}
                             >
-                                {getThemeName(theme.nameKey)}
-                            </Text>
-                        </PressableFeedback>
-                    ))}
+                                <Text
+                                    style={[
+                                        styles.optionText,
+                                        isSelected && styles.optionTextSelected,
+                                    ]}
+                                >
+                                    {getThemeName(theme.nameKey)}
+                                </Text>
+                            </PressableFeedback>
+                        );
+                    })}
                 </View>
 
                 <Text style={[styles.sectionTitle, styles.sectionSpacing]}>{t.languageSection}</Text>
 
                 <View style={styles.optionList}>
-                    {LANGUAGES.map((lang) => (
-                        <PressableFeedback
-                            key={lang.code}
-                            style={[
-                                styles.optionItem,
-                                language === lang.code && styles.optionItemSelected,
-                            ]}
-                            onPress={() => setLanguage(lang.code)}
-                        >
-                            <Text
-                                style={[
-                                    styles.optionText,
-                                    language === lang.code && styles.optionTextSelected,
-                                ]}
+                    {LANGUAGES.map((lang) => {
+                        const isSelected = language === lang.code;
+                        return (
+                            <PressableFeedback
+                                key={lang.code}
+                                style={{
+                                    ...styles.optionItem,
+                                    borderColor: isSelected ? borderSelectedColor : borderColor,
+                                    ...(isSelected && styles.optionItemSelected),
+                                }}
+                                onPress={() => setLanguage(lang.code)}
                             >
-                                {lang.name}
-                            </Text>
-                        </PressableFeedback>
-                    ))}
+                                <Text
+                                    style={[
+                                        styles.optionText,
+                                        isSelected && styles.optionTextSelected,
+                                    ]}
+                                >
+                                    {lang.name}
+                                </Text>
+                            </PressableFeedback>
+                        );
+                    })}
                 </View>
 
                 <Text style={[styles.sectionTitle, styles.sectionSpacing]}>{t.phrasesSection}</Text>
@@ -140,27 +150,27 @@ export default function SettingsScreen() {
 
                 <View style={styles.optionList}>
                     <Link href="/edit-phrases/panic" asChild>
-                        <PressableFeedback style={styles.optionItem}>
+                        <PressableFeedback style={{...styles.optionItem, borderColor}}>
                             <Text style={styles.optionText}>{t.panic}</Text>
                         </PressableFeedback>
                     </Link>
                     <Link href="/edit-phrases/anxiety" asChild>
-                        <PressableFeedback style={styles.optionItem}>
+                        <PressableFeedback style={{...styles.optionItem, borderColor}}>
                             <Text style={styles.optionText}>{t.anxiety}</Text>
                         </PressableFeedback>
                     </Link>
                     <Link href="/edit-phrases/sadness" asChild>
-                        <PressableFeedback style={styles.optionItem}>
+                        <PressableFeedback style={{...styles.optionItem, borderColor}}>
                             <Text style={styles.optionText}>{t.sadness}</Text>
                         </PressableFeedback>
                     </Link>
                     <Link href="/edit-phrases/anger" asChild>
-                        <PressableFeedback style={styles.optionItem}>
+                        <PressableFeedback style={{...styles.optionItem, borderColor}}>
                             <Text style={styles.optionText}>{t.anger}</Text>
                         </PressableFeedback>
                     </Link>
                     <Link href="/edit-phrases/grounding" asChild>
-                        <PressableFeedback style={styles.optionItem}>
+                        <PressableFeedback style={{...styles.optionItem, borderColor}}>
                             <Text style={styles.optionText}>{t.grounding}</Text>
                         </PressableFeedback>
                     </Link>
@@ -200,10 +210,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: '#ccc',
     },
     optionItemSelected: {
-        borderColor: '#666',
         borderWidth: 2,
     },
     optionText: {

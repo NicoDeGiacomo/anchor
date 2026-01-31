@@ -3,8 +3,9 @@ import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Platform, Pressable, StyleSheet } from 'react-native';
 
-import { Text, View, useThemeColor } from '@/components/Themed';
+import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useColor } from '@/hooks/useColor';
 import { getActivePhrases, Mode, Language, Phrase } from '@/utils/phraseStorage';
 
 // Dynamic imports for all mode/language combinations
@@ -57,7 +58,7 @@ export default function ModeScreen() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [phrases, setPhrases] = useState<Phrase[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const secondaryTextColor = useThemeColor({}, 'textSecondary' as any);
+    const secondaryTextColor = useColor('textSecondary');
     const headerHeight = useHeaderHeight();
     const containerStyle = [
         styles.container,
