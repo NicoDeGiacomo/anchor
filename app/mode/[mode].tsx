@@ -1,7 +1,8 @@
-import { useHeaderHeight } from '@react-navigation/elements';
-import { useLocalSearchParams } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Platform, Pressable, StyleSheet } from 'react-native';
+import { Platform, Pressable, StyleSheet, TouchableOpacity } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -55,16 +56,12 @@ const FALLBACK_TRANSLATIONS = {
 export default function ModeScreen() {
     const { mode } = useLocalSearchParams<{ mode: string }>();
     const { language } = useLanguage();
+    const insets = useSafeAreaInsets();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [phrases, setPhrases] = useState<Phrase[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const secondaryTextColor = useColor('textSecondary');
-    const headerHeight = useHeaderHeight();
-    const containerStyle = [
-        styles.container,
-        // Only add extra top padding when the header is transparent (iOS)
-        { paddingTop: Platform.OS === 'ios' ? headerHeight + 32 : 32 },
-    ];
+    const iconColor = useColor('icon');
 
     // Validate mode parameter
     const validMode = (mode && ['panic', 'anxiety', 'sadness', 'anger', 'grounding'].includes(mode)) 
@@ -143,7 +140,15 @@ export default function ModeScreen() {
     if (isLoading || phrases.length === 0) {
         const fallback = FALLBACK_TRANSLATIONS[language];
         return (
-            <View style={containerStyle}>
+            <View style={styles.container}>
+                <TouchableOpacity
+                    onPress={() => router.back()}
+                    hitSlop={{ top: 12, right: 12, bottom: 12, left: 12 }}
+                    style={[styles.backButton, { top: insets.top + 16 }]}
+                    activeOpacity={0.6}
+                >
+                    <Ionicons name="chevron-back" size={24} color={iconColor} />
+                </TouchableOpacity>
                 <View style={styles.phraseWrapper}>
                     <Text style={[styles.phraseText, { opacity: 0.5 }]}>
                         {isLoading ? '' : fallback.notAvailable}
@@ -156,7 +161,15 @@ export default function ModeScreen() {
     const currentPhrase = phrases[currentIndex];
 
     return (
-        <View style={containerStyle}>
+        <View style={styles.container}>
+            <TouchableOpacity
+                onPress={() => router.back()}
+                hitSlop={{ top: 12, right: 12, bottom: 12, left: 12 }}
+                style={[styles.backButton, { top: insets.top + 16 }]}
+                activeOpacity={0.6}
+            >
+                <Ionicons name="chevron-back" size={24} color={iconColor} />
+            </TouchableOpacity>
             {/* Tap-to-advance wrapper */}
             <Pressable style={styles.phraseWrapper} onPress={nextPhrase}>
                 <Text style={styles.phraseText}>
@@ -178,6 +191,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 32,
+    },
+    backButton: {
+        position: 'absolute',
+        left: 16,
+        zIndex: 1,
     },
     phraseWrapper: {
         flex: 1,
