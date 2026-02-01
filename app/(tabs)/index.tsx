@@ -1,11 +1,14 @@
+import { useFocusEffect } from '@react-navigation/native';
 import { Link } from 'expo-router';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 
 import PressableFeedback from '@/components/PressableFeedback';
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useColor } from '@/hooks/useColor';
+import { useModes } from '@/hooks/useModes';
+import { Mode } from '@/utils/phraseStorage';
 
 const TRANSLATIONS = {
   en: {
@@ -44,6 +47,14 @@ export default function MainScreen() {
   const { language } = useLanguage();
   const t = TRANSLATIONS[language];
   const borderColor = useColor('border');
+  const { modes, refetch } = useModes();
+
+  // Refetch modes when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
 
   const modeButtonStyle = useMemo(() => ({
     ...styles.modeButton,
@@ -55,41 +66,24 @@ export default function MainScreen() {
     borderColor,
   }), [borderColor]);
 
+  // Helper to get translated mode name
+  const getModeLabel = (mode: Mode): string => {
+    return t[mode];
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{t.title}</Text>
 
       <View style={styles.buttonContainer}>
         <View style={styles.modeButtons}>
-          <Link href="/mode/panic" asChild>
-            <PressableFeedback style={modeButtonStyle}>
-              <Text style={styles.modeButtonText}>{t.panic}</Text>
-            </PressableFeedback>
-          </Link>
-
-          <Link href="/mode/anxiety" asChild>
-            <PressableFeedback style={modeButtonStyle}>
-              <Text style={styles.modeButtonText}>{t.anxiety}</Text>
-            </PressableFeedback>
-          </Link>
-
-          {/* <Link href="/mode/sadness" asChild>
-            <PressableFeedback style={modeButtonStyle}>
-              <Text style={styles.modeButtonText}>{t.sadness}</Text>
-            </PressableFeedback>
-          </Link> */}
-
-          <Link href="/mode/anger" asChild>
-            <PressableFeedback style={modeButtonStyle}>
-              <Text style={styles.modeButtonText}>{t.anger}</Text>
-            </PressableFeedback>
-          </Link>
-
-          <Link href="/mode/grounding" asChild>
-            <PressableFeedback style={modeButtonStyle}>
-              <Text style={styles.modeButtonText}>{t.grounding}</Text>
-            </PressableFeedback>
-          </Link>
+          {modes.map((mode) => (
+            <Link href={`/mode/${mode}`} asChild key={mode}>
+              <PressableFeedback style={modeButtonStyle}>
+                <Text style={styles.modeButtonText}>{getModeLabel(mode)}</Text>
+              </PressableFeedback>
+            </Link>
+          ))}
         </View>
 
         <View style={styles.secondaryButtons}>

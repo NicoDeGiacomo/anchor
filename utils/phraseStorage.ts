@@ -173,3 +173,110 @@ export const getActivePhrases = async (
     return [...visibleBuiltInPhrases, ...userPhrases];
 };
 
+// ============================================
+// Mode Visibility Storage
+// ============================================
+
+/**
+ * All available modes
+ */
+export const ALL_MODES: Mode[] = ['panic', 'anxiety', 'sadness', 'anger', 'grounding'];
+
+/**
+ * Storage key for hidden modes (not language-specific)
+ */
+const HIDDEN_MODES_KEY = 'hidden_modes';
+
+/**
+ * Default hidden modes for new users
+ */
+const DEFAULT_HIDDEN_MODES: Mode[] = ['sadness'];
+
+/**
+ * Get hidden mode IDs
+ */
+export const getHiddenModes = async (): Promise<Mode[]> => {
+    try {
+        const data = await AsyncStorage.getItem(HIDDEN_MODES_KEY);
+        return data ? JSON.parse(data) : DEFAULT_HIDDEN_MODES;
+    } catch (error) {
+        console.warn('Failed to load hidden modes:', error);
+        return DEFAULT_HIDDEN_MODES;
+    }
+};
+
+/**
+ * Save hidden mode IDs
+ */
+export const saveHiddenModes = async (hiddenModes: Mode[]): Promise<void> => {
+    try {
+        await AsyncStorage.setItem(HIDDEN_MODES_KEY, JSON.stringify(hiddenModes));
+    } catch (error) {
+        console.warn('Failed to save hidden modes:', error);
+        throw error;
+    }
+};
+
+/**
+ * Hide a mode
+ */
+export const hideMode = async (mode: Mode): Promise<void> => {
+    const hiddenModes = await getHiddenModes();
+    if (!hiddenModes.includes(mode)) {
+        await saveHiddenModes([...hiddenModes, mode]);
+    }
+};
+
+/**
+ * Unhide a mode
+ */
+export const unhideMode = async (mode: Mode): Promise<void> => {
+    const hiddenModes = await getHiddenModes();
+    const updatedModes = hiddenModes.filter(m => m !== mode);
+    await saveHiddenModes(updatedModes);
+};
+
+/**
+ * Get all visible modes (excluding hidden)
+ */
+export const getVisibleModes = async (): Promise<Mode[]> => {
+    const hiddenModes = await getHiddenModes();
+    return ALL_MODES.filter(mode => !hiddenModes.includes(mode));
+};
+
+// ============================================
+// Reset to Defaults
+// ============================================
+
+const ALL_LANGUAGES: Language[] = ['en', 'es', 'pt'];
+
+/**
+ * Reset all phrase and mode customizations to defaults
+ * - Removes all user-added phrases
+ * - Unhides all hidden phrases
+ * - Resets hidden modes to default (sadness hidden)
+ */
+export const resetAllToDefaults = async (): Promise<void> => {
+    try {
+        const keysToRemove: string[] = [];
+
+        // Collect all user phrases and hidden phrases keys for all mode/language combinations
+        for (const mode of ALL_MODES) {
+            for (const language of ALL_LANGUAGES) {
+                keysToRemove.push(getUserPhrasesKey(mode, language));
+                keysToRemove.push(getHiddenPhrasesKey(mode, language));
+            }
+        }
+
+        // Remove all phrase-related keys
+        await AsyncStorage.multiRemove(keysToRemove);
+
+        // Reset hidden modes to default by removing the key
+        // (getHiddenModes will return DEFAULT_HIDDEN_MODES when no data exists)
+        await AsyncStorage.removeItem(HIDDEN_MODES_KEY);
+    } catch (error) {
+        console.warn('Failed to reset to defaults:', error);
+        throw error;
+    }
+};
+

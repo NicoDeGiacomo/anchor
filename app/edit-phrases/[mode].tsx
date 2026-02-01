@@ -141,8 +141,6 @@ const TRANSLATIONS = {
         subphrasePlaceholder: 'Subphrase (optional)',
         deleteConfirmTitle: 'Delete phrase',
         deleteConfirmMessage: 'Are you sure you want to delete this phrase?',
-        hideConfirmTitle: 'Hide phrase',
-        hideConfirmMessage: 'This phrase will not appear in your sessions.',
         emptyMainPhraseError: 'Please enter a main phrase',
         modalTitle: 'Add new phrase',
         panic: 'Panic',
@@ -167,8 +165,6 @@ const TRANSLATIONS = {
         subphrasePlaceholder: 'Subfrase (opcional)',
         deleteConfirmTitle: 'Eliminar frase',
         deleteConfirmMessage: '¿Está seguro de que desea eliminar esta frase?',
-        hideConfirmTitle: 'Ocultar frase',
-        hideConfirmMessage: 'Esta frase no aparecerá en tus sesiones.',
         emptyMainPhraseError: 'Por favor, ingrese una frase principal',
         modalTitle: 'Agregar nueva frase',
         panic: 'Pánico',
@@ -193,8 +189,6 @@ const TRANSLATIONS = {
         subphrasePlaceholder: 'Subfrase (opcional)',
         deleteConfirmTitle: 'Excluir frase',
         deleteConfirmMessage: 'Tem certeza de que deseja excluir esta frase?',
-        hideConfirmTitle: 'Ocultar frase',
-        hideConfirmMessage: 'Esta frase não aparecerá em suas sessões.',
         emptyMainPhraseError: 'Por favor, insira uma frase principal',
         modalTitle: 'Adicionar nova frase',
         panic: 'Pânico',
@@ -309,23 +303,14 @@ export default function EditPhrasesScreen() {
     }, [t.deleteConfirmTitle, t.deleteConfirmMessage, t.deleteButton, validMode, language, refetch]);
 
     // Hide built-in phrase
-    const handleHidePhrase = useCallback((phraseId: string) => {
-        setConfirmDialog({
-            visible: true,
-            title: t.hideConfirmTitle,
-            message: t.hideConfirmMessage,
-            confirmText: t.hideButton,
-            onConfirm: async () => {
-                try {
-                    await hideBuiltInPhrase(validMode, language, phraseId);
-                    await refetch();
-                } catch (error) {
-                    console.warn('Failed to hide phrase:', error);
-                }
-                setConfirmDialog(prev => ({ ...prev, visible: false }));
-            },
-        });
-    }, [t.hideConfirmTitle, t.hideConfirmMessage, t.hideButton, validMode, language, refetch]);
+    const handleHidePhrase = useCallback(async (phraseId: string) => {
+        try {
+            await hideBuiltInPhrase(validMode, language, phraseId);
+            await refetch();
+        } catch (error) {
+            console.warn('Failed to hide phrase:', error);
+        }
+    }, [validMode, language, refetch]);
 
     // Unhide built-in phrase
     const handleUnhidePhrase = useCallback(async (phraseId: string) => {
