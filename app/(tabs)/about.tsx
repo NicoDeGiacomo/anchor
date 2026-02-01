@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { Linking, ScrollView, StyleSheet } from 'react-native';
 
 import { Logo } from '@/components/Logo';
@@ -66,9 +67,21 @@ export default function AboutScreen() {
     const { language } = useLanguage();
     const t = TRANSLATIONS[language];
 
-    const openURL = (url: string) => {
-        Linking.openURL(url);
-    };
+    const openGitHub = useCallback(() => {
+        Linking.openURL('https://github.com/NicoDeGiacomo/anchor');
+    }, []);
+
+    const openKofi = useCallback(() => {
+        Linking.openURL('https://ko-fi.com/nicodegiacomo');
+    }, []);
+
+    const openCafecito = useCallback(() => {
+        Linking.openURL('https://cafecito.app/nicodegiacomo');
+    }, []);
+
+    const openLinkedIn = useCallback(() => {
+        Linking.openURL('https://www.linkedin.com/in/nicolasdegiacomo/');
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -100,7 +113,7 @@ export default function AboutScreen() {
                     <Text style={styles.sectionText}>{t.openSource}</Text>
                     <PressableFeedback
                         style={styles.linkWrapper}
-                        onPress={() => openURL('https://github.com/NicoDeGiacomo/anchor')}
+                        onPress={openGitHub}
                     >
                         <Text style={styles.link}>github.com/NicoDeGiacomo/anchor</Text>
                     </PressableFeedback>
@@ -111,13 +124,13 @@ export default function AboutScreen() {
                     <Text style={styles.sectionText}>{t.support}</Text>
                     <PressableFeedback
                         style={styles.linkWrapper}
-                        onPress={() => openURL('https://ko-fi.com/nicodegiacomo')}
+                        onPress={openKofi}
                     >
                         <Text style={styles.link}>ko-fi.com/nicodegiacomo</Text>
                     </PressableFeedback>
                     <PressableFeedback
                         style={styles.linkWrapper}
-                        onPress={() => openURL('https://cafecito.app/nicodegiacomo')}
+                        onPress={openCafecito}
                     >
                         <Text style={styles.link}>cafecito.app/nicodegiacomo</Text>
                     </PressableFeedback>
@@ -127,7 +140,7 @@ export default function AboutScreen() {
                     <Text style={styles.sectionTitle}>{t.authorTitle}</Text>
                     <PressableFeedback
                         style={styles.linkWrapper}
-                        onPress={() => openURL('https://www.linkedin.com/in/nicolasdegiacomo/')}
+                        onPress={openLinkedIn}
                     >
                         <Text style={styles.link}>linkedin.com/in/nicolasdegiacomo</Text>
                     </PressableFeedback>

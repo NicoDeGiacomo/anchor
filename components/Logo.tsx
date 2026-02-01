@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Svg, { G, Path } from 'react-native-svg';
 import { useThemeColor } from './Themed';
 
@@ -6,7 +6,7 @@ interface LogoProps {
   size?: number;
 }
 
-export function Logo({ size = 60 }: LogoProps) {
+export const Logo = memo(function Logo({ size = 60 }: LogoProps) {
   const color = useThemeColor({}, 'text');
 
   return (
@@ -23,5 +23,5 @@ export function Logo({ size = 60 }: LogoProps) {
       </G>
     </Svg>
   );
-}
+});
 

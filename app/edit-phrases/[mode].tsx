@@ -1,9 +1,10 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import React, { memo, useCallback, useMemo, useState } from 'react';
 import {
+    FlatList,
+    ListRenderItem,
     Modal,
     Pressable,
-    ScrollView,
     StyleSheet,
     TextInput,
 } from 'react-native';
@@ -11,12 +12,10 @@ import {
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useColors } from '@/hooks/useColor';
+import { usePhrasesWithSource } from '@/hooks/usePhrases';
 import {
     addUserPhrase,
-    getHiddenPhrases,
-    getUserPhrases,
     hideBuiltInPhrase,
-    Language,
     Mode,
     Phrase,
     removeUserPhrase,
@@ -28,34 +27,103 @@ type PhraseWithSource = Phrase & {
     isHidden?: boolean;
 };
 
-// Dynamic imports for built-in phrases
-const PHRASES_MAP: Record<Mode, Record<Language, Phrase[]>> = {
-    panic: {
-        en: require('@/content/panic/anchors.en.json'),
-        es: require('@/content/panic/anchors.es.json'),
-        pt: require('@/content/panic/anchors.pt.json'),
-    },
-    anxiety: {
-        en: require('@/content/anxiety/anchors.en.json'),
-        es: require('@/content/anxiety/anchors.es.json'),
-        pt: require('@/content/anxiety/anchors.pt.json'),
-    },
-    sadness: {
-        en: require('@/content/sadness/anchors.en.json'),
-        es: require('@/content/sadness/anchors.es.json'),
-        pt: require('@/content/sadness/anchors.pt.json'),
-    },
-    anger: {
-        en: require('@/content/anger/anchors.en.json'),
-        es: require('@/content/anger/anchors.es.json'),
-        pt: require('@/content/anger/anchors.pt.json'),
-    },
-    grounding: {
-        en: require('@/content/grounding/anchors.en.json'),
-        es: require('@/content/grounding/anchors.es.json'),
-        pt: require('@/content/grounding/anchors.pt.json'),
-    },
+type PhraseItemProps = {
+    phrase: PhraseWithSource;
+    borderColor: string;
+    secondaryTextColor: string;
+    dangerColor: string;
+    t: typeof TRANSLATIONS['en'];
+    onDelete: (id: string) => void;
+    onHide: (id: string) => void;
+    onUnhide: (id: string) => void;
 };
+
+const PhraseItem = memo(function PhraseItem({
+    phrase,
+    borderColor,
+    secondaryTextColor,
+    dangerColor,
+    t,
+    onDelete,
+    onHide,
+    onUnhide,
+}: PhraseItemProps) {
+    return (
+        <View
+            style={[
+                styles.phraseItem,
+                { borderColor },
+                phrase.isHidden && styles.phraseItemHidden,
+            ]}
+        >
+            <View style={styles.phraseContent}>
+                <Text
+                    style={[
+                        styles.phraseText,
+                        phrase.isHidden && styles.phraseTextHidden,
+                    ]}
+                >
+                    {phrase.text}
+                </Text>
+                {phrase.subphrase && (
+                    <Text
+                        style={[
+                            styles.subphraseText,
+                            { color: secondaryTextColor },
+                            phrase.isHidden && styles.phraseTextHidden,
+                        ]}
+                    >
+                        {phrase.subphrase}
+                    </Text>
+                )}
+                <Text
+                    style={[
+                        styles.phraseSource,
+                        { color: secondaryTextColor },
+                    ]}
+                >
+                    {phrase.isUserAdded
+                        ? t.userAdded
+                        : phrase.isHidden
+                        ? `${t.builtIn} - ${t.hidden}`
+                        : t.builtIn}
+                </Text>
+            </View>
+
+            {/* Action buttons */}
+            <View style={styles.phraseActions}>
+                {phrase.isUserAdded ? (
+                    <Pressable
+                        style={styles.actionButton}
+                        onPress={() => onDelete(phrase.id)}
+                    >
+                        <Text style={[styles.actionButtonText, { color: dangerColor }]}>
+                            {t.deleteButton}
+                        </Text>
+                    </Pressable>
+                ) : phrase.isHidden ? (
+                    <Pressable
+                        style={styles.actionButton}
+                        onPress={() => onUnhide(phrase.id)}
+                    >
+                        <Text style={styles.actionButtonText}>
+                            {t.unhideButton}
+                        </Text>
+                    </Pressable>
+                ) : (
+                    <Pressable
+                        style={styles.actionButton}
+                        onPress={() => onHide(phrase.id)}
+                    >
+                        <Text style={styles.actionButtonText}>
+                            {t.hideButton}
+                        </Text>
+                    </Pressable>
+                )}
+            </View>
+        </View>
+    );
+});
 
 const TRANSLATIONS = {
     en: {
@@ -82,6 +150,7 @@ const TRANSLATIONS = {
         sadness: 'Sadness',
         anger: 'Anger',
         grounding: 'Grounding',
+        loadError: 'Failed to load phrases. Please try again.',
     },
     es: {
         title: 'Editar frases',
@@ -107,6 +176,7 @@ const TRANSLATIONS = {
         sadness: 'Tristeza',
         anger: 'Ira',
         grounding: 'Conexión',
+        loadError: 'Error al cargar las frases. Por favor, inténtelo de nuevo.',
     },
     pt: {
         title: 'Editar frases',
@@ -132,6 +202,7 @@ const TRANSLATIONS = {
         sadness: 'Tristeza',
         anger: 'Raiva',
         grounding: 'Aterramento',
+        loadError: 'Falha ao carregar as frases. Por favor, tente novamente.',
     },
 };
 
@@ -139,8 +210,15 @@ export default function EditPhrasesScreen() {
     const { mode } = useLocalSearchParams<{ mode: string }>();
     const { language } = useLanguage();
     const router = useRouter();
-    const [phrases, setPhrases] = useState<PhraseWithSource[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    
+    // Validate mode parameter
+    const validMode = (mode && ['panic', 'anxiety', 'sadness', 'anger', 'grounding'].includes(mode))
+        ? mode as Mode
+        : 'panic';
+
+    // Use the phrases hook for loading data
+    const { phrases, isLoading, error, refetch } = usePhrasesWithSource(validMode);
+    
     const [showAddModal, setShowAddModal] = useState(false);
     const [newPhraseText, setNewPhraseText] = useState('');
     const [newSubphrase, setNewSubphrase] = useState('');
@@ -170,12 +248,7 @@ export default function EditPhrasesScreen() {
 
     const t = TRANSLATIONS[language];
 
-    // Validate mode parameter
-    const validMode = (mode && ['panic', 'anxiety', 'sadness', 'anger', 'grounding'].includes(mode))
-        ? mode as Mode
-        : 'panic';
-
-    const getModeTitle = () => {
+    const modeTitle = useMemo(() => {
         switch (validMode) {
             case 'panic': return t.panic;
             case 'anxiety': return t.anxiety;
@@ -183,60 +256,10 @@ export default function EditPhrasesScreen() {
             case 'anger': return t.anger;
             case 'grounding': return t.grounding;
         }
-    };
-
-    // Load phrases
-    const loadPhrases = async () => {
-        setIsLoading(true);
-        try {
-            // Get built-in phrases
-            let builtInPhrases: Phrase[] = [];
-            try {
-                builtInPhrases = PHRASES_MAP[validMode]?.[language] || [];
-                
-                // Fallback to English if current language has no content
-                if (builtInPhrases.length === 0 && language !== 'en') {
-                    builtInPhrases = PHRASES_MAP[validMode]?.en || [];
-                }
-            } catch (error) {
-                console.warn('Failed to load built-in phrases:', error);
-            }
-
-            // Get user phrases and hidden IDs
-            const [userPhrases, hiddenIds] = await Promise.all([
-                getUserPhrases(validMode, language),
-                getHiddenPhrases(validMode, language),
-            ]);
-
-            // Mark built-in phrases
-            const builtInWithSource: PhraseWithSource[] = builtInPhrases.map(phrase => ({
-                ...phrase,
-                isUserAdded: false,
-                isHidden: hiddenIds.includes(phrase.id),
-            }));
-
-            // Mark user phrases
-            const userWithSource: PhraseWithSource[] = userPhrases.map(phrase => ({
-                ...phrase,
-                isUserAdded: true,
-            }));
-
-            // Combine all phrases (visible and hidden)
-            setPhrases([...builtInWithSource, ...userWithSource]);
-        } catch (error) {
-            console.warn('Failed to load phrases:', error);
-            setPhrases([]);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        loadPhrases();
-    }, [validMode, language]);
+    }, [validMode, t]);
 
     // Add new phrase
-    const handleAddPhrase = async () => {
+    const handleAddPhrase = useCallback(async () => {
         if (!newPhraseText.trim()) {
             setConfirmDialog({
                 visible: true,
@@ -259,14 +282,14 @@ export default function EditPhrasesScreen() {
             setNewPhraseText('');
             setNewSubphrase('');
             setShowAddModal(false);
-            await loadPhrases();
+            await refetch();
         } catch (error) {
             console.warn('Failed to add phrase:', error);
         }
-    };
+    }, [newPhraseText, newSubphrase, validMode, language, refetch, t.emptyMainPhraseError]);
 
     // Delete user phrase
-    const handleDeletePhrase = (phraseId: string) => {
+    const handleDeletePhrase = useCallback((phraseId: string) => {
         setConfirmDialog({
             visible: true,
             title: t.deleteConfirmTitle,
@@ -276,17 +299,17 @@ export default function EditPhrasesScreen() {
             onConfirm: async () => {
                 try {
                     await removeUserPhrase(validMode, language, phraseId);
-                    await loadPhrases();
+                    await refetch();
                 } catch (error) {
                     console.warn('Failed to delete phrase:', error);
                 }
                 setConfirmDialog(prev => ({ ...prev, visible: false }));
             },
         });
-    };
+    }, [t.deleteConfirmTitle, t.deleteConfirmMessage, t.deleteButton, validMode, language, refetch]);
 
     // Hide built-in phrase
-    const handleHidePhrase = (phraseId: string) => {
+    const handleHidePhrase = useCallback((phraseId: string) => {
         setConfirmDialog({
             visible: true,
             title: t.hideConfirmTitle,
@@ -295,31 +318,47 @@ export default function EditPhrasesScreen() {
             onConfirm: async () => {
                 try {
                     await hideBuiltInPhrase(validMode, language, phraseId);
-                    await loadPhrases();
+                    await refetch();
                 } catch (error) {
                     console.warn('Failed to hide phrase:', error);
                 }
                 setConfirmDialog(prev => ({ ...prev, visible: false }));
             },
         });
-    };
+    }, [t.hideConfirmTitle, t.hideConfirmMessage, t.hideButton, validMode, language, refetch]);
 
     // Unhide built-in phrase
-    const handleUnhidePhrase = async (phraseId: string) => {
+    const handleUnhidePhrase = useCallback(async (phraseId: string) => {
         try {
             await unhideBuiltInPhrase(validMode, language, phraseId);
-            await loadPhrases();
+            await refetch();
         } catch (error) {
             console.warn('Failed to unhide phrase:', error);
         }
-    };
+    }, [validMode, language, refetch]);
+
+    // FlatList renderItem
+    const renderPhraseItem: ListRenderItem<PhraseWithSource> = useCallback(({ item }) => (
+        <PhraseItem
+            phrase={item}
+            borderColor={borderColor}
+            secondaryTextColor={secondaryTextColor}
+            dangerColor={dangerColor}
+            t={t}
+            onDelete={handleDeletePhrase}
+            onHide={handleHidePhrase}
+            onUnhide={handleUnhidePhrase}
+        />
+    ), [borderColor, secondaryTextColor, dangerColor, t, handleDeletePhrase, handleHidePhrase, handleUnhidePhrase]);
+
+    const keyExtractor = useCallback((item: PhraseWithSource) => item.id, []);
 
     return (
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>
-                    {getModeTitle()} - {t.title}
+                    {modeTitle} - {t.title}
                 </Text>
                 <Pressable
                     style={[styles.addButton, { borderColor }]}
@@ -329,85 +368,26 @@ export default function EditPhrasesScreen() {
                 </Pressable>
             </View>
 
-            {/* Phrase list */}
-            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-                {phrases.map((phrase) => (
-                    <View
-                        key={phrase.id}
-                        style={[
-                            styles.phraseItem,
-                            { borderColor },
-                            phrase.isHidden && styles.phraseItemHidden,
-                        ]}
-                    >
-                        <View style={styles.phraseContent}>
-                            <Text
-                                style={[
-                                    styles.phraseText,
-                                    phrase.isHidden && styles.phraseTextHidden,
-                                ]}
-                            >
-                                {phrase.text}
-                            </Text>
-                            {phrase.subphrase && (
-                                <Text
-                                    style={[
-                                        styles.subphraseText,
-                                        { color: secondaryTextColor },
-                                        phrase.isHidden && styles.phraseTextHidden,
-                                    ]}
-                                >
-                                    {phrase.subphrase}
-                                </Text>
-                            )}
-                            <Text
-                                style={[
-                                    styles.phraseSource,
-                                    { color: secondaryTextColor },
-                                ]}
-                            >
-                                {phrase.isUserAdded
-                                    ? t.userAdded
-                                    : phrase.isHidden
-                                    ? `${t.builtIn} - ${t.hidden}`
-                                    : t.builtIn}
-                            </Text>
-                        </View>
+            {/* Error message */}
+            {error && (
+                <View style={styles.errorContainer}>
+                    <Text style={[styles.errorText, { color: dangerColor }]}>
+                        {t.loadError}
+                    </Text>
+                </View>
+            )}
 
-                        {/* Action buttons */}
-                        <View style={styles.phraseActions}>
-                            {phrase.isUserAdded ? (
-                                <Pressable
-                                    style={styles.actionButton}
-                                    onPress={() => handleDeletePhrase(phrase.id)}
-                                >
-                                    <Text style={[styles.actionButtonText, { color: dangerColor }]}>
-                                        {t.deleteButton}
-                                    </Text>
-                                </Pressable>
-                            ) : phrase.isHidden ? (
-                                <Pressable
-                                    style={styles.actionButton}
-                                    onPress={() => handleUnhidePhrase(phrase.id)}
-                                >
-                                    <Text style={styles.actionButtonText}>
-                                        {t.unhideButton}
-                                    </Text>
-                                </Pressable>
-                            ) : (
-                                <Pressable
-                                    style={styles.actionButton}
-                                    onPress={() => handleHidePhrase(phrase.id)}
-                                >
-                                    <Text style={styles.actionButtonText}>
-                                        {t.hideButton}
-                                    </Text>
-                                </Pressable>
-                            )}
-                        </View>
-                    </View>
-                ))}
-            </ScrollView>
+            {/* Phrase list */}
+            <FlatList
+                data={phrases}
+                renderItem={renderPhraseItem}
+                keyExtractor={keyExtractor}
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollContent}
+                maxToRenderPerBatch={10}
+                windowSize={5}
+                initialNumToRender={10}
+            />
 
             {/* Add phrase modal */}
             <Modal
@@ -657,6 +637,15 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '300',
         lineHeight: 24,
+    },
+    errorContainer: {
+        padding: 20,
+        alignItems: 'center',
+    },
+    errorText: {
+        fontSize: 16,
+        fontWeight: '400',
+        textAlign: 'center',
     },
 });
 

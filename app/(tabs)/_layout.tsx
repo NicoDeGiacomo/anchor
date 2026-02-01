@@ -1,16 +1,32 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs, router } from 'expo-router';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { TouchableOpacity } from 'react-native';
 
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
 
+const headerLeftStyle = { marginLeft: 16 };
+
 export default function TabLayout() { 
   const colorScheme = useColorScheme();
   const iconColor = Colors[colorScheme ?? 'light'].icon;
   const textColor = Colors[colorScheme ?? 'light'].text;
+
+  const handleBackToHome = useCallback(() => {
+    router.push('/');
+  }, []);
+
+  const renderHeaderLeft = useCallback(() => (
+    <TouchableOpacity 
+      onPress={handleBackToHome} 
+      style={headerLeftStyle}
+      activeOpacity={0.6}
+    >
+      <Ionicons name="chevron-back" size={24} color={iconColor} />
+    </TouchableOpacity>
+  ), [iconColor, handleBackToHome]);
 
   return (
     <Tabs
@@ -33,15 +49,7 @@ export default function TabLayout() {
         options={{
           title: 'Settings',
           headerTintColor: textColor,
-          headerLeft: () => (
-            <TouchableOpacity 
-              onPress={() => router.push('/')} 
-              style={{ marginLeft: 16 }}
-              activeOpacity={0.6}
-            >
-              <Ionicons name="chevron-back" size={24} color={iconColor} />
-            </TouchableOpacity>
-          ),
+          headerLeft: renderHeaderLeft,
         }}
       />
       <Tabs.Screen
@@ -49,15 +57,7 @@ export default function TabLayout() {
         options={{
           title: 'About',
           headerTintColor: textColor,
-          headerLeft: () => (
-            <TouchableOpacity 
-              onPress={() => router.push('/')} 
-              style={{ marginLeft: 16 }}
-              activeOpacity={0.6}
-            >
-              <Ionicons name="chevron-back" size={24} color={iconColor} />
-            </TouchableOpacity>
-          ),
+          headerLeft: renderHeaderLeft,
         }}
       />
     </Tabs>

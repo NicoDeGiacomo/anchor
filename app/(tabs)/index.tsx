@@ -1,4 +1,5 @@
 import { Link } from 'expo-router';
+import { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 
 import PressableFeedback from '@/components/PressableFeedback';
@@ -44,6 +45,16 @@ export default function MainScreen() {
   const t = TRANSLATIONS[language];
   const borderColor = useColor('border');
 
+  const modeButtonStyle = useMemo(() => ({
+    ...styles.modeButton,
+    borderColor,
+  }), [borderColor]);
+
+  const secondaryButtonStyle = useMemo(() => ({
+    ...styles.secondaryButton,
+    borderColor,
+  }), [borderColor]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{t.title}</Text>
@@ -51,31 +62,31 @@ export default function MainScreen() {
       <View style={styles.buttonContainer}>
         <View style={styles.modeButtons}>
           <Link href="/mode/panic" asChild>
-            <PressableFeedback style={{...styles.modeButton, borderColor}}>
+            <PressableFeedback style={modeButtonStyle}>
               <Text style={styles.modeButtonText}>{t.panic}</Text>
             </PressableFeedback>
           </Link>
 
           <Link href="/mode/anxiety" asChild>
-            <PressableFeedback style={{...styles.modeButton, borderColor}}>
+            <PressableFeedback style={modeButtonStyle}>
               <Text style={styles.modeButtonText}>{t.anxiety}</Text>
             </PressableFeedback>
           </Link>
 
           {/* <Link href="/mode/sadness" asChild>
-            <PressableFeedback style={{...styles.modeButton, borderColor}}>
+            <PressableFeedback style={modeButtonStyle}>
               <Text style={styles.modeButtonText}>{t.sadness}</Text>
             </PressableFeedback>
           </Link> */}
 
           <Link href="/mode/anger" asChild>
-            <PressableFeedback style={{...styles.modeButton, borderColor}}>
+            <PressableFeedback style={modeButtonStyle}>
               <Text style={styles.modeButtonText}>{t.anger}</Text>
             </PressableFeedback>
           </Link>
 
           <Link href="/mode/grounding" asChild>
-            <PressableFeedback style={{...styles.modeButton, borderColor}}>
+            <PressableFeedback style={modeButtonStyle}>
               <Text style={styles.modeButtonText}>{t.grounding}</Text>
             </PressableFeedback>
           </Link>
@@ -83,13 +94,13 @@ export default function MainScreen() {
 
         <View style={styles.secondaryButtons}>
           <Link href="/settings" asChild>
-            <PressableFeedback style={{...styles.secondaryButton, borderColor}}>
+            <PressableFeedback style={secondaryButtonStyle}>
               <Text style={styles.secondaryButtonText}>{t.settingsButton}</Text>
             </PressableFeedback>
           </Link>
 
           <Link href="/about" asChild>
-            <PressableFeedback style={{...styles.secondaryButton, borderColor}}>
+            <PressableFeedback style={secondaryButtonStyle}>
               <Text style={styles.secondaryButtonText}>{t.aboutButton}</Text>
             </PressableFeedback>
           </Link>

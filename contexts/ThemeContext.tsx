@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useColorScheme as useDeviceColorScheme } from 'react-native';
 
 type ThemeMode = 'auto' | 'light' | 'dark';
@@ -43,14 +43,14 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
         initializeTheme();
     }, []);
 
-    const setThemeMode = async (mode: ThemeMode) => {
+    const setThemeMode = useCallback(async (mode: ThemeMode) => {
         try {
             await AsyncStorage.setItem(STORAGE_KEY, mode);
             setThemeModeState(mode);
         } catch (error) {
             console.warn('Failed to save theme preference:', error);
         }
-    };
+    }, []);
 
     // Determine the actual color scheme based on theme mode
     const colorScheme: ColorScheme = 
@@ -58,12 +58,18 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
             ? (deviceColorScheme ?? 'light')
             : themeMode as ColorScheme;
 
+    const value = useMemo(() => ({
+        themeMode,
+        setThemeMode,
+        colorScheme,
+    }), [themeMode, setThemeMode, colorScheme]);
+
     if (!isInitialized) {
         return null; // Wait for initialization
     }
 
     return (
-        <ThemeContext.Provider value={{ themeMode, setThemeMode, colorScheme }}>
+        <ThemeContext.Provider value={value}>
             {children}
         </ThemeContext.Provider>
     );

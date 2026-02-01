@@ -1,11 +1,18 @@
-import React, { ElementRef, forwardRef, useRef } from 'react';
+import React, { ElementRef, forwardRef, memo } from 'react';
 import {
-  Animated,
-  Easing,
   Pressable,
   PressableProps,
   PressableStateCallbackType,
+  StyleProp,
+  ViewStyle,
 } from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 
 type FeedbackProps = PressableProps & {
   pressedScale?: number;
@@ -28,48 +35,37 @@ const PressableFeedback = forwardRef<ElementRef<typeof Pressable>, FeedbackProps
     },
     ref,
   ) => {
-    const pressValue = useRef(new Animated.Value(0)).current;
-
-    const animateTo = (toValue: number) => {
-      Animated.timing(pressValue, {
-        toValue,
-        duration: animationDuration,
-        easing: Easing.out(Easing.quad),
-        useNativeDriver: true,
-      }).start();
-    };
+    const pressed = useSharedValue(0);
 
     const handlePressIn: PressableProps['onPressIn'] = (event) => {
-      animateTo(1);
+      pressed.value = withTiming(1, {
+        duration: animationDuration,
+        easing: Easing.out(Easing.quad),
+      });
       onPressIn?.(event);
     };
 
     const handlePressOut: PressableProps['onPressOut'] = (event) => {
-      animateTo(0);
+      pressed.value = withTiming(0, {
+        duration: animationDuration,
+        easing: Easing.out(Easing.quad),
+      });
       onPressOut?.(event);
     };
 
-    const animatedStyle = {
+    const animatedStyle = useAnimatedStyle(() => ({
       transform: [
         {
-          scale: pressValue.interpolate({
-            inputRange: [0, 1],
-            outputRange: [1, pressedScale],
-            extrapolate: 'clamp',
-          }),
+          scale: interpolate(pressed.value, [0, 1], [1, pressedScale]),
         },
       ],
-      opacity: pressValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: [1, pressedOpacity],
-        extrapolate: 'clamp',
-      }),
-    };
+      opacity: interpolate(pressed.value, [0, 1], [1, pressedOpacity]),
+    }));
 
     const combinedStyle: PressableProps['style'] =
       typeof style === 'function'
-        ? (state: PressableStateCallbackType) => [animatedStyle, style(state)]
-        : [animatedStyle, style];
+        ? (state: PressableStateCallbackType) => [animatedStyle as StyleProp<ViewStyle>, style(state)]
+        : [animatedStyle as StyleProp<ViewStyle>, style];
 
     return (
       <AnimatedPressable
@@ -85,5 +81,4 @@ const PressableFeedback = forwardRef<ElementRef<typeof Pressable>, FeedbackProps
 
 PressableFeedback.displayName = 'PressableFeedback';
 
-export default PressableFeedback;
-
+export default memo(PressableFeedback);

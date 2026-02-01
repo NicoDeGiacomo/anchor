@@ -1,55 +1,30 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useColor } from '@/hooks/useColor';
-import { getActivePhrases, Mode, Language, Phrase } from '@/utils/phraseStorage';
-
-// Dynamic imports for all mode/language combinations
-const PHRASES_MAP: Record<Mode, Record<Language, Phrase[]>> = {
-    panic: {
-        en: require('@/content/panic/anchors.en.json'),
-        es: require('@/content/panic/anchors.es.json'),
-        pt: require('@/content/panic/anchors.pt.json'),
-    },
-    anxiety: {
-        en: require('@/content/anxiety/anchors.en.json'),
-        es: require('@/content/anxiety/anchors.es.json'),
-        pt: require('@/content/anxiety/anchors.pt.json'),
-    },
-    sadness: {
-        en: require('@/content/sadness/anchors.en.json'),
-        es: require('@/content/sadness/anchors.es.json'),
-        pt: require('@/content/sadness/anchors.pt.json'),
-    },
-    anger: {
-        en: require('@/content/anger/anchors.en.json'),
-        es: require('@/content/anger/anchors.es.json'),
-        pt: require('@/content/anger/anchors.pt.json'),
-    },
-    grounding: {
-        en: require('@/content/grounding/anchors.en.json'),
-        es: require('@/content/grounding/anchors.es.json'),
-        pt: require('@/content/grounding/anchors.pt.json'),
-    },
-};
+import { usePhrases } from '@/hooks/usePhrases';
+import { Mode } from '@/utils/phraseStorage';
 
 const FALLBACK_TRANSLATIONS = {
     en: {
         noContent: 'No phrases available for this mode.',
         notAvailable: 'Content not yet available in this language.',
+        error: 'Something went wrong. Please try again.',
     },
     es: {
         noContent: 'No hay frases disponibles para este modo.',
         notAvailable: 'Contenido aún no disponible en este idioma.',
+        error: 'Algo salió mal. Por favor, inténtelo de nuevo.',
     },
     pt: {
         noContent: 'Nenhuma frase disponível para este modo.',
         notAvailable: 'Conteúdo ainda não disponível neste idioma.',
+        error: 'Algo deu errado. Por favor, tente novamente.',
     },
 };
 
@@ -58,8 +33,6 @@ export default function ModeScreen() {
     const { language } = useLanguage();
     const insets = useSafeAreaInsets();
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [phrases, setPhrases] = useState<Phrase[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
     const secondaryTextColor = useColor('textSecondary');
     const iconColor = useColor('icon');
 
@@ -68,37 +41,8 @@ export default function ModeScreen() {
         ? mode as Mode 
         : 'panic';
 
-    // Load phrases (built-in + user, excluding hidden)
-    useEffect(() => {
-        const loadPhrases = async () => {
-            setIsLoading(true);
-            try {
-                // Get built-in phrases
-                let builtInPhrases: Phrase[] = [];
-                try {
-                    builtInPhrases = PHRASES_MAP[validMode]?.[language] || [];
-                    
-                    // Fallback to English if current language has no content
-                    if (builtInPhrases.length === 0 && language !== 'en') {
-                        builtInPhrases = PHRASES_MAP[validMode]?.en || [];
-                    }
-                } catch (error) {
-                    console.warn('Failed to load built-in phrases:', error);
-                }
-
-                // Get active phrases (built-in + user, excluding hidden)
-                const activePhrases = await getActivePhrases(validMode, language, builtInPhrases);
-                setPhrases(activePhrases);
-            } catch (error) {
-                console.warn('Failed to load phrases:', error);
-                setPhrases([]);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        loadPhrases();
-    }, [validMode, language]);
+    // Load phrases using custom hook
+    const { phrases, isLoading, error } = usePhrases(validMode);
 
     // Reset index when mode or language changes
     useEffect(() => {
@@ -106,11 +50,15 @@ export default function ModeScreen() {
     }, [mode, language]);
 
     // Advance to next phrase with looping
-    const nextPhrase = () => {
+    const nextPhrase = useCallback(() => {
         if (phrases.length > 0) {
             setCurrentIndex((prev) => (prev + 1) % phrases.length);
         }
-    };
+    }, [phrases.length]);
+
+    // Keep a ref to the latest nextPhrase to avoid stale closures in event listener
+    const nextPhraseRef = useRef(nextPhrase);
+    nextPhraseRef.current = nextPhrase;
 
     // Add keyboard support for web browsers (specific keys only)
     useEffect(() => {
@@ -123,7 +71,7 @@ export default function ModeScreen() {
                 event.key === 'ArrowDown'
             ) {
                 event.preventDefault(); // Prevent default scrolling behavior
-                nextPhrase();
+                nextPhraseRef.current();
             }
         };
 
@@ -134,11 +82,20 @@ export default function ModeScreen() {
                 window.removeEventListener('keydown', handleKeyPress);
             };
         }
-    }, [phrases.length]); // Re-attach when phrases change
+    }, []); // No dependencies needed - uses ref for latest function
 
-    // Show fallback if loading or no phrases available
-    if (isLoading || phrases.length === 0) {
+    // Show fallback if loading, error, or no phrases available
+    if (isLoading || error || phrases.length === 0) {
         const fallback = FALLBACK_TRANSLATIONS[language];
+        let message = '';
+        if (isLoading) {
+            message = '';
+        } else if (error) {
+            message = fallback.error;
+        } else {
+            message = fallback.notAvailable;
+        }
+        
         return (
             <View style={styles.container}>
                 <TouchableOpacity
@@ -151,7 +108,7 @@ export default function ModeScreen() {
                 </TouchableOpacity>
                 <View style={styles.phraseWrapper}>
                     <Text style={[styles.phraseText, { opacity: 0.5 }]}>
-                        {isLoading ? '' : fallback.notAvailable}
+                        {message}
                     </Text>
                 </View>
             </View>

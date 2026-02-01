@@ -5,7 +5,7 @@ import { useFonts } from 'expo-font';
 import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import * as SystemUI from 'expo-system-ui';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { TouchableOpacity } from 'react-native';
 import 'react-native-reanimated';
 
@@ -90,6 +90,20 @@ function NavigationTheme() {
     SystemUI.setBackgroundColorAsync(backgroundColor);
   }, [backgroundColor]);
 
+  const handleBackToSettings = useCallback(() => {
+    router.push('/settings');
+  }, []);
+
+  const renderEditPhrasesHeaderLeft = useCallback(() => (
+    <TouchableOpacity 
+      onPress={handleBackToSettings} 
+      style={headerLeftStyle}
+      activeOpacity={0.6}
+    >
+      <Ionicons name="chevron-back" size={24} color={iconColor} />
+    </TouchableOpacity>
+  ), [iconColor, handleBackToSettings]);
+
   return (
     <NavigationThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
       <Stack>
@@ -107,18 +121,12 @@ function NavigationTheme() {
           name="edit-phrases/[mode]" 
           options={{
             title: 'Edit phrases',
-            headerLeft: () => (
-              <TouchableOpacity 
-                onPress={() => router.push('/settings')} 
-                style={{ marginLeft: 16 }}
-                activeOpacity={0.6}
-              >
-                <Ionicons name="chevron-back" size={24} color={iconColor} />
-              </TouchableOpacity>
-            ),
+            headerLeft: renderEditPhrasesHeaderLeft,
           }}
         />
       </Stack>
     </NavigationThemeProvider>
   );
 }
+
+const headerLeftStyle = { marginLeft: 16 };

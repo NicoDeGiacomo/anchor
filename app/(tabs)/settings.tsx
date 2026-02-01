@@ -1,5 +1,6 @@
 import { Link } from 'expo-router';
-import { ScrollView, StyleSheet } from 'react-native';
+import { useCallback, useMemo } from 'react';
+import { ScrollView, StyleSheet, ViewStyle } from 'react-native';
 
 import PressableFeedback from '@/components/PressableFeedback';
 import { Text, View } from '@/components/Themed';
@@ -73,7 +74,7 @@ export default function SettingsScreen() {
     const t = TRANSLATIONS[language];
     const { border: borderColor, borderSelected: borderSelectedColor } = useColors('border', 'borderSelected');
 
-    const getThemeName = (themeKey: string) => {
+    const getThemeName = useCallback((themeKey: string) => {
         switch (themeKey) {
             case 'auto':
                 return t.themeAuto;
@@ -84,7 +85,24 @@ export default function SettingsScreen() {
             default:
                 return themeKey;
         }
-    };
+    }, [t.themeAuto, t.themeLight, t.themeDark]);
+
+    // Memoized base styles
+    const optionItemStyle = useMemo(() => ({
+        ...styles.optionItem,
+        borderColor,
+    }), [borderColor]);
+
+    const optionItemSelectedStyle = useMemo(() => ({
+        ...styles.optionItem,
+        ...styles.optionItemSelected,
+        borderColor: borderSelectedColor,
+    }), [borderSelectedColor]);
+
+    // Helper to get the correct style based on selection state
+    const getOptionStyle = useCallback((isSelected: boolean): ViewStyle => {
+        return isSelected ? optionItemSelectedStyle : optionItemStyle;
+    }, [optionItemStyle, optionItemSelectedStyle]);
 
     return (
         <View style={styles.container}>
@@ -97,11 +115,7 @@ export default function SettingsScreen() {
                         return (
                             <PressableFeedback
                                 key={theme.mode}
-                                style={{
-                                    ...styles.optionItem,
-                                    borderColor: isSelected ? borderSelectedColor : borderColor,
-                                    ...(isSelected && styles.optionItemSelected),
-                                }}
+                                style={getOptionStyle(isSelected)}
                                 onPress={() => setThemeMode(theme.mode)}
                             >
                                 <Text
@@ -125,11 +139,7 @@ export default function SettingsScreen() {
                         return (
                             <PressableFeedback
                                 key={lang.code}
-                                style={{
-                                    ...styles.optionItem,
-                                    borderColor: isSelected ? borderSelectedColor : borderColor,
-                                    ...(isSelected && styles.optionItemSelected),
-                                }}
+                                style={getOptionStyle(isSelected)}
                                 onPress={() => setLanguage(lang.code)}
                             >
                                 <Text
@@ -150,27 +160,27 @@ export default function SettingsScreen() {
 
                 <View style={styles.optionList}>
                     <Link href="/edit-phrases/panic" asChild>
-                        <PressableFeedback style={{...styles.optionItem, borderColor}}>
+                        <PressableFeedback style={optionItemStyle}>
                             <Text style={styles.optionText}>{t.panic}</Text>
                         </PressableFeedback>
                     </Link>
                     <Link href="/edit-phrases/anxiety" asChild>
-                        <PressableFeedback style={{...styles.optionItem, borderColor}}>
+                        <PressableFeedback style={optionItemStyle}>
                             <Text style={styles.optionText}>{t.anxiety}</Text>
                         </PressableFeedback>
                     </Link>
                     <Link href="/edit-phrases/sadness" asChild>
-                        <PressableFeedback style={{...styles.optionItem, borderColor}}>
+                        <PressableFeedback style={optionItemStyle}>
                             <Text style={styles.optionText}>{t.sadness}</Text>
                         </PressableFeedback>
                     </Link>
                     <Link href="/edit-phrases/anger" asChild>
-                        <PressableFeedback style={{...styles.optionItem, borderColor}}>
+                        <PressableFeedback style={optionItemStyle}>
                             <Text style={styles.optionText}>{t.anger}</Text>
                         </PressableFeedback>
                     </Link>
                     <Link href="/edit-phrases/grounding" asChild>
-                        <PressableFeedback style={{...styles.optionItem, borderColor}}>
+                        <PressableFeedback style={optionItemStyle}>
                             <Text style={styles.optionText}>{t.grounding}</Text>
                         </PressableFeedback>
                     </Link>

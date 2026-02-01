@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLocales } from 'expo-localization';
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 type Language = 'en' | 'es' | 'pt';
 
@@ -56,21 +56,26 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
         initializeLanguage();
     }, []);
 
-    const setLanguage = async (lang: Language) => {
+    const setLanguage = useCallback(async (lang: Language) => {
         try {
             await AsyncStorage.setItem(STORAGE_KEY, lang);
             setLanguageState(lang);
         } catch (error) {
             console.warn('Failed to save language preference:', error);
         }
-    };
+    }, []);
+
+    const value = useMemo(() => ({
+        language,
+        setLanguage,
+    }), [language, setLanguage]);
 
     if (!isInitialized) {
         return null; // Wait for initialization
     }
 
     return (
-        <LanguageContext.Provider value={{ language, setLanguage }}>
+        <LanguageContext.Provider value={value}>
             {children}
         </LanguageContext.Provider>
     );
