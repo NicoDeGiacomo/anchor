@@ -53,7 +53,7 @@ const TRANSLATIONS = {
         deleteConfirmTitle: 'Delete mode?',
         deleteConfirmMessage: 'This will delete the mode and all its phrases. This cannot be undone.',
         emptyNameError: 'Please enter a name',
-        customModeLabel: 'Custom',
+        defaultModeLabel: 'Default',
         phrasesSection: 'Customize phrases',
         phrasesDescription: 'Add, remove, or hide phrases for each mode',
         panic: 'Panic',
@@ -89,7 +89,7 @@ const TRANSLATIONS = {
         deleteConfirmTitle: '¿Eliminar modo?',
         deleteConfirmMessage: 'Esto eliminará el modo y todas sus frases. Esta acción no se puede deshacer.',
         emptyNameError: 'Por favor, ingrese un nombre',
-        customModeLabel: 'Personalizado',
+        defaultModeLabel: 'Predeterminado',
         phrasesSection: 'Personalizar frases',
         phrasesDescription: 'Agregar, eliminar u ocultar frases para cada modo',
         panic: 'Pánico',
@@ -125,7 +125,7 @@ const TRANSLATIONS = {
         deleteConfirmTitle: 'Excluir modo?',
         deleteConfirmMessage: 'Isso excluirá o modo e todas as suas frases. Esta ação não pode ser desfeita.',
         emptyNameError: 'Por favor, insira um nome',
-        customModeLabel: 'Personalizado',
+        defaultModeLabel: 'Padrão',
         phrasesSection: 'Personalizar frases',
         phrasesDescription: 'Adicionar, excluir ou ocultar frases para cada modo',
         panic: 'Pânico',
@@ -371,9 +371,9 @@ export default function SettingsScreen() {
                                     >
                                         {getModeLabel(mode)}
                                     </Text>
-                                    {isCustom && (
-                                        <Text style={[styles.customBadge, { color: secondaryTextColor }]}>
-                                            {t.customModeLabel}
+                                    {!isCustom && (
+                                        <Text style={[styles.defaultBadge, { color: secondaryTextColor }]}>
+                                            {t.defaultModeLabel}
                                         </Text>
                                     )}
                                 </View>
@@ -710,7 +710,7 @@ const styles = StyleSheet.create({
     modeTextHidden: {
         opacity: 0.6,
     },
-    customBadge: {
+    defaultBadge: {
         fontSize: 12,
         fontWeight: '300',
     },

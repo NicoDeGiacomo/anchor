@@ -82,8 +82,8 @@ const PhraseItem = memo(function PhraseItem({
                     {phrase.isUserAdded
                         ? t.userAdded
                         : phrase.isHidden
-                        ? `${t.builtIn} - ${t.hidden}`
-                        : t.builtIn}
+                        ? `${t.defaultPhrase} - ${t.hidden}`
+                        : t.defaultPhrase}
                 </Text>
             </View>
 
@@ -126,7 +126,7 @@ const TRANSLATIONS = {
     en: {
         title: 'Edit phrases',
         addButton: 'Add phrase',
-        builtIn: 'Built-in',
+        defaultPhrase: 'Default',
         userAdded: 'Your phrase',
         hidden: 'Hidden',
         hideButton: 'Hide',
@@ -150,7 +150,7 @@ const TRANSLATIONS = {
     es: {
         title: 'Editar frases',
         addButton: 'Agregar frase',
-        builtIn: 'Integrada',
+        defaultPhrase: 'Predeterminada',
         userAdded: 'Tu frase',
         hidden: 'Oculta',
         hideButton: 'Ocultar',
@@ -174,7 +174,7 @@ const TRANSLATIONS = {
     pt: {
         title: 'Editar frases',
         addButton: 'Adicionar frase',
-        builtIn: 'Integrada',
+        defaultPhrase: 'Padrão',
         userAdded: 'Sua frase',
         hidden: 'Oculta',
         hideButton: 'Ocultar',
@@ -352,18 +352,18 @@ export default function EditPhrasesScreen() {
 
     const keyExtractor = useCallback((item: PhraseWithSource) => item.id, []);
 
+    // Footer component with "Add phrase" button (dotted style like "Create custom mode")
+    const ListFooterComponent = useCallback(() => (
+        <Pressable
+            style={[styles.addPhraseButton, { borderColor }]}
+            onPress={() => setShowAddModal(true)}
+        >
+            <Text style={styles.addPhraseButtonText}>+ {t.addButton}</Text>
+        </Pressable>
+    ), [borderColor, t.addButton]);
+
     return (
         <View style={styles.container}>
-            {/* Add button */}
-            <View style={styles.addButtonContainer}>
-                <Pressable
-                    style={[styles.addButton, { borderColor }]}
-                    onPress={() => setShowAddModal(true)}
-                >
-                    <Text style={styles.addButtonText}>{t.addButton}</Text>
-                </Pressable>
-            </View>
-
             {/* Error message */}
             {error && (
                 <View style={styles.errorContainer}>
@@ -373,7 +373,7 @@ export default function EditPhrasesScreen() {
                 </View>
             )}
 
-            {/* Phrase list */}
+            {/* Phrase list with add button at the end */}
             <FlatList
                 data={phrases}
                 renderItem={renderPhraseItem}
@@ -383,6 +383,7 @@ export default function EditPhrasesScreen() {
                 maxToRenderPerBatch={10}
                 windowSize={5}
                 initialNumToRender={10}
+                ListFooterComponent={ListFooterComponent}
             />
 
             {/* Add phrase modal */}
@@ -511,27 +512,26 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    addButtonContainer: {
-        padding: 20,
-        paddingBottom: 0,
-    },
-    addButton: {
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-        borderWidth: 1,
-        alignItems: 'center',
-    },
-    addButtonText: {
-        fontSize: 16,
-        fontWeight: '400',
-    },
     scrollView: {
         flex: 1,
     },
     scrollContent: {
         padding: 20,
         gap: 12,
+    },
+    addPhraseButton: {
+        paddingVertical: 16,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderStyle: 'dashed',
+        alignItems: 'center',
+        marginTop: 4,
+    },
+    addPhraseButtonText: {
+        fontSize: 16,
+        fontWeight: '300',
+        opacity: 0.7,
     },
     phraseItem: {
         padding: 16,
