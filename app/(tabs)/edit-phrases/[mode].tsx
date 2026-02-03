@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { useLocalSearchParams } from 'expo-router';
-import React, { memo, useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import {
     FlatList,
     ListRenderItem,
@@ -13,20 +13,16 @@ import {
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useColors } from '@/hooks/useColor';
-import { usePhrasesWithSource } from '@/hooks/usePhrases';
+import { PhraseWithSource, usePhrasesWithSource } from '@/hooks/usePhrases';
 import {
     addUserPhrase,
+    BuiltInMode,
+    getCustomModeById,
     hideBuiltInPhrase,
-    Mode,
-    Phrase,
+    isBuiltInMode,
     removeUserPhrase,
     unhideBuiltInPhrase
 } from '@/utils/phraseStorage';
-
-type PhraseWithSource = Phrase & {
-    isUserAdded: boolean;
-    isHidden?: boolean;
-};
 
 type PhraseItemProps = {
     phrase: PhraseWithSource;
@@ -205,17 +201,16 @@ export default function EditPhrasesScreen() {
     const { mode } = useLocalSearchParams<{ mode: string }>();
     const { language } = useLanguage();
     
-    // Validate mode parameter
-    const validMode = (mode && ['panic', 'anxiety', 'sadness', 'anger', 'grounding'].includes(mode))
-        ? mode as Mode
-        : 'panic';
+    // Accept any non-empty mode string (built-in or custom mode ID)
+    const validMode = mode || 'panic';
 
     // Use the phrases hook for loading data
-    const { phrases, isLoading, error, refetch } = usePhrasesWithSource(validMode);
+    const { phrases, isLoading, error, refetch, isCustomMode } = usePhrasesWithSource(validMode);
     
     const [showAddModal, setShowAddModal] = useState(false);
     const [newPhraseText, setNewPhraseText] = useState('');
     const [newSubphrase, setNewSubphrase] = useState('');
+    const [customModeName, setCustomModeName] = useState<string | null>(null);
     const [confirmDialog, setConfirmDialog] = useState<{
         visible: boolean;
         title: string;
@@ -242,15 +237,26 @@ export default function EditPhrasesScreen() {
 
     const t = TRANSLATIONS[language];
 
-    const modeTitle = useMemo(() => {
-        switch (validMode) {
-            case 'panic': return t.panic;
-            case 'anxiety': return t.anxiety;
-            case 'sadness': return t.sadness;
-            case 'anger': return t.anger;
-            case 'grounding': return t.grounding;
+    // Load custom mode name if this is a custom mode
+    useEffect(() => {
+        if (isCustomMode && validMode) {
+            getCustomModeById(validMode).then(customMode => {
+                setCustomModeName(customMode?.name || validMode);
+            });
         }
-    }, [validMode, t]);
+    }, [isCustomMode, validMode]);
+
+    // Get the mode title (translated for built-in, custom name for custom modes)
+    const modeTitle = useMemo(() => {
+        if (isCustomMode) {
+            return customModeName || validMode;
+        }
+        if (isBuiltInMode(validMode)) {
+            const builtInMode = validMode as BuiltInMode;
+            return t[builtInMode];
+        }
+        return validMode;
+    }, [validMode, isCustomMode, customModeName, t]);
 
     // Set dynamic navigation title
     const navigation = useNavigation();

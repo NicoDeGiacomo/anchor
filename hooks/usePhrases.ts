@@ -2,16 +2,17 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
+    BuiltInMode,
     getActivePhrases,
     getHiddenPhrases,
     getUserPhrases,
+    isBuiltInMode,
     Language,
-    Mode,
     Phrase,
 } from '@/utils/phraseStorage';
 
-// Dynamic imports for all mode/language combinations
-const PHRASES_MAP: Record<Mode, Record<Language, Phrase[]>> = {
+// Dynamic imports for all built-in mode/language combinations
+const PHRASES_MAP: Record<BuiltInMode, Record<Language, Phrase[]>> = {
     panic: {
         en: require('@/content/panic/anchors.en.json'),
         es: require('@/content/panic/anchors.es.json'),
@@ -39,7 +40,7 @@ const PHRASES_MAP: Record<Mode, Record<Language, Phrase[]>> = {
     },
 };
 
-type PhraseWithSource = Phrase & {
+export type PhraseWithSource = Phrase & {
     isUserAdded: boolean;
     isHidden?: boolean;
 };
@@ -56,12 +57,19 @@ interface UsePhrasesWithSourceResult {
     isLoading: boolean;
     error: string | null;
     refetch: () => Promise<void>;
+    isCustomMode: boolean;
 }
 
 /**
  * Helper to get built-in phrases with fallback to English
+ * Returns empty array for custom modes
  */
-function getBuiltInPhrases(mode: Mode, language: Language): Phrase[] {
+function getBuiltInPhrases(mode: string, language: Language): Phrase[] {
+    // Custom modes have no built-in phrases
+    if (!isBuiltInMode(mode)) {
+        return [];
+    }
+    
     try {
         let phrases = PHRASES_MAP[mode]?.[language] || [];
         
@@ -80,8 +88,9 @@ function getBuiltInPhrases(mode: Mode, language: Language): Phrase[] {
 /**
  * Hook to load active phrases for display (built-in + user, excluding hidden)
  * Use this for the mode display screen
+ * For custom modes, only loads user-added phrases
  */
-export function usePhrases(mode: Mode): UsePhasesResult {
+export function usePhrases(mode: string): UsePhasesResult {
     const { language } = useLanguage();
     const [phrases, setPhrases] = useState<Phrase[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -120,12 +129,14 @@ export function usePhrases(mode: Mode): UsePhasesResult {
 /**
  * Hook to load all phrases with source information (for editing)
  * Includes built-in, user-added, and hidden phrases
+ * For custom modes, only loads user-added phrases (no built-in to hide/unhide)
  */
-export function usePhrasesWithSource(mode: Mode): UsePhrasesWithSourceResult {
+export function usePhrasesWithSource(mode: string): UsePhrasesWithSourceResult {
     const { language } = useLanguage();
     const [phrases, setPhrases] = useState<PhraseWithSource[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const isCustom = !isBuiltInMode(mode);
 
     const loadPhrases = useCallback(async () => {
         setIsLoading(true);
@@ -140,7 +151,7 @@ export function usePhrasesWithSource(mode: Mode): UsePhrasesWithSourceResult {
                 getHiddenPhrases(mode, language),
             ]);
 
-            // Mark built-in phrases
+            // Mark built-in phrases (empty for custom modes)
             const builtInWithSource: PhraseWithSource[] = builtInPhrases.map(phrase => ({
                 ...phrase,
                 isUserAdded: false,
@@ -174,5 +185,6 @@ export function usePhrasesWithSource(mode: Mode): UsePhrasesWithSourceResult {
         isLoading,
         error,
         refetch: loadPhrases,
+        isCustomMode: isCustom,
     };
 }

@@ -1,6 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export type Mode = 'panic' | 'anxiety' | 'sadness' | 'anger' | 'grounding';
+// Built-in mode type (the 5 predefined modes)
+export type BuiltInMode = 'panic' | 'anxiety' | 'sadness' | 'anger' | 'grounding';
+
+// Mode can be either a built-in mode or a custom mode ID (string)
+export type Mode = BuiltInMode | string;
+
 export type Language = 'en' | 'es' | 'pt';
 
 export interface Phrase {
@@ -13,12 +18,21 @@ export interface UserPhrase extends Phrase {
     // User phrases use the same structure as built-in phrases
 }
 
+// Custom mode interface
+export interface CustomMode {
+    id: string;           // Unique ID (e.g., "custom_1706123456789")
+    name: string;         // User-defined display name
+    createdAt: number;    // Timestamp for ordering
+}
+
 // Storage keys
-const getUserPhrasesKey = (mode: Mode, language: Language) => 
+const getUserPhrasesKey = (mode: string, language: Language) => 
     `user_phrases:${mode}:${language}`;
 
-const getHiddenPhrasesKey = (mode: Mode, language: Language) => 
+const getHiddenPhrasesKey = (mode: string, language: Language) => 
     `hidden_phrases:${mode}:${language}`;
+
+const CUSTOM_MODES_KEY = 'custom_modes';
 
 /**
  * Generate a unique ID for a user phrase
@@ -30,7 +44,7 @@ export const generatePhraseId = (): string => {
 /**
  * Get user-added phrases for a specific mode and language
  */
-export const getUserPhrases = async (mode: Mode, language: Language): Promise<UserPhrase[]> => {
+export const getUserPhrases = async (mode: string, language: Language): Promise<UserPhrase[]> => {
     try {
         const key = getUserPhrasesKey(mode, language);
         const data = await AsyncStorage.getItem(key);
@@ -45,7 +59,7 @@ export const getUserPhrases = async (mode: Mode, language: Language): Promise<Us
  * Save user-added phrases for a specific mode and language
  */
 export const saveUserPhrases = async (
-    mode: Mode, 
+    mode: string, 
     language: Language, 
     phrases: UserPhrase[]
 ): Promise<void> => {
@@ -62,7 +76,7 @@ export const saveUserPhrases = async (
  * Add a new user phrase
  */
 export const addUserPhrase = async (
-    mode: Mode,
+    mode: string,
     language: Language,
     text: string,
     subphrase?: string
@@ -84,7 +98,7 @@ export const addUserPhrase = async (
  * Remove a user phrase by ID
  */
 export const removeUserPhrase = async (
-    mode: Mode,
+    mode: string,
     language: Language,
     phraseId: string
 ): Promise<void> => {
@@ -96,7 +110,7 @@ export const removeUserPhrase = async (
 /**
  * Get hidden built-in phrase IDs for a specific mode and language
  */
-export const getHiddenPhrases = async (mode: Mode, language: Language): Promise<string[]> => {
+export const getHiddenPhrases = async (mode: string, language: Language): Promise<string[]> => {
     try {
         const key = getHiddenPhrasesKey(mode, language);
         const data = await AsyncStorage.getItem(key);
@@ -111,7 +125,7 @@ export const getHiddenPhrases = async (mode: Mode, language: Language): Promise<
  * Save hidden built-in phrase IDs
  */
 export const saveHiddenPhrases = async (
-    mode: Mode,
+    mode: string,
     language: Language,
     hiddenIds: string[]
 ): Promise<void> => {
@@ -128,7 +142,7 @@ export const saveHiddenPhrases = async (
  * Hide a built-in phrase
  */
 export const hideBuiltInPhrase = async (
-    mode: Mode,
+    mode: string,
     language: Language,
     phraseId: string
 ): Promise<void> => {
@@ -142,7 +156,7 @@ export const hideBuiltInPhrase = async (
  * Unhide a built-in phrase
  */
 export const unhideBuiltInPhrase = async (
-    mode: Mode,
+    mode: string,
     language: Language,
     phraseId: string
 ): Promise<void> => {
@@ -155,7 +169,7 @@ export const unhideBuiltInPhrase = async (
  * Get all active phrases (built-in + user, excluding hidden)
  */
 export const getActivePhrases = async (
-    mode: Mode,
+    mode: string,
     language: Language,
     builtInPhrases: Phrase[]
 ): Promise<Phrase[]> => {
@@ -178,9 +192,16 @@ export const getActivePhrases = async (
 // ============================================
 
 /**
- * All available modes
+ * All built-in modes (the 5 predefined modes)
  */
-export const ALL_MODES: Mode[] = ['panic', 'anxiety', 'sadness', 'anger', 'grounding'];
+export const BUILT_IN_MODES: BuiltInMode[] = ['panic', 'anxiety', 'sadness', 'anger', 'grounding'];
+
+/**
+ * Check if a mode ID is a built-in mode
+ */
+export const isBuiltInMode = (mode: string): mode is BuiltInMode => {
+    return BUILT_IN_MODES.includes(mode as BuiltInMode);
+};
 
 /**
  * Storage key for hidden modes (not language-specific)
@@ -190,12 +211,12 @@ const HIDDEN_MODES_KEY = 'hidden_modes';
 /**
  * Default hidden modes for new users
  */
-const DEFAULT_HIDDEN_MODES: Mode[] = ['sadness'];
+const DEFAULT_HIDDEN_MODES: string[] = ['sadness'];
 
 /**
- * Get hidden mode IDs
+ * Get hidden mode IDs (includes both built-in and custom modes)
  */
-export const getHiddenModes = async (): Promise<Mode[]> => {
+export const getHiddenModes = async (): Promise<string[]> => {
     try {
         const data = await AsyncStorage.getItem(HIDDEN_MODES_KEY);
         return data ? JSON.parse(data) : DEFAULT_HIDDEN_MODES;
@@ -208,7 +229,7 @@ export const getHiddenModes = async (): Promise<Mode[]> => {
 /**
  * Save hidden mode IDs
  */
-export const saveHiddenModes = async (hiddenModes: Mode[]): Promise<void> => {
+export const saveHiddenModes = async (hiddenModes: string[]): Promise<void> => {
     try {
         await AsyncStorage.setItem(HIDDEN_MODES_KEY, JSON.stringify(hiddenModes));
     } catch (error) {
@@ -220,7 +241,7 @@ export const saveHiddenModes = async (hiddenModes: Mode[]): Promise<void> => {
 /**
  * Hide a mode
  */
-export const hideMode = async (mode: Mode): Promise<void> => {
+export const hideMode = async (mode: string): Promise<void> => {
     const hiddenModes = await getHiddenModes();
     if (!hiddenModes.includes(mode)) {
         await saveHiddenModes([...hiddenModes, mode]);
@@ -230,18 +251,125 @@ export const hideMode = async (mode: Mode): Promise<void> => {
 /**
  * Unhide a mode
  */
-export const unhideMode = async (mode: Mode): Promise<void> => {
+export const unhideMode = async (mode: string): Promise<void> => {
     const hiddenModes = await getHiddenModes();
     const updatedModes = hiddenModes.filter(m => m !== mode);
     await saveHiddenModes(updatedModes);
 };
 
 /**
- * Get all visible modes (excluding hidden)
+ * Get all visible built-in modes (excluding hidden)
  */
-export const getVisibleModes = async (): Promise<Mode[]> => {
+export const getVisibleModes = async (): Promise<BuiltInMode[]> => {
     const hiddenModes = await getHiddenModes();
-    return ALL_MODES.filter(mode => !hiddenModes.includes(mode));
+    return BUILT_IN_MODES.filter(mode => !hiddenModes.includes(mode));
+};
+
+// ============================================
+// Custom Mode Storage
+// ============================================
+
+/**
+ * Generate a unique ID for a custom mode
+ */
+export const generateCustomModeId = (): string => {
+    return `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+};
+
+/**
+ * Get all custom modes
+ */
+export const getCustomModes = async (): Promise<CustomMode[]> => {
+    try {
+        const data = await AsyncStorage.getItem(CUSTOM_MODES_KEY);
+        return data ? JSON.parse(data) : [];
+    } catch (error) {
+        console.warn('Failed to load custom modes:', error);
+        return [];
+    }
+};
+
+/**
+ * Save all custom modes
+ */
+const saveCustomModes = async (modes: CustomMode[]): Promise<void> => {
+    try {
+        await AsyncStorage.setItem(CUSTOM_MODES_KEY, JSON.stringify(modes));
+    } catch (error) {
+        console.warn('Failed to save custom modes:', error);
+        throw error;
+    }
+};
+
+/**
+ * Add a new custom mode
+ */
+export const addCustomMode = async (name: string): Promise<CustomMode> => {
+    const newMode: CustomMode = {
+        id: generateCustomModeId(),
+        name,
+        createdAt: Date.now(),
+    };
+
+    const existingModes = await getCustomModes();
+    await saveCustomModes([...existingModes, newMode]);
+
+    return newMode;
+};
+
+/**
+ * Update a custom mode's name
+ */
+export const updateCustomMode = async (id: string, name: string): Promise<void> => {
+    const modes = await getCustomModes();
+    const updatedModes = modes.map(mode => 
+        mode.id === id ? { ...mode, name } : mode
+    );
+    await saveCustomModes(updatedModes);
+};
+
+/**
+ * Delete a custom mode and all its associated data
+ */
+export const deleteCustomMode = async (id: string): Promise<void> => {
+    // Remove the mode from custom modes list
+    const modes = await getCustomModes();
+    const updatedModes = modes.filter(mode => mode.id !== id);
+    await saveCustomModes(updatedModes);
+
+    // Remove the mode from hidden modes if present
+    const hiddenModes = await getHiddenModes();
+    if (hiddenModes.includes(id)) {
+        await saveHiddenModes(hiddenModes.filter(m => m !== id));
+    }
+
+    // Remove all phrases for this custom mode (all languages)
+    const ALL_LANGUAGES: Language[] = ['en', 'es', 'pt'];
+    const keysToRemove: string[] = [];
+    for (const language of ALL_LANGUAGES) {
+        keysToRemove.push(getUserPhrasesKey(id, language));
+        keysToRemove.push(getHiddenPhrasesKey(id, language));
+    }
+    await AsyncStorage.multiRemove(keysToRemove);
+};
+
+/**
+ * Get a custom mode by ID
+ */
+export const getCustomModeById = async (id: string): Promise<CustomMode | null> => {
+    const modes = await getCustomModes();
+    return modes.find(mode => mode.id === id) || null;
+};
+
+/**
+ * Get all visible custom modes (excluding hidden)
+ */
+export const getVisibleCustomModes = async (): Promise<CustomMode[]> => {
+    const [customModes, hiddenModes] = await Promise.all([
+        getCustomModes(),
+        getHiddenModes(),
+    ]);
+    return customModes.filter(mode => !hiddenModes.includes(mode.id));
 };
 
 // ============================================
@@ -282,19 +410,29 @@ const ALL_LANGUAGES: Language[] = ['en', 'es', 'pt'];
 
 /**
  * Reset all phrase and mode customizations to defaults
- * - Removes all user-added phrases
+ * - Removes all user-added phrases (for built-in and custom modes)
  * - Unhides all hidden phrases
  * - Resets hidden modes to default (sadness hidden)
+ * - Removes all custom modes
  */
 export const resetAllToDefaults = async (): Promise<void> => {
     try {
         const keysToRemove: string[] = [];
 
-        // Collect all user phrases and hidden phrases keys for all mode/language combinations
-        for (const mode of ALL_MODES) {
+        // Collect all user phrases and hidden phrases keys for built-in modes
+        for (const mode of BUILT_IN_MODES) {
             for (const language of ALL_LANGUAGES) {
                 keysToRemove.push(getUserPhrasesKey(mode, language));
                 keysToRemove.push(getHiddenPhrasesKey(mode, language));
+            }
+        }
+
+        // Also collect keys for any custom modes
+        const customModes = await getCustomModes();
+        for (const mode of customModes) {
+            for (const language of ALL_LANGUAGES) {
+                keysToRemove.push(getUserPhrasesKey(mode.id, language));
+                keysToRemove.push(getHiddenPhrasesKey(mode.id, language));
             }
         }
 
@@ -304,6 +442,9 @@ export const resetAllToDefaults = async (): Promise<void> => {
         // Reset hidden modes to default by removing the key
         // (getHiddenModes will return DEFAULT_HIDDEN_MODES when no data exists)
         await AsyncStorage.removeItem(HIDDEN_MODES_KEY);
+
+        // Remove all custom modes
+        await AsyncStorage.removeItem(CUSTOM_MODES_KEY);
 
         // Reset navigation hint so it shows again
         await AsyncStorage.removeItem(NAVIGATION_HINT_KEY);

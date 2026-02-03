@@ -9,7 +9,7 @@ import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useColor } from '@/hooks/useColor';
 import { usePhrases } from '@/hooks/usePhrases';
-import { Mode, hasSeenNavigationHint, markNavigationHintSeen } from '@/utils/phraseStorage';
+import { hasSeenNavigationHint, markNavigationHintSeen } from '@/utils/phraseStorage';
 
 const FALLBACK_TRANSLATIONS = {
     en: {
@@ -42,10 +42,9 @@ export default function ModeScreen() {
     const secondaryTextColor = useColor('textSecondary');
     const iconColor = useColor('icon');
 
-    // Validate mode parameter
-    const validMode = (mode && ['panic', 'anxiety', 'sadness', 'anger', 'grounding'].includes(mode)) 
-        ? mode as Mode 
-        : 'panic';
+    // Accept any non-empty mode string (built-in or custom mode ID)
+    // The usePhrases hook will handle invalid modes gracefully
+    const validMode = mode || 'panic';
 
     // Load phrases using custom hook
     const { phrases, isLoading, error } = usePhrases(validMode);

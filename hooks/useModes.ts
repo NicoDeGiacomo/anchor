@@ -1,19 +1,26 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import {
-    ALL_MODES,
+    BUILT_IN_MODES,
+    BuiltInMode,
+    CustomMode,
+    getCustomModes,
     getHiddenModes,
+    getVisibleCustomModes,
     getVisibleModes,
-    Mode,
 } from '@/utils/phraseStorage';
 
+// A display mode can be either a built-in mode ID or a custom mode object
+export type DisplayMode = BuiltInMode | CustomMode;
+
 export interface ModeWithVisibility {
-    mode: Mode;
+    mode: DisplayMode;
     isHidden: boolean;
+    isCustom: boolean;
 }
 
 interface UseModesResult {
-    modes: Mode[];
+    modes: DisplayMode[];
     isLoading: boolean;
     refetch: () => Promise<void>;
 }
@@ -24,24 +31,51 @@ interface UseModesWithVisibilityResult {
     refetch: () => Promise<void>;
 }
 
+interface UseCustomModesResult {
+    customModes: CustomMode[];
+    isLoading: boolean;
+    refetch: () => Promise<void>;
+}
+
+/**
+ * Helper to check if a display mode is a custom mode
+ */
+export function isCustomMode(mode: DisplayMode): mode is CustomMode {
+    return typeof mode === 'object' && 'id' in mode && 'name' in mode;
+}
+
+/**
+ * Helper to get the mode ID (works for both built-in and custom modes)
+ */
+export function getModeId(mode: DisplayMode): string {
+    return isCustomMode(mode) ? mode.id : mode;
+}
+
 /**
  * Hook to load visible modes for display (excluding hidden)
  * Use this for the home screen
  */
 export function useModes(): UseModesResult {
-    const [modes, setModes] = useState<Mode[]>([]);
+    const [modes, setModes] = useState<DisplayMode[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const loadModes = useCallback(async () => {
         setIsLoading(true);
         
         try {
-            const visibleModes = await getVisibleModes();
-            setModes(visibleModes);
+            // Load visible built-in modes and visible custom modes
+            const [visibleBuiltIn, visibleCustom] = await Promise.all([
+                getVisibleModes(),
+                getVisibleCustomModes(),
+            ]);
+            
+            // Combine: built-in modes first, then custom modes (sorted by creation date)
+            const sortedCustom = [...visibleCustom].sort((a, b) => a.createdAt - b.createdAt);
+            setModes([...visibleBuiltIn, ...sortedCustom]);
         } catch (error) {
             console.warn('Failed to load modes:', error);
-            // Fallback to all modes if loading fails
-            setModes(ALL_MODES);
+            // Fallback to built-in modes if loading fails
+            setModes([...BUILT_IN_MODES]);
         } finally {
             setIsLoading(false);
         }
@@ -70,18 +104,31 @@ export function useModesWithVisibility(): UseModesWithVisibilityResult {
         setIsLoading(true);
         
         try {
-            const hiddenModes = await getHiddenModes();
+            const [hiddenModes, customModes] = await Promise.all([
+                getHiddenModes(),
+                getCustomModes(),
+            ]);
             
-            const modesWithVisibility: ModeWithVisibility[] = ALL_MODES.map(mode => ({
+            // Built-in modes with visibility
+            const builtInWithVisibility: ModeWithVisibility[] = BUILT_IN_MODES.map(mode => ({
                 mode,
                 isHidden: hiddenModes.includes(mode),
+                isCustom: false,
             }));
             
-            setModes(modesWithVisibility);
+            // Custom modes with visibility (sorted by creation date)
+            const sortedCustom = [...customModes].sort((a, b) => a.createdAt - b.createdAt);
+            const customWithVisibility: ModeWithVisibility[] = sortedCustom.map(mode => ({
+                mode,
+                isHidden: hiddenModes.includes(mode.id),
+                isCustom: true,
+            }));
+            
+            setModes([...builtInWithVisibility, ...customWithVisibility]);
         } catch (error) {
             console.warn('Failed to load modes:', error);
-            // Fallback to all modes visible if loading fails
-            setModes(ALL_MODES.map(mode => ({ mode, isHidden: false })));
+            // Fallback to built-in modes visible if loading fails
+            setModes(BUILT_IN_MODES.map(mode => ({ mode, isHidden: false, isCustom: false })));
         } finally {
             setIsLoading(false);
         }
@@ -95,5 +142,38 @@ export function useModesWithVisibility(): UseModesWithVisibilityResult {
         modes,
         isLoading,
         refetch: loadModes,
+    };
+}
+
+/**
+ * Hook to load custom modes only (for management in settings)
+ */
+export function useCustomModes(): UseCustomModesResult {
+    const [customModes, setCustomModes] = useState<CustomMode[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const loadCustomModes = useCallback(async () => {
+        setIsLoading(true);
+        
+        try {
+            const modes = await getCustomModes();
+            // Sort by creation date
+            setCustomModes([...modes].sort((a, b) => a.createdAt - b.createdAt));
+        } catch (error) {
+            console.warn('Failed to load custom modes:', error);
+            setCustomModes([]);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        loadCustomModes();
+    }, [loadCustomModes]);
+
+    return {
+        customModes,
+        isLoading,
+        refetch: loadCustomModes,
     };
 }

@@ -7,8 +7,8 @@ import PressableFeedback from '@/components/PressableFeedback';
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useColor } from '@/hooks/useColor';
-import { useModes } from '@/hooks/useModes';
-import { Mode } from '@/utils/phraseStorage';
+import { DisplayMode, getModeId, isCustomMode, useModes } from '@/hooks/useModes';
+import { BuiltInMode } from '@/utils/phraseStorage';
 
 const TRANSLATIONS = {
   en: {
@@ -66,10 +66,13 @@ export default function MainScreen() {
     borderColor,
   }), [borderColor]);
 
-  // Helper to get translated mode name
-  const getModeLabel = (mode: Mode): string => {
-    return t[mode];
-  };
+  // Helper to get mode label (translated for built-in, custom name for custom)
+  const getModeLabel = useCallback((mode: DisplayMode): string => {
+    if (isCustomMode(mode)) {
+      return mode.name;
+    }
+    return t[mode as BuiltInMode];
+  }, [t]);
 
   return (
     <View style={styles.container}>
@@ -77,13 +80,16 @@ export default function MainScreen() {
 
       <View style={styles.buttonContainer}>
         <View style={styles.modeButtons}>
-          {modes.map((mode) => (
-            <Link href={`/mode/${mode}`} asChild key={mode}>
-              <PressableFeedback style={modeButtonStyle}>
-                <Text style={styles.modeButtonText}>{getModeLabel(mode)}</Text>
-              </PressableFeedback>
-            </Link>
-          ))}
+          {modes.map((mode) => {
+            const modeId = getModeId(mode);
+            return (
+              <Link href={`/mode/${modeId}`} asChild key={modeId}>
+                <PressableFeedback style={modeButtonStyle}>
+                  <Text style={styles.modeButtonText}>{getModeLabel(mode)}</Text>
+                </PressableFeedback>
+              </Link>
+            );
+          })}
         </View>
 
         <View style={styles.secondaryButtons}>

@@ -1,14 +1,23 @@
 import { Link } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, ViewStyle } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, TextInput, ViewStyle } from 'react-native';
 
 import PressableFeedback from '@/components/PressableFeedback';
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useColors } from '@/hooks/useColor';
-import { useModesWithVisibility } from '@/hooks/useModes';
-import { hideMode, unhideMode, resetAllToDefaults, Mode } from '@/utils/phraseStorage';
+import { DisplayMode, getModeId, isCustomMode, useModesWithVisibility } from '@/hooks/useModes';
+import {
+    addCustomMode,
+    BuiltInMode,
+    CustomMode,
+    deleteCustomMode,
+    hideMode,
+    resetAllToDefaults,
+    unhideMode,
+    updateCustomMode,
+} from '@/utils/phraseStorage';
 
 const LANGUAGES = [
     { code: 'en' as const, name: 'English' },
@@ -34,6 +43,17 @@ const TRANSLATIONS = {
         modesDescription: 'Show or hide modes on the home screen',
         hideButton: 'Hide',
         showButton: 'Show',
+        createCustomMode: 'Create custom mode',
+        renameButton: 'Rename',
+        deleteButton: 'Delete',
+        createModeTitle: 'Create custom mode',
+        renameModeTitle: 'Rename mode',
+        modeNamePlaceholder: 'Mode name',
+        saveButton: 'Save',
+        deleteConfirmTitle: 'Delete mode?',
+        deleteConfirmMessage: 'This will delete the mode and all its phrases. This cannot be undone.',
+        emptyNameError: 'Please enter a name',
+        customModeLabel: 'Custom',
         phrasesSection: 'Customize phrases',
         phrasesDescription: 'Add, remove, or hide phrases for each mode',
         panic: 'Panic',
@@ -44,7 +64,7 @@ const TRANSLATIONS = {
         resetSection: 'Reset',
         resetButton: 'Reset to defaults',
         resetConfirmTitle: 'Reset to defaults?',
-        resetConfirmMessage: 'This will remove all your custom phrases and restore default mode visibility. This cannot be undone.',
+        resetConfirmMessage: 'This will remove all your custom phrases, custom modes, and restore default mode visibility. This cannot be undone.',
         resetConfirmButton: 'Reset',
         cancelButton: 'Cancel',
     },
@@ -59,6 +79,17 @@ const TRANSLATIONS = {
         modesDescription: 'Mostrar u ocultar modos en la pantalla principal',
         hideButton: 'Ocultar',
         showButton: 'Mostrar',
+        createCustomMode: 'Crear modo personalizado',
+        renameButton: 'Renombrar',
+        deleteButton: 'Eliminar',
+        createModeTitle: 'Crear modo personalizado',
+        renameModeTitle: 'Renombrar modo',
+        modeNamePlaceholder: 'Nombre del modo',
+        saveButton: 'Guardar',
+        deleteConfirmTitle: '¿Eliminar modo?',
+        deleteConfirmMessage: 'Esto eliminará el modo y todas sus frases. Esta acción no se puede deshacer.',
+        emptyNameError: 'Por favor, ingrese un nombre',
+        customModeLabel: 'Personalizado',
         phrasesSection: 'Personalizar frases',
         phrasesDescription: 'Agregar, eliminar u ocultar frases para cada modo',
         panic: 'Pánico',
@@ -69,7 +100,7 @@ const TRANSLATIONS = {
         resetSection: 'Restablecer',
         resetButton: 'Restablecer valores predeterminados',
         resetConfirmTitle: '¿Restablecer valores predeterminados?',
-        resetConfirmMessage: 'Esto eliminará todas tus frases personalizadas y restaurará la visibilidad predeterminada de los modos. Esta acción no se puede deshacer.',
+        resetConfirmMessage: 'Esto eliminará todas tus frases personalizadas, modos personalizados y restaurará la visibilidad predeterminada. Esta acción no se puede deshacer.',
         resetConfirmButton: 'Restablecer',
         cancelButton: 'Cancelar',
     },
@@ -84,6 +115,17 @@ const TRANSLATIONS = {
         modesDescription: 'Mostrar ou ocultar modos na tela inicial',
         hideButton: 'Ocultar',
         showButton: 'Mostrar',
+        createCustomMode: 'Criar modo personalizado',
+        renameButton: 'Renomear',
+        deleteButton: 'Excluir',
+        createModeTitle: 'Criar modo personalizado',
+        renameModeTitle: 'Renomear modo',
+        modeNamePlaceholder: 'Nome do modo',
+        saveButton: 'Salvar',
+        deleteConfirmTitle: 'Excluir modo?',
+        deleteConfirmMessage: 'Isso excluirá o modo e todas as suas frases. Esta ação não pode ser desfeita.',
+        emptyNameError: 'Por favor, insira um nome',
+        customModeLabel: 'Personalizado',
         phrasesSection: 'Personalizar frases',
         phrasesDescription: 'Adicionar, excluir ou ocultar frases para cada modo',
         panic: 'Pânico',
@@ -94,7 +136,7 @@ const TRANSLATIONS = {
         resetSection: 'Redefinir',
         resetButton: 'Redefinir para padrões',
         resetConfirmTitle: 'Redefinir para padrões?',
-        resetConfirmMessage: 'Isso removerá todas as suas frases personalizadas e restaurará a visibilidade padrão dos modos. Esta ação não pode ser desfeita.',
+        resetConfirmMessage: 'Isso removerá todas as suas frases personalizadas, modos personalizados e restaurará a visibilidade padrão. Esta ação não pode ser desfeita.',
         resetConfirmButton: 'Redefinir',
         cancelButton: 'Cancelar',
     },
@@ -106,13 +148,23 @@ export default function SettingsScreen() {
     const t = TRANSLATIONS[language];
     const { 
         background: backgroundColor,
+        text: textColor,
+        textSecondary: secondaryTextColor,
         border: borderColor, 
         borderSelected: borderSelectedColor,
         danger: dangerColor,
         overlay: overlayColor,
-    } = useColors('background', 'border', 'borderSelected', 'danger', 'overlay');
+    } = useColors('background', 'text', 'textSecondary', 'border', 'borderSelected', 'danger', 'overlay');
     const { modes: modesWithVisibility, refetch: refetchModes } = useModesWithVisibility();
     const [showResetConfirm, setShowResetConfirm] = useState(false);
+    
+    // Custom mode management state
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showRenameModal, setShowRenameModal] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [newModeName, setNewModeName] = useState('');
+    const [editingMode, setEditingMode] = useState<CustomMode | null>(null);
+    const [modeToDelete, setModeToDelete] = useState<CustomMode | null>(null);
 
     const getThemeName = useCallback((themeKey: string) => {
         switch (themeKey) {
@@ -127,27 +179,91 @@ export default function SettingsScreen() {
         }
     }, [t.themeAuto, t.themeLight, t.themeDark]);
 
-    // Helper to get translated mode name
-    const getModeLabel = useCallback((mode: Mode): string => {
-        return t[mode];
+    // Helper to get translated mode name (works for both built-in and custom modes)
+    const getModeLabel = useCallback((mode: DisplayMode): string => {
+        if (isCustomMode(mode)) {
+            return mode.name;
+        }
+        return t[mode as BuiltInMode];
     }, [t]);
 
     // Handle hide mode
-    const handleHideMode = useCallback(async (mode: Mode) => {
+    const handleHideMode = useCallback(async (mode: DisplayMode) => {
         // Prevent hiding the last visible mode
         const visibleModes = modesWithVisibility.filter(m => !m.isHidden);
         if (visibleModes.length <= 1) {
             return;
         }
-        await hideMode(mode);
+        const modeId = getModeId(mode);
+        await hideMode(modeId);
         await refetchModes();
     }, [modesWithVisibility, refetchModes]);
 
     // Handle show mode
-    const handleShowMode = useCallback(async (mode: Mode) => {
-        await unhideMode(mode);
+    const handleShowMode = useCallback(async (mode: DisplayMode) => {
+        const modeId = getModeId(mode);
+        await unhideMode(modeId);
         await refetchModes();
     }, [refetchModes]);
+
+    // Handle create custom mode
+    const handleCreateMode = useCallback(async () => {
+        if (!newModeName.trim()) {
+            return;
+        }
+        try {
+            await addCustomMode(newModeName.trim());
+            setNewModeName('');
+            setShowCreateModal(false);
+            await refetchModes();
+        } catch (error) {
+            console.warn('Failed to create custom mode:', error);
+        }
+    }, [newModeName, refetchModes]);
+
+    // Handle rename custom mode
+    const handleRenameMode = useCallback(async () => {
+        if (!editingMode || !newModeName.trim()) {
+            return;
+        }
+        try {
+            await updateCustomMode(editingMode.id, newModeName.trim());
+            setNewModeName('');
+            setEditingMode(null);
+            setShowRenameModal(false);
+            await refetchModes();
+        } catch (error) {
+            console.warn('Failed to rename custom mode:', error);
+        }
+    }, [editingMode, newModeName, refetchModes]);
+
+    // Handle delete custom mode
+    const handleDeleteMode = useCallback(async () => {
+        if (!modeToDelete) {
+            return;
+        }
+        try {
+            await deleteCustomMode(modeToDelete.id);
+            setModeToDelete(null);
+            setShowDeleteConfirm(false);
+            await refetchModes();
+        } catch (error) {
+            console.warn('Failed to delete custom mode:', error);
+        }
+    }, [modeToDelete, refetchModes]);
+
+    // Open rename modal
+    const openRenameModal = useCallback((mode: CustomMode) => {
+        setEditingMode(mode);
+        setNewModeName(mode.name);
+        setShowRenameModal(true);
+    }, []);
+
+    // Open delete confirmation
+    const openDeleteConfirm = useCallback((mode: CustomMode) => {
+        setModeToDelete(mode);
+        setShowDeleteConfirm(true);
+    }, []);
 
     // Handle reset to defaults
     const handleReset = useCallback(async () => {
@@ -232,78 +348,104 @@ export default function SettingsScreen() {
                 <Text style={styles.sectionDescription}>{t.modesDescription}</Text>
 
                 <View style={styles.optionList}>
-                    {modesWithVisibility.map(({ mode, isHidden }) => {
+                    {modesWithVisibility.map(({ mode, isHidden, isCustom }) => {
                         const visibleCount = modesWithVisibility.filter(m => !m.isHidden).length;
                         const isLastVisible = !isHidden && visibleCount <= 1;
+                        const modeKey = getModeId(mode);
                         
                         return (
                             <View
-                                key={mode}
+                                key={modeKey}
                                 style={[
                                     styles.modeItem,
                                     { borderColor },
                                     isHidden && styles.modeItemHidden,
                                 ]}
                             >
-                                <Text
-                                    style={[
-                                        styles.optionText,
-                                        isHidden && styles.modeTextHidden,
-                                    ]}
-                                >
-                                    {getModeLabel(mode)}
-                                </Text>
-                                <PressableFeedback
-                                    style={[
-                                        styles.toggleButton,
-                                        isLastVisible && styles.toggleButtonDisabled,
-                                    ]}
-                                    onPress={() => isHidden ? handleShowMode(mode) : handleHideMode(mode)}
-                                    disabled={isLastVisible}
-                                >
+                                <View style={styles.modeNameContainer}>
                                     <Text
                                         style={[
-                                            styles.toggleButtonText,
-                                            isLastVisible && styles.toggleButtonTextDisabled,
+                                            styles.optionText,
+                                            isHidden && styles.modeTextHidden,
                                         ]}
                                     >
-                                        {isHidden ? t.showButton : t.hideButton}
+                                        {getModeLabel(mode)}
                                     </Text>
-                                </PressableFeedback>
+                                    {isCustom && (
+                                        <Text style={[styles.customBadge, { color: secondaryTextColor }]}>
+                                            {t.customModeLabel}
+                                        </Text>
+                                    )}
+                                </View>
+                                <View style={styles.modeActions}>
+                                    {isCustom && isCustomMode(mode) && (
+                                        <>
+                                            <PressableFeedback
+                                                style={styles.toggleButton}
+                                                onPress={() => openRenameModal(mode)}
+                                            >
+                                                <Text style={styles.toggleButtonText}>
+                                                    {t.renameButton}
+                                                </Text>
+                                            </PressableFeedback>
+                                            <PressableFeedback
+                                                style={styles.toggleButton}
+                                                onPress={() => openDeleteConfirm(mode)}
+                                            >
+                                                <Text style={[styles.toggleButtonText, { color: dangerColor }]}>
+                                                    {t.deleteButton}
+                                                </Text>
+                                            </PressableFeedback>
+                                        </>
+                                    )}
+                                    <PressableFeedback
+                                        style={[
+                                            styles.toggleButton,
+                                            isLastVisible && styles.toggleButtonDisabled,
+                                        ]}
+                                        onPress={() => isHidden ? handleShowMode(mode) : handleHideMode(mode)}
+                                        disabled={isLastVisible}
+                                    >
+                                        <Text
+                                            style={[
+                                                styles.toggleButtonText,
+                                                isLastVisible && styles.toggleButtonTextDisabled,
+                                            ]}
+                                        >
+                                            {isHidden ? t.showButton : t.hideButton}
+                                        </Text>
+                                    </PressableFeedback>
+                                </View>
                             </View>
                         );
                     })}
+                    
+                    {/* Create custom mode button */}
+                    <PressableFeedback
+                        style={[styles.createModeButton, { borderColor }]}
+                        onPress={() => setShowCreateModal(true)}
+                    >
+                        <Text style={styles.createModeButtonText}>+ {t.createCustomMode}</Text>
+                    </PressableFeedback>
                 </View>
 
                 <Text style={[styles.sectionTitle, styles.sectionSpacing]}>{t.phrasesSection}</Text>
                 <Text style={styles.sectionDescription}>{t.phrasesDescription}</Text>
 
                 <View style={styles.optionList}>
-                    <Link href="/edit-phrases/panic" asChild>
-                        <PressableFeedback style={optionItemStyle}>
-                            <Text style={styles.optionText}>{t.panic}</Text>
-                        </PressableFeedback>
-                    </Link>
-                    <Link href="/edit-phrases/anxiety" asChild>
-                        <PressableFeedback style={optionItemStyle}>
-                            <Text style={styles.optionText}>{t.anxiety}</Text>
-                        </PressableFeedback>
-                    </Link>
-                    <Link href="/edit-phrases/sadness" asChild>
-                        <PressableFeedback style={optionItemStyle}>
-                            <Text style={styles.optionText}>{t.sadness}</Text>
-                        </PressableFeedback>
-                    </Link>
-                    <Link href="/edit-phrases/anger" asChild>
-                        <PressableFeedback style={optionItemStyle}>
-                            <Text style={styles.optionText}>{t.anger}</Text>
-                        </PressableFeedback>
-                    </Link>
-                    <Link href="/edit-phrases/grounding" asChild>
-                        <PressableFeedback style={optionItemStyle}>
-                            <Text style={styles.optionText}>{t.grounding}</Text>
-                        </PressableFeedback>
-                    </Link>
+                    {/* Dynamically render phrase editing links for all modes */}
+                    {modesWithVisibility.map(({ mode }) => {
+                        const modeId = getModeId(mode);
+                        const label = getModeLabel(mode);
+                        
+                        return (
+                            <Link key={modeId} href={`/edit-phrases/${modeId}`} asChild>
+                                <PressableFeedback style={optionItemStyle}>
+                                    <Text style={styles.optionText}>{label}</Text>
+                                </PressableFeedback>
+                            </Link>
+                        );
+                    })}
                 </View>
 
                 <Text style={[styles.sectionTitle, styles.sectionSpacing]}>{t.resetSection}</Text>
@@ -345,6 +487,158 @@ export default function SettingsScreen() {
                             >
                                 <Text style={[styles.modalButtonText, { color: dangerColor }]}>
                                     {t.resetConfirmButton}
+                                </Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* Create custom mode modal */}
+            <Modal
+                visible={showCreateModal}
+                transparent
+                animationType="fade"
+                onRequestClose={() => {
+                    setShowCreateModal(false);
+                    setNewModeName('');
+                }}
+            >
+                <View style={[styles.modalOverlay, { backgroundColor: overlayColor }]}>
+                    <View style={[styles.modalContent, { backgroundColor }]}>
+                        <Text style={styles.modalTitle}>{t.createModeTitle}</Text>
+
+                        <TextInput
+                            style={[
+                                styles.input,
+                                { 
+                                    borderColor,
+                                    color: textColor,
+                                    backgroundColor,
+                                },
+                            ]}
+                            placeholder={t.modeNamePlaceholder}
+                            placeholderTextColor={secondaryTextColor}
+                            value={newModeName}
+                            onChangeText={setNewModeName}
+                            autoFocus
+                        />
+
+                        <View style={styles.modalButtons}>
+                            <Pressable
+                                style={[styles.modalButton, { borderColor }]}
+                                onPress={() => {
+                                    setShowCreateModal(false);
+                                    setNewModeName('');
+                                }}
+                            >
+                                <Text style={styles.modalButtonText}>
+                                    {t.cancelButton}
+                                </Text>
+                            </Pressable>
+                            <Pressable
+                                style={[styles.modalButton, styles.modalButtonPrimary, { borderColor }]}
+                                onPress={handleCreateMode}
+                            >
+                                <Text style={[styles.modalButtonText, styles.modalButtonTextPrimary]}>
+                                    {t.saveButton}
+                                </Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* Rename custom mode modal */}
+            <Modal
+                visible={showRenameModal}
+                transparent
+                animationType="fade"
+                onRequestClose={() => {
+                    setShowRenameModal(false);
+                    setEditingMode(null);
+                    setNewModeName('');
+                }}
+            >
+                <View style={[styles.modalOverlay, { backgroundColor: overlayColor }]}>
+                    <View style={[styles.modalContent, { backgroundColor }]}>
+                        <Text style={styles.modalTitle}>{t.renameModeTitle}</Text>
+
+                        <TextInput
+                            style={[
+                                styles.input,
+                                { 
+                                    borderColor,
+                                    color: textColor,
+                                    backgroundColor,
+                                },
+                            ]}
+                            placeholder={t.modeNamePlaceholder}
+                            placeholderTextColor={secondaryTextColor}
+                            value={newModeName}
+                            onChangeText={setNewModeName}
+                            autoFocus
+                        />
+
+                        <View style={styles.modalButtons}>
+                            <Pressable
+                                style={[styles.modalButton, { borderColor }]}
+                                onPress={() => {
+                                    setShowRenameModal(false);
+                                    setEditingMode(null);
+                                    setNewModeName('');
+                                }}
+                            >
+                                <Text style={styles.modalButtonText}>
+                                    {t.cancelButton}
+                                </Text>
+                            </Pressable>
+                            <Pressable
+                                style={[styles.modalButton, styles.modalButtonPrimary, { borderColor }]}
+                                onPress={handleRenameMode}
+                            >
+                                <Text style={[styles.modalButtonText, styles.modalButtonTextPrimary]}>
+                                    {t.saveButton}
+                                </Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* Delete custom mode confirmation modal */}
+            <Modal
+                visible={showDeleteConfirm}
+                transparent
+                animationType="fade"
+                onRequestClose={() => {
+                    setShowDeleteConfirm(false);
+                    setModeToDelete(null);
+                }}
+            >
+                <View style={[styles.modalOverlay, { backgroundColor: overlayColor }]}>
+                    <View style={[styles.modalContent, { backgroundColor }]}>
+                        <Text style={styles.modalTitle}>{t.deleteConfirmTitle}</Text>
+                        <Text style={styles.modalMessage}>{t.deleteConfirmMessage}</Text>
+
+                        <View style={styles.modalButtons}>
+                            <Pressable
+                                style={[styles.modalButton, { borderColor }]}
+                                onPress={() => {
+                                    setShowDeleteConfirm(false);
+                                    setModeToDelete(null);
+                                }}
+                            >
+                                <Text style={styles.modalButtonText}>
+                                    {t.cancelButton}
+                                </Text>
+                            </Pressable>
+                            <Pressable
+                                style={[styles.modalButton, styles.modalButtonDanger, { borderColor: dangerColor }]}
+                                onPress={handleDeleteMode}
+                            >
+                                <Text style={[styles.modalButtonText, { color: dangerColor }]}>
+                                    {t.deleteButton}
                                 </Text>
                             </Pressable>
                         </View>
@@ -400,16 +694,29 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 16,
-        paddingHorizontal: 20,
+        paddingVertical: 12,
+        paddingLeft: 20,
+        paddingRight: 8,
         borderRadius: 8,
         borderWidth: 1,
     },
     modeItemHidden: {
         opacity: 0.5,
     },
+    modeNameContainer: {
+        flex: 1,
+        gap: 4,
+    },
     modeTextHidden: {
         opacity: 0.6,
+    },
+    customBadge: {
+        fontSize: 12,
+        fontWeight: '300',
+    },
+    modeActions: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     toggleButton: {
         paddingVertical: 8,
@@ -424,6 +731,19 @@ const styles = StyleSheet.create({
     },
     toggleButtonTextDisabled: {
         opacity: 0.5,
+    },
+    createModeButton: {
+        paddingVertical: 16,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderStyle: 'dashed',
+        alignItems: 'center',
+    },
+    createModeButtonText: {
+        fontSize: 16,
+        fontWeight: '300',
+        opacity: 0.7,
     },
     resetButton: {
         paddingVertical: 16,
@@ -459,6 +779,13 @@ const styles = StyleSheet.create({
         lineHeight: 24,
         opacity: 0.8,
     },
+    input: {
+        borderWidth: 1,
+        borderRadius: 8,
+        padding: 12,
+        fontSize: 16,
+        minHeight: 48,
+    },
     modalButtons: {
         flexDirection: 'row',
         gap: 12,
@@ -471,11 +798,17 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         alignItems: 'center',
     },
+    modalButtonPrimary: {
+        borderWidth: 2,
+    },
     modalButtonDanger: {
         borderWidth: 2,
     },
     modalButtonText: {
         fontSize: 16,
         fontWeight: '400',
+    },
+    modalButtonTextPrimary: {
+        fontWeight: '500',
     },
 });
