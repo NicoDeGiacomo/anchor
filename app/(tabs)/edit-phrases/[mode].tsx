@@ -1,5 +1,6 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { useLocalSearchParams } from 'expo-router';
+import React, { memo, useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import {
     FlatList,
     ListRenderItem,
@@ -203,7 +204,6 @@ const TRANSLATIONS = {
 export default function EditPhrasesScreen() {
     const { mode } = useLocalSearchParams<{ mode: string }>();
     const { language } = useLanguage();
-    const router = useRouter();
     
     // Validate mode parameter
     const validMode = (mode && ['panic', 'anxiety', 'sadness', 'anger', 'grounding'].includes(mode))
@@ -251,6 +251,14 @@ export default function EditPhrasesScreen() {
             case 'grounding': return t.grounding;
         }
     }, [validMode, t]);
+
+    // Set dynamic navigation title
+    const navigation = useNavigation();
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: `${modeTitle} - ${t.title}`,
+        });
+    }, [navigation, modeTitle, t.title]);
 
     // Add new phrase
     const handleAddPhrase = useCallback(async () => {
@@ -340,11 +348,8 @@ export default function EditPhrasesScreen() {
 
     return (
         <View style={styles.container}>
-            {/* Header */}
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>
-                    {modeTitle} - {t.title}
-                </Text>
+            {/* Add button */}
+            <View style={styles.addButtonContainer}>
                 <Pressable
                     style={[styles.addButton, { borderColor }]}
                     onPress={() => setShowAddModal(true)}
@@ -500,13 +505,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    header: {
+    addButtonContainer: {
         padding: 20,
-        gap: 16,
-    },
-    headerTitle: {
-        fontSize: 24,
-        fontWeight: '400',
+        paddingBottom: 0,
     },
     addButton: {
         paddingVertical: 12,

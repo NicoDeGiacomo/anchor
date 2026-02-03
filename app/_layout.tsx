@@ -1,12 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider as NavigationThemeProvider, Theme } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack, router } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import * as SystemUI from 'expo-system-ui';
-import { useCallback, useEffect } from 'react';
-import { TouchableOpacity } from 'react-native';
+import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
@@ -82,27 +80,12 @@ function RootLayoutNav() {
 
 function NavigationTheme() {
   const colorScheme = useColorScheme();
-  const iconColor = Colors[colorScheme ?? 'light'].icon;
   const backgroundColor = colorScheme === 'dark' ? Colors.dark.background : Colors.light.background;
 
   // Set the native root view background color to prevent white flash on Android
   useEffect(() => {
     SystemUI.setBackgroundColorAsync(backgroundColor);
   }, [backgroundColor]);
-
-  const handleBackToSettings = useCallback(() => {
-    router.push('/settings');
-  }, []);
-
-  const renderEditPhrasesHeaderLeft = useCallback(() => (
-    <TouchableOpacity 
-      onPress={handleBackToSettings} 
-      style={headerLeftStyle}
-      activeOpacity={0.6}
-    >
-      <Ionicons name="chevron-back" size={24} color={iconColor} />
-    </TouchableOpacity>
-  ), [iconColor, handleBackToSettings]);
 
   return (
     <NavigationThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
@@ -117,16 +100,7 @@ function NavigationTheme() {
             contentStyle: { backgroundColor },
           }}
         />
-        <Stack.Screen 
-          name="edit-phrases/[mode]" 
-          options={{
-            title: 'Edit phrases',
-            headerLeft: renderEditPhrasesHeaderLeft,
-          }}
-        />
       </Stack>
     </NavigationThemeProvider>
   );
 }
-
-const headerLeftStyle = { marginLeft: 16 };

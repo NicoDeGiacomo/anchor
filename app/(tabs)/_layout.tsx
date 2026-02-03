@@ -18,6 +18,10 @@ export default function TabLayout() {
     router.push('/');
   }, []);
 
+  const handleBackToSettings = useCallback(() => {
+    router.push('/settings');
+  }, []);
+
   const renderHeaderLeft = useCallback(() => (
     <TouchableOpacity 
       onPress={handleBackToHome} 
@@ -27,6 +31,16 @@ export default function TabLayout() {
       <Ionicons name="chevron-back" size={24} color={iconColor} />
     </TouchableOpacity>
   ), [iconColor, handleBackToHome]);
+
+  const renderEditPhrasesHeaderLeft = useCallback(() => (
+    <TouchableOpacity 
+      onPress={handleBackToSettings} 
+      style={headerLeftStyle}
+      activeOpacity={0.6}
+    >
+      <Ionicons name="chevron-back" size={24} color={iconColor} />
+    </TouchableOpacity>
+  ), [iconColor, handleBackToSettings]);
 
   return (
     <Tabs
@@ -58,6 +72,14 @@ export default function TabLayout() {
           title: 'About',
           headerTintColor: textColor,
           headerLeft: renderHeaderLeft,
+        }}
+      />
+      <Tabs.Screen
+        name="edit-phrases/[mode]"
+        options={{
+          title: 'Edit phrases',
+          headerTintColor: textColor,
+          headerLeft: renderEditPhrasesHeaderLeft,
         }}
       />
     </Tabs>
