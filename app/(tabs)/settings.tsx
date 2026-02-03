@@ -27,8 +27,10 @@ const LANGUAGES = [
 
 const THEMES = [
     { mode: 'auto' as const, nameKey: 'auto' },
-    { mode: 'light' as const, nameKey: 'light' },
+    { mode: 'black' as const, nameKey: 'black' },
     { mode: 'dark' as const, nameKey: 'dark' },
+    { mode: 'light' as const, nameKey: 'light' },
+    { mode: 'white' as const, nameKey: 'white' },
 ];
 
 const TRANSLATIONS = {
@@ -37,8 +39,10 @@ const TRANSLATIONS = {
         languageSection: 'Language',
         themeSection: 'Theme',
         themeAuto: 'Auto (System)',
-        themeLight: 'Light',
+        themeBlack: 'Black',
         themeDark: 'Dark',
+        themeLight: 'Light',
+        themeWhite: 'White',
         modesSection: 'Customize modes',
         modesDescription: 'Show or hide modes on the home screen',
         hideButton: 'Hide',
@@ -73,8 +77,10 @@ const TRANSLATIONS = {
         languageSection: 'Idioma',
         themeSection: 'Tema',
         themeAuto: 'Automático (Sistema)',
-        themeLight: 'Claro',
+        themeBlack: 'Negro',
         themeDark: 'Oscuro',
+        themeLight: 'Claro',
+        themeWhite: 'Blanco',
         modesSection: 'Personalizar modos',
         modesDescription: 'Mostrar u ocultar modos en la pantalla principal',
         hideButton: 'Ocultar',
@@ -109,8 +115,10 @@ const TRANSLATIONS = {
         languageSection: 'Idioma',
         themeSection: 'Tema',
         themeAuto: 'Automático (Sistema)',
-        themeLight: 'Claro',
+        themeBlack: 'Preto',
         themeDark: 'Escuro',
+        themeLight: 'Claro',
+        themeWhite: 'Branco',
         modesSection: 'Personalizar modos',
         modesDescription: 'Mostrar ou ocultar modos na tela inicial',
         hideButton: 'Ocultar',
@@ -170,14 +178,18 @@ export default function SettingsScreen() {
         switch (themeKey) {
             case 'auto':
                 return t.themeAuto;
-            case 'light':
-                return t.themeLight;
+            case 'black':
+                return t.themeBlack;
             case 'dark':
                 return t.themeDark;
+            case 'light':
+                return t.themeLight;
+            case 'white':
+                return t.themeWhite;
             default:
                 return themeKey;
         }
-    }, [t.themeAuto, t.themeLight, t.themeDark]);
+    }, [t.themeAuto, t.themeBlack, t.themeDark, t.themeLight, t.themeWhite]);
 
     // Helper to get translated mode name (works for both built-in and custom modes)
     const getModeLabel = useCallback((mode: DisplayMode): string => {

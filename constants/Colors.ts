@@ -1,4 +1,17 @@
-// Color keys type for type safety
+// =============================================================================
+// Logo Colors - Easily adjustable when final logo arrives
+// =============================================================================
+export const LOGO_BLUE = '#4A90D9'; // Soft blue (placeholder - adjust when final logo is ready)
+export const LOGO_WHITE = '#FFFFFF';
+
+// Derived logo colors for variations
+export const LOGO_BLUE_LIGHT = '#6BA3E0'; // Lighter variant for hover/secondary
+export const LOGO_BLUE_DARK = '#3A7BC8'; // Darker variant for pressed states
+export const LOGO_BLUE_MUTED = '#7FAED4'; // Muted variant for secondary text
+
+// =============================================================================
+// Color Keys Type
+// =============================================================================
 export type ColorName =
   | 'text'
   | 'textSecondary'
@@ -14,25 +27,19 @@ export type ColorName =
   | 'overlay'
   | 'separator';
 
-export type ColorScheme = 'light' | 'dark';
+// =============================================================================
+// Color Schemes
+// =============================================================================
+// black: Pure black background with white text (original dark theme)
+// dark: Blue dominant with white accents (matches logo)
+// light: White dominant with blue accents (matches logo)
+// white: Pure white background with black text (original light theme)
+// =============================================================================
+export type ColorScheme = 'black' | 'dark' | 'light' | 'white';
 
 const Colors: Record<ColorScheme, Record<ColorName, string>> = {
-  light: {
-    text: '#000',
-    textSecondary: '#666',
-    background: '#fff',
-    tint: '#2f95dc',
-    tabIconDefault: '#ccc',
-    tabIconSelected: '#2f95dc',
-    icon: '#666',
-    border: '#ccc',
-    borderSelected: '#666',
-    danger: '#d32f2f',
-    link: '#2e78b7',
-    overlay: 'rgba(0, 0, 0, 0.5)',
-    separator: '#eee',
-  },
-  dark: {
+  // Pure black/white theme (original dark theme)
+  black: {
     text: '#fff',
     textSecondary: '#999',
     background: '#000',
@@ -46,6 +53,57 @@ const Colors: Record<ColorScheme, Record<ColorName, string>> = {
     link: '#5dade2',
     overlay: 'rgba(0, 0, 0, 0.7)',
     separator: 'rgba(255, 255, 255, 0.1)',
+  },
+
+  // Blue dominant with white accents (matches logo - dark mode)
+  dark: {
+    text: LOGO_WHITE,
+    textSecondary: LOGO_BLUE_MUTED,
+    background: LOGO_BLUE_DARK,
+    tint: LOGO_WHITE,
+    tabIconDefault: LOGO_BLUE_MUTED,
+    tabIconSelected: LOGO_WHITE,
+    icon: LOGO_BLUE_LIGHT,
+    border: LOGO_BLUE,
+    borderSelected: LOGO_WHITE,
+    danger: '#ef5350',
+    link: LOGO_WHITE,
+    overlay: 'rgba(0, 0, 0, 0.5)',
+    separator: `rgba(255, 255, 255, 0.15)`,
+  },
+
+  // White dominant with blue accents (matches logo - light mode)
+  light: {
+    text: LOGO_BLUE_DARK,
+    textSecondary: LOGO_BLUE_MUTED,
+    background: LOGO_WHITE,
+    tint: LOGO_BLUE,
+    tabIconDefault: LOGO_BLUE_MUTED,
+    tabIconSelected: LOGO_BLUE,
+    icon: LOGO_BLUE,
+    border: LOGO_BLUE_LIGHT,
+    borderSelected: LOGO_BLUE,
+    danger: '#d32f2f',
+    link: LOGO_BLUE_DARK,
+    overlay: 'rgba(0, 0, 0, 0.5)',
+    separator: `rgba(74, 144, 217, 0.15)`,
+  },
+
+  // Pure white/black theme (original light theme)
+  white: {
+    text: '#000',
+    textSecondary: '#666',
+    background: '#fff',
+    tint: '#2f95dc',
+    tabIconDefault: '#ccc',
+    tabIconSelected: '#2f95dc',
+    icon: '#666',
+    border: '#ccc',
+    borderSelected: '#666',
+    danger: '#d32f2f',
+    link: '#2e78b7',
+    overlay: 'rgba(0, 0, 0, 0.5)',
+    separator: '#eee',
   },
 };
 

@@ -2,8 +2,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useColorScheme as useDeviceColorScheme } from 'react-native';
 
-type ThemeMode = 'auto' | 'light' | 'dark';
-type ColorScheme = 'light' | 'dark';
+// Theme modes the user can select
+type ThemeMode = 'auto' | 'black' | 'dark' | 'light' | 'white';
+
+// Color schemes that map to Colors.ts
+type ColorScheme = 'black' | 'dark' | 'light' | 'white';
+
+const VALID_THEME_MODES: ThemeMode[] = ['auto', 'black', 'dark', 'light', 'white'];
 
 interface ThemeContextType {
     themeMode: ThemeMode;
@@ -25,7 +30,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
             try {
                 const storedTheme = await AsyncStorage.getItem(STORAGE_KEY);
 
-                if (storedTheme && ['auto', 'light', 'dark'].includes(storedTheme)) {
+                if (storedTheme && VALID_THEME_MODES.includes(storedTheme as ThemeMode)) {
                     setThemeModeState(storedTheme as ThemeMode);
                 } else {
                     // Default to auto (system preference)
@@ -53,10 +58,16 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     // Determine the actual color scheme based on theme mode
-    const colorScheme: ColorScheme = 
-        themeMode === 'auto' 
-            ? (deviceColorScheme ?? 'light')
-            : themeMode as ColorScheme;
+    // - 'auto' uses the new blue themes (dark/light) based on system preference
+    // - Other modes map directly to their color scheme
+    const colorScheme: ColorScheme = useMemo(() => {
+        if (themeMode === 'auto') {
+            // Auto mode uses the blue-themed dark/light based on system preference
+            return deviceColorScheme === 'dark' ? 'dark' : 'light';
+        }
+        // Direct mapping for explicit theme selections
+        return themeMode;
+    }, [themeMode, deviceColorScheme]);
 
     const value = useMemo(() => ({
         themeMode,
@@ -82,4 +93,3 @@ export const useTheme = () => {
     }
     return context;
 };
-
