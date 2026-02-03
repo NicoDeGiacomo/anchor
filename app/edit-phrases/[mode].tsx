@@ -1,6 +1,5 @@
-import { Ionicons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
-import React, { memo, useCallback, useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { memo, useCallback, useMemo, useState } from 'react';
 import {
     FlatList,
     ListRenderItem,
@@ -8,9 +7,7 @@ import {
     Pressable,
     StyleSheet,
     TextInput,
-    TouchableOpacity,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -206,6 +203,7 @@ const TRANSLATIONS = {
 export default function EditPhrasesScreen() {
     const { mode } = useLocalSearchParams<{ mode: string }>();
     const { language } = useLanguage();
+    const router = useRouter();
     
     // Validate mode parameter
     const validMode = (mode && ['panic', 'anxiety', 'sadness', 'anger', 'grounding'].includes(mode))
@@ -240,15 +238,19 @@ export default function EditPhrasesScreen() {
         border: borderColor,
         danger: dangerColor,
         overlay: overlayColor,
-        icon: iconColor,
-    } = useColors('background', 'text', 'textSecondary', 'border', 'danger', 'overlay', 'icon');
+    } = useColors('background', 'text', 'textSecondary', 'border', 'danger', 'overlay');
 
-    const insets = useSafeAreaInsets();
     const t = TRANSLATIONS[language];
 
-    const handleBack = useCallback(() => {
-        router.back();
-    }, []);
+    const modeTitle = useMemo(() => {
+        switch (validMode) {
+            case 'panic': return t.panic;
+            case 'anxiety': return t.anxiety;
+            case 'sadness': return t.sadness;
+            case 'anger': return t.anger;
+            case 'grounding': return t.grounding;
+        }
+    }, [validMode, t]);
 
     // Add new phrase
     const handleAddPhrase = useCallback(async () => {
@@ -339,16 +341,16 @@ export default function EditPhrasesScreen() {
     return (
         <View style={styles.container}>
             {/* Header */}
-            <View style={[styles.header, { paddingTop: insets.top, borderBottomColor: borderColor }]}>
-                <TouchableOpacity 
-                    onPress={handleBack} 
-                    style={styles.backButton}
-                    activeOpacity={0.6}
+            <View style={styles.header}>
+                <Text style={styles.headerTitle}>
+                    {modeTitle} - {t.title}
+                </Text>
+                <Pressable
+                    style={[styles.addButton, { borderColor }]}
+                    onPress={() => setShowAddModal(true)}
                 >
-                    <Ionicons name="chevron-back" size={24} color={iconColor} />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>{t.title}</Text>
-                <View style={styles.headerSpacer} />
+                    <Text style={styles.addButtonText}>{t.addButton}</Text>
+                </Pressable>
             </View>
 
             {/* Error message */}
@@ -370,14 +372,6 @@ export default function EditPhrasesScreen() {
                 maxToRenderPerBatch={10}
                 windowSize={5}
                 initialNumToRender={10}
-                ListFooterComponent={
-                    <Pressable
-                        style={[styles.addButton, { borderColor }]}
-                        onPress={() => setShowAddModal(true)}
-                    >
-                        <Text style={styles.addButtonText}>{t.addButton}</Text>
-                    </Pressable>
-                }
             />
 
             {/* Add phrase modal */}
@@ -507,27 +501,14 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingBottom: 12,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-    },
-    backButton: {
-        width: 32,
-        alignItems: 'flex-start',
+        padding: 20,
+        gap: 16,
     },
     headerTitle: {
-        flex: 1,
-        fontSize: 17,
-        fontWeight: '600',
-        textAlign: 'center',
-    },
-    headerSpacer: {
-        width: 32,
+        fontSize: 24,
+        fontWeight: '400',
     },
     addButton: {
-        marginTop: 12,
         paddingVertical: 12,
         paddingHorizontal: 20,
         borderRadius: 8,

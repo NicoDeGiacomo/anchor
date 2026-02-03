@@ -80,12 +80,9 @@ function RootLayoutNav() {
   );
 }
 
-const headerLeftStyle = { marginLeft: 16 };
-
 function NavigationTheme() {
   const colorScheme = useColorScheme();
   const iconColor = Colors[colorScheme ?? 'light'].icon;
-  const textColor = Colors[colorScheme ?? 'light'].text;
   const backgroundColor = colorScheme === 'dark' ? Colors.dark.background : Colors.light.background;
 
   // Set the native root view background color to prevent white flash on Android
@@ -93,19 +90,19 @@ function NavigationTheme() {
     SystemUI.setBackgroundColorAsync(backgroundColor);
   }, [backgroundColor]);
 
-  const handleBack = useCallback(() => {
-    router.back();
+  const handleBackToSettings = useCallback(() => {
+    router.push('/settings');
   }, []);
 
-  const renderHeaderLeft = useCallback(() => (
+  const renderEditPhrasesHeaderLeft = useCallback(() => (
     <TouchableOpacity 
-      onPress={handleBack} 
+      onPress={handleBackToSettings} 
       style={headerLeftStyle}
       activeOpacity={0.6}
     >
       <Ionicons name="chevron-back" size={24} color={iconColor} />
     </TouchableOpacity>
-  ), [iconColor, handleBack]);
+  ), [iconColor, handleBackToSettings]);
 
   return (
     <NavigationThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
@@ -123,10 +120,13 @@ function NavigationTheme() {
         <Stack.Screen 
           name="edit-phrases/[mode]" 
           options={{
-            headerShown: false,
+            title: 'Edit phrases',
+            headerLeft: renderEditPhrasesHeaderLeft,
           }}
         />
       </Stack>
     </NavigationThemeProvider>
   );
 }
+
+const headerLeftStyle = { marginLeft: 16 };
