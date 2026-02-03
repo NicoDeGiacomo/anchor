@@ -1,30 +1,34 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams, router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, StyleSheet, TouchableOpacity } from 'react-native';
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useColor } from '@/hooks/useColor';
 import { usePhrases } from '@/hooks/usePhrases';
-import { Mode } from '@/utils/phraseStorage';
+import { Mode, hasSeenNavigationHint, markNavigationHintSeen } from '@/utils/phraseStorage';
 
 const FALLBACK_TRANSLATIONS = {
     en: {
         noContent: 'No phrases available for this mode.',
         notAvailable: 'Content not yet available in this language.',
         error: 'Something went wrong. Please try again.',
+        tapHint: 'tap anywhere to continue',
     },
     es: {
         noContent: 'No hay frases disponibles para este modo.',
         notAvailable: 'Contenido aún no disponible en este idioma.',
         error: 'Algo salió mal. Por favor, inténtelo de nuevo.',
+        tapHint: 'toca en cualquier lugar para continuar',
     },
     pt: {
         noContent: 'Nenhuma frase disponível para este modo.',
         notAvailable: 'Conteúdo ainda não disponível neste idioma.',
         error: 'Algo deu errado. Por favor, tente novamente.',
+        tapHint: 'toque em qualquer lugar para continuar',
     },
 };
 
@@ -33,6 +37,8 @@ export default function ModeScreen() {
     const { language } = useLanguage();
     const insets = useSafeAreaInsets();
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [showHint, setShowHint] = useState(false);
+    const hintOpacity = useSharedValue(1);
     const secondaryTextColor = useColor('textSecondary');
     const iconColor = useColor('icon');
 
@@ -44,17 +50,45 @@ export default function ModeScreen() {
     // Load phrases using custom hook
     const { phrases, isLoading, error } = usePhrases(validMode);
 
+    // Check if user has seen the navigation hint
+    useEffect(() => {
+        hasSeenNavigationHint().then((hasSeen) => {
+            if (!hasSeen) {
+                setShowHint(true);
+            }
+        });
+    }, []);
+
     // Reset index when mode or language changes
     useEffect(() => {
         setCurrentIndex(0);
     }, [mode, language]);
+
+    // Hide hint with animation
+    const hideHint = useCallback(() => {
+        if (showHint) {
+            hintOpacity.value = withTiming(0, { duration: 300 }, (finished) => {
+                if (finished) {
+                    runOnJS(setShowHint)(false);
+                    runOnJS(markNavigationHintSeen)();
+                }
+            });
+        }
+    }, [showHint, hintOpacity]);
+
+    // Animated style for the hint
+    const hintAnimatedStyle = useAnimatedStyle(() => ({
+        opacity: hintOpacity.value,
+    }));
 
     // Advance to next phrase with looping
     const nextPhrase = useCallback(() => {
         if (phrases.length > 0) {
             setCurrentIndex((prev) => (prev + 1) % phrases.length);
         }
-    }, [phrases.length]);
+        // Hide hint on first tap
+        hideHint();
+    }, [phrases.length, hideHint]);
 
     // Keep a ref to the latest nextPhrase to avoid stale closures in event listener
     const nextPhraseRef = useRef(nextPhrase);
@@ -116,6 +150,7 @@ export default function ModeScreen() {
     }
 
     const currentPhrase = phrases[currentIndex];
+    const fallback = FALLBACK_TRANSLATIONS[language];
 
     return (
         <View style={styles.container}>
@@ -138,6 +173,14 @@ export default function ModeScreen() {
                     </Text>
                 )}
             </Pressable>
+            {/* Navigation hint - shown only on first use */}
+            {showHint && (
+                <Animated.View style={[styles.hintContainer, { bottom: insets.bottom + 32 }, hintAnimatedStyle]}>
+                    <Text style={[styles.hintText, { color: secondaryTextColor }]}>
+                        {fallback.tapHint}
+                    </Text>
+                </Animated.View>
+            )}
         </View>
     );
 }
@@ -172,6 +215,17 @@ const styles = StyleSheet.create({
         lineHeight: 28,
         textAlign: 'center',
         marginTop: 16,
+    },
+    hintContainer: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+    },
+    hintText: {
+        fontSize: 14,
+        fontWeight: '300',
+        opacity: 0.7,
     },
 });
 

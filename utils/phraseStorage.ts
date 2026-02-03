@@ -245,6 +245,36 @@ export const getVisibleModes = async (): Promise<Mode[]> => {
 };
 
 // ============================================
+// Navigation Hint Storage
+// ============================================
+
+const NAVIGATION_HINT_KEY = '@anchor_has_seen_nav_hint';
+
+/**
+ * Check if the user has seen the navigation hint
+ */
+export const hasSeenNavigationHint = async (): Promise<boolean> => {
+    try {
+        const value = await AsyncStorage.getItem(NAVIGATION_HINT_KEY);
+        return value === 'true';
+    } catch (error) {
+        console.warn('Failed to check navigation hint status:', error);
+        return false;
+    }
+};
+
+/**
+ * Mark the navigation hint as seen
+ */
+export const markNavigationHintSeen = async (): Promise<void> => {
+    try {
+        await AsyncStorage.setItem(NAVIGATION_HINT_KEY, 'true');
+    } catch (error) {
+        console.warn('Failed to mark navigation hint as seen:', error);
+    }
+};
+
+// ============================================
 // Reset to Defaults
 // ============================================
 
@@ -274,6 +304,9 @@ export const resetAllToDefaults = async (): Promise<void> => {
         // Reset hidden modes to default by removing the key
         // (getHiddenModes will return DEFAULT_HIDDEN_MODES when no data exists)
         await AsyncStorage.removeItem(HIDDEN_MODES_KEY);
+
+        // Reset navigation hint so it shows again
+        await AsyncStorage.removeItem(NAVIGATION_HINT_KEY);
     } catch (error) {
         console.warn('Failed to reset to defaults:', error);
         throw error;
