@@ -1,27 +1,31 @@
 [
     
     {
-        "id": "phrase2",
+        "id": "phrase1",
         "text": "Sinta seus pés no chão."
     },
     {
-        "id": "phrase1",
-        "text": "Me diga 5 coisas que você possa ver."
+        "id": "phrase2",
+        "text": "Faz uma respiração profunda."
     },
     {
         "id": "phrase3",
-        "text": "Me diga 4 coisas que você possa ouvir."
+        "text": "Me diga 5 coisas que você possa ver."
     },
     {
         "id": "phrase4",
-        "text": "Me diga 3 coisas que você possa tocar."
+        "text": "Me diga 4 coisas que você possa ouvir."
     },
     {
         "id": "phrase5",
-        "text": "Me diga 2 coisas que você possa cheirar."
+        "text": "Me diga 3 coisas que você possa tocar."
     },
     {
         "id": "phrase6",
+        "text": "Me diga 2 coisas que você possa cheirar."
+    },
+    {
+        "id": "phrase7",
         "text": "Me diga 1 coisa que você possa saborear."
     }
 ]

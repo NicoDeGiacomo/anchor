@@ -1,27 +1,31 @@
 [
     
     {
-        "id": "phrase2",
+        "id": "phrase1",
         "text": "Feel your feet on the floor."
     },
     {
-        "id": "phrase1",
-        "text": "Tel me 5 things you can see."
+        "id": "phrase2",
+        "text": "Take a deep breath."
     },
     {
         "id": "phrase3",
-        "text": "Tel me 4 things you can hear."
+        "text": "Tel me 5 things you can see."
     },
     {
         "id": "phrase4",
-        "text": "Tel me 3 things you can touch."
+        "text": "Tel me 4 things you can hear."
     },
     {
         "id": "phrase5",
-        "text": "Tel me 2 things you can smell."
+        "text": "Tel me 3 things you can touch."
     },
     {
         "id": "phrase6",
+        "text": "Tel me 2 things you can smell."
+    },
+    {
+        "id": "phrase7",
         "text": "Tel me 1 thing you can taste."
     }
 ]

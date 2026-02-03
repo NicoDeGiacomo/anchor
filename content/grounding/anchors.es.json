@@ -1,27 +1,31 @@
 [
     
     {
-        "id": "phrase2",
+        "id": "phrase1",
         "text": "Siente tus pies en el suelo."
     },
     {
-        "id": "phrase1",
-        "text": "Dime 5 cosas que puedas ver."
+        "id": "phrase2",
+        "text": "Haz una respiración profunda."
     },
     {
         "id": "phrase3",
-        "text": "Dime 4 cosas que puedas oír."
+        "text": "Dime 5 cosas que puedas ver."
     },
     {
         "id": "phrase4",
-        "text": "Dime 3 cosas que puedas tocar."
+        "text": "Dime 4 cosas que puedas oír."
     },
     {
         "id": "phrase5",
-        "text": "Dime 2 cosas que puedas oler."
+        "text": "Dime 3 cosas que puedas tocar."
     },
     {
         "id": "phrase6",
+        "text": "Dime 2 cosas que puedas oler."
+    },
+    {
+        "id": "phrase7",
         "text": "Dime 1 cosa que puedas saborear."
     }
 ]
