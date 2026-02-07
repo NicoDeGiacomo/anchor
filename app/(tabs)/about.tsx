@@ -12,6 +12,8 @@ const TRANSLATIONS = {
         tagline: 'Gentle reminders for overwhelming moments',
         intentionTitle: 'Intention',
         intention: 'Anchor is a simple app with gentle reminders for overwhelming moments.\n\nI created it based on my own experience with anxiety and panic attacks, as a small, predictable tool to read when things feel too intense. The goal is not to fix anything — just to help you stay grounded until the moment passes.',
+        evidenceTitle: 'Evidence-based',
+        evidence: 'The grounding techniques and phrases in Anchor are rooted in established psychological practices. Our content has been reviewed by mental health professionals to ensure it follows evidence-based approaches.\n\nWe are committed to providing scientifically-validated methods you can trust.',
         importantTitle: 'Important note',
         important: 'This app does not provide medical, psychological, professional, diagnosis, or treatment.\nIt is not a substitute for professional care.\n\nIf you are in immediate danger or experiencing a crisis, please contact local emergency services or a trusted professional.',
         privacyTitle: 'Privacy',
@@ -30,6 +32,8 @@ const TRANSLATIONS = {
         tagline: 'Recordatorios suaves para momentos abrumadores',
         intentionTitle: 'Intención',
         intention: 'Anchor es una aplicación simple con recordatorios suaves para momentos abrumadores.\n\nLa creé basándome en mi propia experiencia con la ansiedad y los ataques de pánico, como una pequeña herramienta predecible para leer cuando las cosas se sienten demasiado intensas. El objetivo no es arreglar nada, solo ayudarte a mantenerte conectado hasta que el momento pase.',
+        evidenceTitle: 'Basado en evidencia',
+        evidence: 'Las técnicas de anclaje y las frases en Anchor están basadas en prácticas psicológicas establecidas. Nuestro contenido ha sido revisado por profesionales de salud mental para asegurar que sigue enfoques basados en evidencia.\n\nNos comprometemos a proporcionar métodos científicamente validados en los que puedes confiar.',
         importantTitle: 'Nota importante',
         important: 'Esta aplicación no proporciona consejos médicos, psicológicos, profesionales, diagnósticos, ni tratamientos.\nNo sustituye la atención profesional.\n\nSi está en peligro inmediato o experimenta una crisis, comuníquese con los servicios de emergencia locales o un profesional de confianza.',
         privacyTitle: 'Privacidad',
@@ -48,6 +52,8 @@ const TRANSLATIONS = {
         tagline: 'Lembretes suaves para momentos difíceis',
         intentionTitle: 'Intenção',
         intention: 'Anchor é um aplicativo simples com lembretes suaves para momentos difíceis.\n\nEu o criei com base na minha própria experiência com ansiedade e ataques de pânico, como uma pequena ferramenta previsível para ler quando as coisas parecem muito intensas. O objetivo não é consertar nada — apenas ajudá-lo a permanecer fundamentado até que o momento passe.',
+        evidenceTitle: 'Baseado em evidências',
+        evidence: 'As técnicas de ancoragem e frases no Anchor são baseadas em práticas psicológicas estabelecidas. Nosso conteúdo foi revisado por profissionais de saúde mental para garantir que segue abordagens baseadas em evidências.\n\nEstamos comprometidos em fornecer métodos cientificamente validados em que você pode confiar.',
         importantTitle: 'Nota importante',
         important: 'Este aplicativo não fornece aconselhamento médico, psicológico, profissional, diagnóstico, ou tratamento.\nNão substitui cuidados profissionais.\n\nSe você estiver em perigo imediato ou passando por uma crise, entre em contato com os serviços de emergência locais ou um profissional de confiança.',
         privacyTitle: 'Privacidade',
@@ -95,6 +101,11 @@ export default function AboutScreen() {
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>{t.intentionTitle}</Text>
                     <Text style={styles.sectionText}>{t.intention}</Text>
+                </View>
+
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>{t.evidenceTitle}</Text>
+                    <Text style={styles.sectionText}>{t.evidence}</Text>
                 </View>
 
                 <View style={styles.section}>

@@ -16,6 +16,7 @@ Anchor is a simple tool for when emotions feel overwhelming. It provides gentle 
 - **Minimal** — Clean, distraction-free interface
 - **Private** — All data stays on your device
 - **Customizable** — Add your own phrases and modes
+- **Evidence-based** — Techniques backed by science and reviewed by experts
 
 > **Important:** Anchor is not a medical tool or therapy replacement. It's simply a reading tool that provides phrases you can reflect on during difficult moments. If you're experiencing a mental health crisis, please reach out to a professional or crisis helpline.
 
@@ -28,6 +29,7 @@ Anchor is a simple tool for when emotions feel overwhelming. It provides gentle 
 - **Themes** — Light, Dark, or Auto (follows system)
 - **Cross-platform** — iOS, Android, and Web
 - **Privacy-first** — No accounts, no analytics, no tracking
+- **Evidence-based** — Techniques backed by science and reviewed by mental health experts
 
 ## Getting Started
 
@@ -112,6 +114,16 @@ In **Settings**, you can:
 - **[Expo Router](https://docs.expo.dev/router/introduction/)** — File-based routing
 - **[AsyncStorage](https://react-native-async-storage.github.io/async-storage/)** — Local data persistence
 - **[Reanimated](https://docs.swmansion.com/react-native-reanimated/)** — Smooth animations
+
+## Science-Backed Approach
+
+Anchor's grounding techniques are:
+
+- **Evidence-based** — Rooted in established psychological practices
+- **Expert-reviewed** — Techniques reviewed by mental health professionals
+- **Research-informed** — Based on proven methods for managing anxiety and panic
+
+We are committed to providing scientifically-validated approaches you can trust.
 
 ## Privacy
 
