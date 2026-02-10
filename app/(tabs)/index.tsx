@@ -82,10 +82,15 @@ export default function MainScreen() {
         <View style={styles.modeButtons}>
           {modes.map((mode) => {
             const modeId = getModeId(mode);
+            const label = getModeLabel(mode);
             return (
               <Link href={`/mode/${modeId}`} asChild key={modeId}>
-                <PressableFeedback style={modeButtonStyle}>
-                  <Text style={styles.modeButtonText}>{getModeLabel(mode)}</Text>
+                <PressableFeedback
+                  style={modeButtonStyle}
+                  accessibilityRole="button"
+                  accessibilityLabel={label}
+                >
+                  <Text style={styles.modeButtonText}>{label}</Text>
                 </PressableFeedback>
               </Link>
             );
@@ -94,13 +99,21 @@ export default function MainScreen() {
 
         <View style={styles.secondaryButtons}>
           <Link href="/settings" asChild>
-            <PressableFeedback style={secondaryButtonStyle}>
+            <PressableFeedback
+              style={secondaryButtonStyle}
+              accessibilityRole="button"
+              accessibilityLabel={t.settingsButton}
+            >
               <Text style={styles.secondaryButtonText}>{t.settingsButton}</Text>
             </PressableFeedback>
           </Link>
 
           <Link href="/about" asChild>
-            <PressableFeedback style={secondaryButtonStyle}>
+            <PressableFeedback
+              style={secondaryButtonStyle}
+              accessibilityRole="button"
+              accessibilityLabel={t.aboutButton}
+            >
               <Text style={styles.secondaryButtonText}>{t.aboutButton}</Text>
             </PressableFeedback>
           </Link>

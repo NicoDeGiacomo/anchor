@@ -19,6 +19,7 @@ export const Logo = memo(function Logo({ size = 60 }: LogoProps) {
       source={source}
       style={{ width: size, height: size }}
       resizeMode="contain"
+      accessibilityLabel="Anchor logo"
     />
   );
 });

@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import { useCallback } from 'react';
 import { Linking, ScrollView, StyleSheet } from 'react-native';
 
@@ -5,6 +6,8 @@ import { Logo } from '@/components/Logo';
 import PressableFeedback from '@/components/PressableFeedback';
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
+
+const appVersion = Constants.expoConfig?.version ?? '1.0.0';
 
 const TRANSLATIONS = {
     en: {
@@ -96,6 +99,7 @@ export default function AboutScreen() {
                     <Logo size={80} />
                     <Text style={styles.title}>{t.title}</Text>
                     <Text style={styles.tagline}>{t.tagline}</Text>
+                    <Text style={styles.version}>v{appVersion}</Text>
                 </View>
 
                 <View style={styles.section}>
@@ -125,6 +129,8 @@ export default function AboutScreen() {
                     <PressableFeedback
                         style={styles.linkWrapper}
                         onPress={openGitHub}
+                        accessibilityRole="link"
+                        accessibilityLabel="GitHub"
                     >
                         <Text style={styles.link}>github.com/NicoDeGiacomo/anchor</Text>
                     </PressableFeedback>
@@ -136,12 +142,16 @@ export default function AboutScreen() {
                     <PressableFeedback
                         style={styles.linkWrapper}
                         onPress={openKofi}
+                        accessibilityRole="link"
+                        accessibilityLabel="Ko-fi"
                     >
                         <Text style={styles.link}>ko-fi.com/nicodegiacomo</Text>
                     </PressableFeedback>
                     <PressableFeedback
                         style={styles.linkWrapper}
                         onPress={openCafecito}
+                        accessibilityRole="link"
+                        accessibilityLabel="Cafecito"
                     >
                         <Text style={styles.link}>cafecito.app/nicodegiacomo</Text>
                     </PressableFeedback>
@@ -152,6 +162,8 @@ export default function AboutScreen() {
                     <PressableFeedback
                         style={styles.linkWrapper}
                         onPress={openLinkedIn}
+                        accessibilityRole="link"
+                        accessibilityLabel="LinkedIn"
                     >
                         <Text style={styles.link}>linkedin.com/in/nicolasdegiacomo</Text>
                     </PressableFeedback>
@@ -183,6 +195,11 @@ const styles = StyleSheet.create({
         fontWeight: '300',
         opacity: 0.7,
         textAlign: 'center',
+    },
+    version: {
+        fontSize: 13,
+        fontWeight: '300',
+        opacity: 0.4,
         marginBottom: 16,
     },
     section: {

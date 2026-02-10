@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "anchor",
+    "name": "Anchor",
     "slug": "anchor",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -18,9 +18,13 @@
       }
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.nicodegiacomo.anchor",
+      "buildNumber": "1"
     },
     "android": {
+      "package": "com.nicodegiacomo.anchor",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"

@@ -5,8 +5,7 @@ A minimal, open-source grounding app for overwhelming moments.
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform: iOS | Android | Web](https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20%7C%20Web-lightgrey.svg)](#)
 
-<!-- Add your screenshot or demo GIF here -->
-<!-- ![Anchor App Screenshot](assets/images/screenshot.png) -->
+![Anchor App Screenshot](assets/images/screenshot.png)
 
 ## About
 
@@ -144,11 +143,11 @@ Contributions are welcome! Whether it's:
 - Improving documentation
 - Submitting pull requests
 
-Please feel free to open an issue or submit a PR.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get started.
 
 ## Publishing
 
-See [PUBLISHING.md](PUBLISHING.md) for detailed instructions on building and publishing to:
+See [PUBLISHING.md](docs/PUBLISHING.md) for detailed instructions on building and publishing to:
 - iOS App Store
 - Google Play Store
 - Web

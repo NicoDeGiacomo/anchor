@@ -313,11 +313,15 @@ export default function SettingsScreen() {
                 <View style={styles.optionList}>
                     {THEMES.map((theme) => {
                         const isSelected = themeMode === theme.mode;
+                        const themeName = getThemeName(theme.nameKey);
                         return (
                             <PressableFeedback
                                 key={theme.mode}
                                 style={getOptionStyle(isSelected)}
                                 onPress={() => setThemeMode(theme.mode)}
+                                accessibilityRole="radio"
+                                accessibilityLabel={themeName}
+                                accessibilityState={{ selected: isSelected }}
                             >
                                 <Text
                                     style={[
@@ -325,7 +329,7 @@ export default function SettingsScreen() {
                                         isSelected && styles.optionTextSelected,
                                     ]}
                                 >
-                                    {getThemeName(theme.nameKey)}
+                                    {themeName}
                                 </Text>
                             </PressableFeedback>
                         );
@@ -342,6 +346,9 @@ export default function SettingsScreen() {
                                 key={lang.code}
                                 style={getOptionStyle(isSelected)}
                                 onPress={() => setLanguage(lang.code)}
+                                accessibilityRole="radio"
+                                accessibilityLabel={lang.name}
+                                accessibilityState={{ selected: isSelected }}
                             >
                                 <Text
                                     style={[
@@ -395,6 +402,8 @@ export default function SettingsScreen() {
                                             <PressableFeedback
                                                 style={styles.toggleButton}
                                                 onPress={() => openRenameModal(mode)}
+                                                accessibilityRole="button"
+                                                accessibilityLabel={`${t.renameButton} ${getModeLabel(mode)}`}
                                             >
                                                 <Text style={styles.toggleButtonText}>
                                                     {t.renameButton}
@@ -403,6 +412,8 @@ export default function SettingsScreen() {
                                             <PressableFeedback
                                                 style={styles.toggleButton}
                                                 onPress={() => openDeleteConfirm(mode)}
+                                                accessibilityRole="button"
+                                                accessibilityLabel={`${t.deleteButton} ${getModeLabel(mode)}`}
                                             >
                                                 <Text style={[styles.toggleButtonText, { color: dangerColor }]}>
                                                     {t.deleteButton}
@@ -417,6 +428,9 @@ export default function SettingsScreen() {
                                         ]}
                                         onPress={() => isHidden ? handleShowMode(mode) : handleHideMode(mode)}
                                         disabled={isLastVisible}
+                                        accessibilityRole="button"
+                                        accessibilityLabel={`${isHidden ? t.showButton : t.hideButton} ${getModeLabel(mode)}`}
+                                        accessibilityState={{ disabled: isLastVisible }}
                                     >
                                         <Text
                                             style={[
@@ -436,6 +450,8 @@ export default function SettingsScreen() {
                     <PressableFeedback
                         style={[styles.createModeButton, { borderColor }]}
                         onPress={() => setShowCreateModal(true)}
+                        accessibilityRole="button"
+                        accessibilityLabel={t.createCustomMode}
                     >
                         <Text style={styles.createModeButtonText}>+ {t.createCustomMode}</Text>
                     </PressableFeedback>
@@ -452,7 +468,11 @@ export default function SettingsScreen() {
                         
                         return (
                             <Link key={modeId} href={`/edit-phrases/${modeId}`} asChild>
-                                <PressableFeedback style={optionItemStyle}>
+                                <PressableFeedback
+                                    style={optionItemStyle}
+                                    accessibilityRole="button"
+                                    accessibilityLabel={`${t.phrasesSection} — ${label}`}
+                                >
                                     <Text style={styles.optionText}>{label}</Text>
                                 </PressableFeedback>
                             </Link>
@@ -465,6 +485,8 @@ export default function SettingsScreen() {
                 <PressableFeedback
                     style={[styles.resetButton, { borderColor: dangerColor }]}
                     onPress={() => setShowResetConfirm(true)}
+                    accessibilityRole="button"
+                    accessibilityLabel={t.resetButton}
                 >
                     <Text style={[styles.resetButtonText, { color: dangerColor }]}>
                         {t.resetButton}

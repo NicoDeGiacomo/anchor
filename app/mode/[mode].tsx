@@ -18,6 +18,8 @@ const FALLBACK_TRANSLATIONS = {
         error: 'Something went wrong. Please try again.',
         tapHint: 'tap anywhere to continue',
         feelingBetter: "I'm feeling better",
+        backLabel: 'Go back',
+        nextPhraseHint: 'Tap to see the next phrase',
     },
     es: {
         noContent: 'No hay frases disponibles para este modo.',
@@ -25,6 +27,8 @@ const FALLBACK_TRANSLATIONS = {
         error: 'Algo salió mal. Por favor, inténtelo de nuevo.',
         tapHint: 'toca en cualquier lugar para continuar',
         feelingBetter: 'Me siento mejor',
+        backLabel: 'Volver',
+        nextPhraseHint: 'Toca para ver la siguiente frase',
     },
     pt: {
         noContent: 'Nenhuma frase disponível para este modo.',
@@ -32,6 +36,8 @@ const FALLBACK_TRANSLATIONS = {
         error: 'Algo deu errado. Por favor, tente novamente.',
         tapHint: 'toque em qualquer lugar para continuar',
         feelingBetter: 'Estou me sentindo melhor',
+        backLabel: 'Voltar',
+        nextPhraseHint: 'Toque para ver a próxima frase',
     },
 };
 
@@ -171,6 +177,8 @@ export default function ModeScreen() {
                     hitSlop={{ top: 12, right: 12, bottom: 12, left: 12 }}
                     style={[styles.backButton, { top: insets.top + 16 }]}
                     activeOpacity={0.6}
+                    accessibilityRole="button"
+                    accessibilityLabel={fallback.backLabel}
                 >
                     <Ionicons name="chevron-back" size={24} color={iconColor} />
                 </TouchableOpacity>
@@ -193,6 +201,8 @@ export default function ModeScreen() {
                 hitSlop={{ top: 12, right: 12, bottom: 12, left: 12 }}
                 style={[styles.backButton, { top: insets.top + 16 }]}
                 activeOpacity={0.6}
+                accessibilityRole="button"
+                accessibilityLabel={fallback.backLabel}
             >
                 <Ionicons name="chevron-back" size={24} color={iconColor} />
             </TouchableOpacity>
@@ -204,6 +214,8 @@ export default function ModeScreen() {
                     hitSlop={{ top: 12, right: 12, bottom: 12, left: 12 }}
                     style={[styles.feelingBetterButton, { top: insets.top + 16 }]}
                     activeOpacity={0.6}
+                    accessibilityRole="button"
+                    accessibilityLabel={fallback.feelingBetter}
                 >
                     <Text style={[styles.feelingBetterText, { color: secondaryTextColor }]}>
                         {fallback.feelingBetter}
@@ -213,7 +225,13 @@ export default function ModeScreen() {
 
             {/* Tap-to-advance wrapper */}
             {currentPhrase ? (
-                <Pressable style={styles.phraseWrapper} onPress={nextPhrase}>
+                <Pressable
+                    style={styles.phraseWrapper}
+                    onPress={nextPhrase}
+                    accessibilityRole="button"
+                    accessibilityLabel={currentPhrase.text}
+                    accessibilityHint={fallback.nextPhraseHint}
+                >
                     <Text style={styles.phraseText}>
                         {currentPhrase.text}
                     </Text>

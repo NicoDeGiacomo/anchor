@@ -27,6 +27,8 @@ export default function TabLayout() {
       onPress={handleBackToHome} 
       style={headerLeftStyle}
       activeOpacity={0.6}
+      accessibilityRole="button"
+      accessibilityLabel="Go back"
     >
       <Ionicons name="chevron-back" size={24} color={iconColor} />
     </TouchableOpacity>
@@ -37,6 +39,8 @@ export default function TabLayout() {
       onPress={handleBackToSettings} 
       style={headerLeftStyle}
       activeOpacity={0.6}
+      accessibilityRole="button"
+      accessibilityLabel="Go back"
     >
       <Ionicons name="chevron-back" size={24} color={iconColor} />
     </TouchableOpacity>

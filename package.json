@@ -2,11 +2,19 @@
   "name": "anchor",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NicoDeGiacomo/anchor.git"
+  },
+  "homepage": "https://github.com/NicoDeGiacomo/anchor",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\""
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -33,7 +41,10 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
+    "eslint": "^9.39.2",
+    "eslint-config-expo": "^10.0.0",
     "playwright": "^1.58.1",
+    "prettier": "^3.8.1",
     "react-test-renderer": "19.1.0",
     "sharp": "^0.34.5",
     "typescript": "~5.9.2"

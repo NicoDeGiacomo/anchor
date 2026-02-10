@@ -95,6 +95,8 @@ const PhraseItem = memo(function PhraseItem({
                     <Pressable
                         style={styles.actionButton}
                         onPress={() => onDelete(phrase.id)}
+                        accessibilityRole="button"
+                        accessibilityLabel={t.deleteButton}
                     >
                         <Text style={[styles.actionButtonText, { color: dangerColor }]}>
                             {t.deleteButton}
@@ -104,6 +106,8 @@ const PhraseItem = memo(function PhraseItem({
                     <Pressable
                         style={styles.actionButton}
                         onPress={() => onUnhide(phrase.id)}
+                        accessibilityRole="button"
+                        accessibilityLabel={t.unhideButton}
                     >
                         <Text style={styles.actionButtonText}>
                             {t.unhideButton}
@@ -113,6 +117,8 @@ const PhraseItem = memo(function PhraseItem({
                     <Pressable
                         style={styles.actionButton}
                         onPress={() => onHide(phrase.id)}
+                        accessibilityRole="button"
+                        accessibilityLabel={t.hideButton}
                     >
                         <Text style={styles.actionButtonText}>
                             {t.hideButton}
@@ -392,6 +398,8 @@ export default function EditPhrasesScreen() {
         <Pressable
             style={[styles.addPhraseButton, { borderColor }]}
             onPress={() => setAddModalPhase(section.phase)}
+            accessibilityRole="button"
+            accessibilityLabel={`${t.addButton} — ${section.title}`}
         >
             <Text style={styles.addPhraseButtonText}>+ {t.addButton}</Text>
         </Pressable>
