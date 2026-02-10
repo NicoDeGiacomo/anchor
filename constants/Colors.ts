@@ -1,13 +1,13 @@
 // =============================================================================
-// Logo Colors - Easily adjustable when final logo arrives
+// Logo Colors - Derived from the brand cyan in the final logo assets
 // =============================================================================
-export const LOGO_BLUE = '#4A90D9'; // Soft blue (placeholder - adjust when final logo is ready)
+export const LOGO_BLUE = '#4AAFCA'; // Brand cyan - primary accent
 export const LOGO_WHITE = '#FFFFFF';
 
 // Derived logo colors for variations
-export const LOGO_BLUE_LIGHT = '#6BA3E0'; // Lighter variant for hover/secondary
-export const LOGO_BLUE_DARK = '#3A7BC8'; // Darker variant for pressed states
-export const LOGO_BLUE_MUTED = '#7FAED4'; // Muted variant for secondary text
+export const LOGO_BLUE_LIGHT = '#7DD3E8'; // Light cyan (matches logo imagery)
+export const LOGO_BLUE_DARK = '#236B7A'; // Deep teal for dark theme backgrounds
+export const LOGO_BLUE_MUTED = '#7AB0BE'; // Muted cyan for secondary text
 
 // =============================================================================
 // Color Keys Type
