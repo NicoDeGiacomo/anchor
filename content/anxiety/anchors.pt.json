@@ -1,17 +1,49 @@
-[
-    {
-        "id": "phrase1",
-        "text": "A ansiedade vai subir e descer por conta própria.",
-        "subphrase": "Respire profundamente por 4 segundos, depois expire por 6 segundos."
-    },
-    {
-        "id": "phrase2",
-        "text": "Os cenários que você imagina não refletem necessariamente a realidade.",
-        "subphrase": "Nomeie 5 coisas que você possa ver, 4 que possa ouvir, 3 que possa tocar."
-    },
-    {
-        "id": "phrase3",
-        "text": "Não tente lutar contra seus pensamentos, apenas deixe-os passar.",
-        "subphrase": "Nomeie 2 coisas que você possa tocar e 1 coisa que possa saborear."
-    }
-]
+{
+    "preparation": [
+        {
+            "id": "prep1",
+            "text": "A ansiedade é o sistema de alarme do seu corpo.",
+            "subphrase": "Vai subir e descer por conta própria."
+        },
+        {
+            "id": "prep2",
+            "text": "Os cenários que você imagina não refletem necessariamente a realidade."
+        },
+        {
+            "id": "prep3",
+            "text": "O que você está sentindo agora é temporário."
+        }
+    ],
+    "confrontation": [
+        {
+            "id": "conf1",
+            "text": "Não tente lutar contra seus pensamentos, apenas deixe-os passar.",
+            "subphrase": "Inspire lentamente."
+        },
+        {
+            "id": "conf2",
+            "text": "Foque no que é real agora, não no que pode acontecer.",
+            "subphrase": "Segure a respiração suavemente."
+        },
+        {
+            "id": "conf3",
+            "text": "Um passo de cada vez. Apenas este momento.",
+            "subphrase": "Expire lentamente."
+        }
+    ],
+    "reinforcement": [
+        {
+            "id": "reinf1",
+            "text": "Você ficou com isso, e passou."
+        },
+        {
+            "id": "reinf2",
+            "text": "Preocupar-se não ajudou, mas você sim.",
+            "subphrase": "Você lidou bem com isso."
+        },
+        {
+            "id": "reinf3",
+            "text": "Você consegue lidar com mais do que imagina."
+        }
+    ]
+}

@@ -2,10 +2,10 @@ import { useNavigation } from '@react-navigation/native';
 import { useLocalSearchParams } from 'expo-router';
 import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import {
-    FlatList,
-    ListRenderItem,
     Modal,
     Pressable,
+    SectionList,
+    SectionListRenderItem,
     StyleSheet,
     TextInput,
 } from 'react-native';
@@ -20,6 +20,8 @@ import {
     getCustomModeById,
     hideBuiltInPhrase,
     isBuiltInMode,
+    PHRASE_PHASES,
+    PhrasePhase,
     removeUserPhrase,
     unhideBuiltInPhrase
 } from '@/utils/phraseStorage';
@@ -146,6 +148,9 @@ const TRANSLATIONS = {
         anger: 'Anger',
         grounding: 'Grounding',
         loadError: 'Failed to load phrases. Please try again.',
+        preparation: 'Preparation',
+        confrontation: 'Confrontation',
+        reinforcement: 'Reinforcement',
     },
     es: {
         title: 'Editar frases',
@@ -170,6 +175,9 @@ const TRANSLATIONS = {
         anger: 'Ira',
         grounding: 'Conexión',
         loadError: 'Error al cargar las frases. Por favor, inténtelo de nuevo.',
+        preparation: 'Preparación',
+        confrontation: 'Confrontación',
+        reinforcement: 'Refuerzo',
     },
     pt: {
         title: 'Editar frases',
@@ -194,7 +202,16 @@ const TRANSLATIONS = {
         anger: 'Raiva',
         grounding: 'Aterramento',
         loadError: 'Falha ao carregar as frases. Por favor, tente novamente.',
+        preparation: 'Preparação',
+        confrontation: 'Confrontação',
+        reinforcement: 'Reforço',
     },
+};
+
+type PhraseSection = {
+    phase: PhrasePhase;
+    title: string;
+    data: PhraseWithSource[];
 };
 
 export default function EditPhrasesScreen() {
@@ -204,10 +221,10 @@ export default function EditPhrasesScreen() {
     // Accept any non-empty mode string (built-in or custom mode ID)
     const validMode = mode || 'panic';
 
-    // Use the phrases hook for loading data
+    // Use the phrases hook for loading data (now returns phased data)
     const { phrases, isLoading, error, refetch, isCustomMode } = usePhrasesWithSource(validMode);
     
-    const [showAddModal, setShowAddModal] = useState(false);
+    const [addModalPhase, setAddModalPhase] = useState<PhrasePhase | null>(null);
     const [newPhraseText, setNewPhraseText] = useState('');
     const [newSubphrase, setNewSubphrase] = useState('');
     const [customModeName, setCustomModeName] = useState<string | null>(null);
@@ -266,7 +283,17 @@ export default function EditPhrasesScreen() {
         });
     }, [navigation, modeTitle, t.title]);
 
-    // Add new phrase
+    // Build SectionList sections from phased data
+    const sections: PhraseSection[] = useMemo(() => 
+        PHRASE_PHASES.map(phase => ({
+            phase,
+            title: t[phase],
+            data: phrases[phase],
+        })),
+        [phrases, t]
+    );
+
+    // Add new phrase (scoped to the phase selected via the modal)
     const handleAddPhrase = useCallback(async () => {
         if (!newPhraseText.trim()) {
             setConfirmDialog({
@@ -279,25 +306,28 @@ export default function EditPhrasesScreen() {
             return;
         }
 
+        if (!addModalPhase) return;
+
         try {
             await addUserPhrase(
                 validMode,
                 language,
+                addModalPhase,
                 newPhraseText.trim(),
                 newSubphrase.trim() || undefined
             );
             
             setNewPhraseText('');
             setNewSubphrase('');
-            setShowAddModal(false);
+            setAddModalPhase(null);
             await refetch();
-        } catch (error) {
-            console.warn('Failed to add phrase:', error);
+        } catch (err) {
+            console.warn('Failed to add phrase:', err);
         }
-    }, [newPhraseText, newSubphrase, validMode, language, refetch, t.emptyMainPhraseError]);
+    }, [newPhraseText, newSubphrase, validMode, language, addModalPhase, refetch, t.emptyMainPhraseError]);
 
-    // Delete user phrase
-    const handleDeletePhrase = useCallback((phraseId: string) => {
+    // Delete user phrase (needs the phase to know which storage key to use)
+    const handleDeletePhrase = useCallback((phraseId: string, phase: PhrasePhase) => {
         setConfirmDialog({
             visible: true,
             title: t.deleteConfirmTitle,
@@ -306,10 +336,10 @@ export default function EditPhrasesScreen() {
             isDanger: true,
             onConfirm: async () => {
                 try {
-                    await removeUserPhrase(validMode, language, phraseId);
+                    await removeUserPhrase(validMode, language, phase, phraseId);
                     await refetch();
-                } catch (error) {
-                    console.warn('Failed to delete phrase:', error);
+                } catch (err) {
+                    console.warn('Failed to delete phrase:', err);
                 }
                 setConfirmDialog(prev => ({ ...prev, visible: false }));
             },
@@ -321,8 +351,8 @@ export default function EditPhrasesScreen() {
         try {
             await hideBuiltInPhrase(validMode, language, phraseId);
             await refetch();
-        } catch (error) {
-            console.warn('Failed to hide phrase:', error);
+        } catch (err) {
+            console.warn('Failed to hide phrase:', err);
         }
     }, [validMode, language, refetch]);
 
@@ -331,36 +361,43 @@ export default function EditPhrasesScreen() {
         try {
             await unhideBuiltInPhrase(validMode, language, phraseId);
             await refetch();
-        } catch (error) {
-            console.warn('Failed to unhide phrase:', error);
+        } catch (err) {
+            console.warn('Failed to unhide phrase:', err);
         }
     }, [validMode, language, refetch]);
 
-    // FlatList renderItem
-    const renderPhraseItem: ListRenderItem<PhraseWithSource> = useCallback(({ item }) => (
+    // SectionList renderItem - need to determine the phase from the section
+    const renderPhraseItem: SectionListRenderItem<PhraseWithSource, PhraseSection> = useCallback(({ item, section }) => (
         <PhraseItem
             phrase={item}
             borderColor={borderColor}
             secondaryTextColor={secondaryTextColor}
             dangerColor={dangerColor}
             t={t}
-            onDelete={handleDeletePhrase}
+            onDelete={(id) => handleDeletePhrase(id, section.phase)}
             onHide={handleHidePhrase}
             onUnhide={handleUnhidePhrase}
         />
     ), [borderColor, secondaryTextColor, dangerColor, t, handleDeletePhrase, handleHidePhrase, handleUnhidePhrase]);
 
-    const keyExtractor = useCallback((item: PhraseWithSource) => item.id, []);
+    // Section header
+    const renderSectionHeader = useCallback(({ section }: { section: PhraseSection }) => (
+        <View style={styles.sectionHeader}>
+            <Text style={styles.sectionHeaderText}>{section.title}</Text>
+        </View>
+    ), []);
 
-    // Footer component with "Add phrase" button (dotted style like "Create custom mode")
-    const ListFooterComponent = useCallback(() => (
+    // Section footer with "Add phrase" button for each phase
+    const renderSectionFooter = useCallback(({ section }: { section: PhraseSection }) => (
         <Pressable
             style={[styles.addPhraseButton, { borderColor }]}
-            onPress={() => setShowAddModal(true)}
+            onPress={() => setAddModalPhase(section.phase)}
         >
             <Text style={styles.addPhraseButtonText}>+ {t.addButton}</Text>
         </Pressable>
     ), [borderColor, t.addButton]);
+
+    const keyExtractor = useCallback((item: PhraseWithSource) => item.id, []);
 
     return (
         <View style={styles.container}>
@@ -373,29 +410,30 @@ export default function EditPhrasesScreen() {
                 </View>
             )}
 
-            {/* Phrase list with add button at the end */}
-            <FlatList
-                data={phrases}
+            {/* Phrase list grouped by phase */}
+            <SectionList
+                sections={sections}
                 renderItem={renderPhraseItem}
+                renderSectionHeader={renderSectionHeader}
+                renderSectionFooter={renderSectionFooter}
                 keyExtractor={keyExtractor}
                 style={styles.scrollView}
                 contentContainerStyle={styles.scrollContent}
-                maxToRenderPerBatch={10}
-                windowSize={5}
-                initialNumToRender={10}
-                ListFooterComponent={ListFooterComponent}
+                stickySectionHeadersEnabled={false}
             />
 
             {/* Add phrase modal */}
             <Modal
-                visible={showAddModal}
+                visible={addModalPhase !== null}
                 transparent
                 animationType="fade"
-                onRequestClose={() => setShowAddModal(false)}
+                onRequestClose={() => setAddModalPhase(null)}
             >
                 <View style={[styles.modalOverlay, { backgroundColor: overlayColor }]}>
                     <View style={[styles.modalContent, { backgroundColor }]}>
-                        <Text style={styles.modalTitle}>{t.modalTitle}</Text>
+                        <Text style={styles.modalTitle}>
+                            {t.modalTitle} — {addModalPhase ? t[addModalPhase] : ''}
+                        </Text>
 
                         <TextInput
                             style={[
@@ -434,7 +472,7 @@ export default function EditPhrasesScreen() {
                             <Pressable
                                 style={[styles.modalButton, { borderColor }]}
                                 onPress={() => {
-                                    setShowAddModal(false);
+                                    setAddModalPhase(null);
                                     setNewPhraseText('');
                                     setNewSubphrase('');
                                 }}
@@ -517,7 +555,18 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         padding: 20,
-        gap: 12,
+        paddingBottom: 40,
+    },
+    sectionHeader: {
+        paddingTop: 20,
+        paddingBottom: 10,
+    },
+    sectionHeaderText: {
+        fontSize: 18,
+        fontWeight: '500',
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+        opacity: 0.7,
     },
     addPhraseButton: {
         paddingVertical: 16,
@@ -526,7 +575,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderStyle: 'dashed',
         alignItems: 'center',
-        marginTop: 4,
+        marginTop: 8,
+        marginBottom: 12,
     },
     addPhraseButtonText: {
         fontSize: 16,
@@ -538,6 +588,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderWidth: 1,
         gap: 12,
+        marginBottom: 12,
     },
     phraseItemHidden: {
         opacity: 0.5,
@@ -640,4 +691,3 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 });
-

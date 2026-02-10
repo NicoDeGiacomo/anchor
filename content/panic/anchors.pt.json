@@ -1,22 +1,54 @@
-[
-    {
-        "id": "phrase1",
-        "text": "Isso é desconfortável, não perigoso.",
-        "subphrase": "Inspire"
-    },
-    {
-        "id": "phrase2",
-        "text": "Você já passou por isso antes.",
-        "subphrase": "Segure a respiração"
-    },
-    {
-        "id": "phrase3",
-        "text": "Você está seguro.",
-        "subphrase": "Expire"
-    },
-    {
-        "id": "phrase4",
-        "text": "Este sentimento vai passar.",
-        "subphrase": "Segure a respiração"
-    }
-]
+{
+    "preparation": [
+        {
+            "id": "prep1",
+            "text": "Isso é um ataque de pânico.",
+            "subphrase": "Parece terrível, mas não é perigoso."
+        },
+        {
+            "id": "prep2",
+            "text": "Seu corpo ativou o sistema de alarme.",
+            "subphrase": "Ele vai se desligar sozinho."
+        },
+        {
+            "id": "prep3",
+            "text": "Isso é desconfortável, não perigoso."
+        }
+    ],
+    "confrontation": [
+        {
+            "id": "conf1",
+            "text": "Foque neste momento.",
+            "subphrase": "Inspire lentamente pelo nariz."
+        },
+        {
+            "id": "conf2",
+            "text": "Você sobreviveu a todos os ataques de pânico anteriores.",
+            "subphrase": "Segure a respiração suavemente."
+        },
+        {
+            "id": "conf3",
+            "text": "Este sentimento vai passar.",
+            "subphrase": "Agora expire lentamente pela boca."
+        },
+        {
+            "id": "conf4",
+            "text": "Você está seguro agora."
+        }
+    ],
+    "reinforcement": [
+        {
+            "id": "reinf1",
+            "text": "Você lidou com isso.",
+            "subphrase": "Você é mais forte do que pensa."
+        },
+        {
+            "id": "reinf2",
+            "text": "Cada vez que você enfrenta isso, fica um pouco mais fácil."
+        },
+        {
+            "id": "reinf3",
+            "text": "Você conseguiu. Lembre-se desta sensação de controle."
+        }
+    ]
+}

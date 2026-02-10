@@ -1,14 +1,46 @@
-[
-    {
-        "id": "phrase1",
-        "text": "Você pode sentir isso."
-    },
-    {
-        "id": "phrase2",
-        "text": "Nada precisa ser decidido agora."
-    },
-    {
-        "id": "phrase3",
-        "text": "Você pode ser gentil consigo mesmo."
-    }
-]
+{
+    "preparation": [
+        {
+            "id": "prep1",
+            "text": "Você pode sentir isso."
+        },
+        {
+            "id": "prep2",
+            "text": "A tristeza é uma resposta natural.",
+            "subphrase": "Significa que algo importa para você."
+        },
+        {
+            "id": "prep3",
+            "text": "Nada precisa ser decidido agora."
+        }
+    ],
+    "confrontation": [
+        {
+            "id": "conf1",
+            "text": "Você pode ser gentil consigo mesmo."
+        },
+        {
+            "id": "conf2",
+            "text": "Faça uma respiração lenta e profunda.",
+            "subphrase": "Solte o ar suavemente."
+        },
+        {
+            "id": "conf3",
+            "text": "Você não precisa carregar tudo de uma vez."
+        }
+    ],
+    "reinforcement": [
+        {
+            "id": "reinf1",
+            "text": "Você ficou com um sentimento difícil, e ainda está aqui."
+        },
+        {
+            "id": "reinf2",
+            "text": "Ser gentil consigo mesmo é força, não fraqueza."
+        },
+        {
+            "id": "reinf3",
+            "text": "Você merece a mesma compaixão que dá aos outros."
+        }
+    ]
+}

@@ -1,12 +1,48 @@
-[
-    {
-        "id": "phrase1",
-        "text": "Los sentimientos fuertes no requieren acción inmediata.",
-        "subphrase": "Puedes sostener un hielo en tu mano el mayor tiempo posible."
-    },
-    {
-        "id": "phrase2",
-        "text": "Lo que estás sintiendo es una emoción como cualquier otra.",
-        "subphrase": "Puedes agarrar una almohada para gritar en ella."
-    }
-]
+{
+    "preparation": [
+        {
+            "id": "prep1",
+            "text": "Lo que estás sintiendo es una emoción como cualquier otra.",
+            "subphrase": "Es intensa, pero no va a durar para siempre."
+        },
+        {
+            "id": "prep2",
+            "text": "Los sentimientos fuertes no requieren acción inmediata."
+        },
+        {
+            "id": "prep3",
+            "text": "Tu enojo es válido, pero actuar ahora puede no ayudar."
+        }
+    ],
+    "confrontation": [
+        {
+            "id": "conf1",
+            "text": "Pausa. No necesitas responder ahora mismo.",
+            "subphrase": "Puedes sostener un hielo en tu mano el mayor tiempo posible."
+        },
+        {
+            "id": "conf2",
+            "text": "Toma una respiración lenta antes de hacer algo.",
+            "subphrase": "Puedes agarrar una almohada para gritar en ella."
+        },
+        {
+            "id": "conf3",
+            "text": "Concéntrate en tu respiración. Deja que el calor pase."
+        }
+    ],
+    "reinforcement": [
+        {
+            "id": "reinf1",
+            "text": "Elegiste no reaccionar impulsivamente.",
+            "subphrase": "Eso requiere verdadera fortaleza."
+        },
+        {
+            "id": "reinf2",
+            "text": "Dejaste pasar la ola sin que te controlara."
+        },
+        {
+            "id": "reinf3",
+            "text": "Puedes sentir enojo y aún tomar buenas decisiones."
+        }
+    ]
+}

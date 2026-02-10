@@ -1,23 +1,54 @@
-[
-    {
-        "id": "phrase1",
-        "text": "This is uncomfortable, not dangerous.",
-        "subphrase": "Breathe in"
-    },
-    {
-        "id": "phrase2",
-        "text": "You are doing fine.",
-        "subphrase": "Hold your breath"
-    },
-    {
-        "id": "phrase3",
-        "text": "You are safe.",
-        "subphrase": "Breathe out"
-    },
-    {
-        "id": "phrase4",
-        "text": "This emotion will pass.",
-        "subphrase": "Hold your breath"
-    }
-]
-
+{
+    "preparation": [
+        {
+            "id": "prep1",
+            "text": "This is a panic attack.",
+            "subphrase": "It feels terrible, but it is not dangerous."
+        },
+        {
+            "id": "prep2",
+            "text": "Your body activated its alarm system.",
+            "subphrase": "It will turn off on its own."
+        },
+        {
+            "id": "prep3",
+            "text": "This is uncomfortable, not dangerous."
+        }
+    ],
+    "confrontation": [
+        {
+            "id": "conf1",
+            "text": "Focus on this moment.",
+            "subphrase": "Breathe in slowly through your nose."
+        },
+        {
+            "id": "conf2",
+            "text": "You have survived every panic attack before this one.",
+            "subphrase": "Hold your breath gently."
+        },
+        {
+            "id": "conf3",
+            "text": "This emotion will pass.",
+            "subphrase": "Now breathe out slowly through your mouth."
+        },
+        {
+            "id": "conf4",
+            "text": "You are safe right now."
+        }
+    ],
+    "reinforcement": [
+        {
+            "id": "reinf1",
+            "text": "You handled that.",
+            "subphrase": "You're stronger than you think."
+        },
+        {
+            "id": "reinf2",
+            "text": "Each time you face this, it gets a little easier."
+        },
+        {
+            "id": "reinf3",
+            "text": "You got through it. Remember this feeling of control."
+        }
+    ]
+}

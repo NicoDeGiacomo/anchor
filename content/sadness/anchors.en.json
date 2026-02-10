@@ -1,15 +1,46 @@
-[
-    {
-        "id": "phrase1",
-        "text": "You're allowed to feel this."
-    },
-    {
-        "id": "phrase2",
-        "text": "Nothing needs to be decided right now."
-    },
-    {
-        "id": "phrase3",
-        "text": "You can be gentle with yourself."
-    }
-]
-
+{
+    "preparation": [
+        {
+            "id": "prep1",
+            "text": "You're allowed to feel this."
+        },
+        {
+            "id": "prep2",
+            "text": "Sadness is a natural response.",
+            "subphrase": "It means something matters to you."
+        },
+        {
+            "id": "prep3",
+            "text": "Nothing needs to be decided right now."
+        }
+    ],
+    "confrontation": [
+        {
+            "id": "conf1",
+            "text": "You can be gentle with yourself."
+        },
+        {
+            "id": "conf2",
+            "text": "Take a slow, deep breath.",
+            "subphrase": "Let it out gently."
+        },
+        {
+            "id": "conf3",
+            "text": "You don't have to carry everything at once."
+        }
+    ],
+    "reinforcement": [
+        {
+            "id": "reinf1",
+            "text": "You sat with a hard feeling, and you're still here."
+        },
+        {
+            "id": "reinf2",
+            "text": "Being kind to yourself is strength, not weakness."
+        },
+        {
+            "id": "reinf3",
+            "text": "You deserve the same compassion you give others."
+        }
+    ]
+}

@@ -1,12 +1,48 @@
-[
-    {
-        "id": "phrase1",
-        "text": "Sentimentos fortes não exigem ação imediata.",
-        "subphrase": "Você pode segurar algo frio contra sua pele."
-    },
-    {
-        "id": "phrase2",
-        "text": "O que você está sentindo é uma emoção como qualquer outra.",
-        "subphrase": "Você pode pegar um travesseiro para gritar nele."
-    }
-]
+{
+    "preparation": [
+        {
+            "id": "prep1",
+            "text": "O que você está sentindo é uma emoção como qualquer outra.",
+            "subphrase": "É intensa, mas não vai durar para sempre."
+        },
+        {
+            "id": "prep2",
+            "text": "Sentimentos fortes não exigem ação imediata."
+        },
+        {
+            "id": "prep3",
+            "text": "Sua raiva é válida, mas agir agora pode não ajudar."
+        }
+    ],
+    "confrontation": [
+        {
+            "id": "conf1",
+            "text": "Pausa. Você não precisa responder agora.",
+            "subphrase": "Você pode segurar algo frio contra sua pele."
+        },
+        {
+            "id": "conf2",
+            "text": "Respire devagar antes de fazer qualquer coisa.",
+            "subphrase": "Você pode pegar um travesseiro para gritar nele."
+        },
+        {
+            "id": "conf3",
+            "text": "Foque na sua respiração. Deixe o calor passar."
+        }
+    ],
+    "reinforcement": [
+        {
+            "id": "reinf1",
+            "text": "Você escolheu não reagir impulsivamente.",
+            "subphrase": "Isso exige verdadeira força."
+        },
+        {
+            "id": "reinf2",
+            "text": "Você deixou a onda passar sem que ela te controlasse."
+        },
+        {
+            "id": "reinf3",
+            "text": "Você pode sentir raiva e ainda fazer boas escolhas."
+        }
+    ]
+}

@@ -8,11 +8,14 @@ import {
     getUserPhrases,
     isBuiltInMode,
     Language,
+    PhasedPhrases,
     Phrase,
+    PHRASE_PHASES
 } from '@/utils/phraseStorage';
 
 // Dynamic imports for all built-in mode/language combinations
-const PHRASES_MAP: Record<BuiltInMode, Record<Language, Phrase[]>> = {
+// These now return PhasedPhrases objects instead of flat arrays
+const PHRASES_MAP: Record<BuiltInMode, Record<Language, PhasedPhrases>> = {
     panic: {
         en: require('@/content/panic/anchors.en.json'),
         es: require('@/content/panic/anchors.es.json'),
@@ -40,20 +43,32 @@ const PHRASES_MAP: Record<BuiltInMode, Record<Language, Phrase[]>> = {
     },
 };
 
+const EMPTY_PHASED: PhasedPhrases = {
+    preparation: [],
+    confrontation: [],
+    reinforcement: [],
+};
+
 export type PhraseWithSource = Phrase & {
     isUserAdded: boolean;
     isHidden?: boolean;
 };
 
+export type PhasedPhrasesWithSource = {
+    preparation: PhraseWithSource[];
+    confrontation: PhraseWithSource[];
+    reinforcement: PhraseWithSource[];
+};
+
 interface UsePhasesResult {
-    phrases: Phrase[];
+    phrases: PhasedPhrases;
     isLoading: boolean;
     error: string | null;
     refetch: () => Promise<void>;
 }
 
 interface UsePhrasesWithSourceResult {
-    phrases: PhraseWithSource[];
+    phrases: PhasedPhrasesWithSource;
     isLoading: boolean;
     error: string | null;
     refetch: () => Promise<void>;
@@ -62,37 +77,36 @@ interface UsePhrasesWithSourceResult {
 
 /**
  * Helper to get built-in phrases with fallback to English
- * Returns empty array for custom modes
+ * Returns empty phased object for custom modes
  */
-function getBuiltInPhrases(mode: string, language: Language): Phrase[] {
+function getBuiltInPhrases(mode: string, language: Language): PhasedPhrases {
     // Custom modes have no built-in phrases
     if (!isBuiltInMode(mode)) {
-        return [];
+        return EMPTY_PHASED;
     }
     
     try {
-        let phrases = PHRASES_MAP[mode]?.[language] || [];
+        let phrases = PHRASES_MAP[mode]?.[language];
         
         // Fallback to English if current language has no content
-        if (phrases.length === 0 && language !== 'en') {
-            phrases = PHRASES_MAP[mode]?.en || [];
+        if ((!phrases || (phrases.preparation.length === 0 && phrases.confrontation.length === 0)) && language !== 'en') {
+            phrases = PHRASES_MAP[mode]?.en;
         }
         
-        return phrases;
+        return phrases || EMPTY_PHASED;
     } catch (error) {
         console.warn('Failed to load built-in phrases:', error);
-        return [];
+        return EMPTY_PHASED;
     }
 }
 
 /**
  * Hook to load active phrases for display (built-in + user, excluding hidden)
- * Use this for the mode display screen
- * For custom modes, only loads user-added phrases
+ * Returns phrases grouped by phase: { preparation, confrontation, reinforcement }
  */
 export function usePhrases(mode: string): UsePhasesResult {
     const { language } = useLanguage();
-    const [phrases, setPhrases] = useState<Phrase[]>([]);
+    const [phrases, setPhrases] = useState<PhasedPhrases>(EMPTY_PHASED);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -108,7 +122,7 @@ export function usePhrases(mode: string): UsePhasesResult {
             const errorMessage = err instanceof Error ? err.message : 'Failed to load phrases';
             console.warn('Failed to load phrases:', err);
             setError(errorMessage);
-            setPhrases([]);
+            setPhrases(EMPTY_PHASED);
         } finally {
             setIsLoading(false);
         }
@@ -128,12 +142,15 @@ export function usePhrases(mode: string): UsePhasesResult {
 
 /**
  * Hook to load all phrases with source information (for editing)
- * Includes built-in, user-added, and hidden phrases
- * For custom modes, only loads user-added phrases (no built-in to hide/unhide)
+ * Includes built-in, user-added, and hidden phrases grouped by phase
  */
 export function usePhrasesWithSource(mode: string): UsePhrasesWithSourceResult {
     const { language } = useLanguage();
-    const [phrases, setPhrases] = useState<PhraseWithSource[]>([]);
+    const [phrases, setPhrases] = useState<PhasedPhrasesWithSource>({
+        preparation: [],
+        confrontation: [],
+        reinforcement: [],
+    });
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const isCustom = !isBuiltInMode(mode);
@@ -145,32 +162,49 @@ export function usePhrasesWithSource(mode: string): UsePhrasesWithSourceResult {
         try {
             const builtInPhrases = getBuiltInPhrases(mode, language);
 
-            // Get user phrases and hidden IDs
-            const [userPhrases, hiddenIds] = await Promise.all([
-                getUserPhrases(mode, language),
-                getHiddenPhrases(mode, language),
-            ]);
+            // Get hidden IDs (shared across phases)
+            const hiddenIds = await getHiddenPhrases(mode, language);
+            const hiddenSet = new Set(hiddenIds);
 
-            // Mark built-in phrases (empty for custom modes)
-            const builtInWithSource: PhraseWithSource[] = builtInPhrases.map(phrase => ({
-                ...phrase,
-                isUserAdded: false,
-                isHidden: hiddenIds.includes(phrase.id),
-            }));
+            // Build phased result
+            const result: PhasedPhrasesWithSource = {
+                preparation: [],
+                confrontation: [],
+                reinforcement: [],
+            };
 
-            // Mark user phrases
-            const userWithSource: PhraseWithSource[] = userPhrases.map(phrase => ({
-                ...phrase,
-                isUserAdded: true,
-            }));
+            // Load user phrases for all phases in parallel
+            const userPhrasesByPhase = await Promise.all(
+                PHRASE_PHASES.map(phase => getUserPhrases(mode, language, phase))
+            );
 
-            // Combine all phrases (visible and hidden)
-            setPhrases([...builtInWithSource, ...userWithSource]);
+            for (let i = 0; i < PHRASE_PHASES.length; i++) {
+                const phase = PHRASE_PHASES[i];
+                const builtIn = builtInPhrases[phase] || [];
+                const userPhrases = userPhrasesByPhase[i];
+
+                // Mark built-in phrases
+                const builtInWithSource: PhraseWithSource[] = builtIn.map(phrase => ({
+                    ...phrase,
+                    isUserAdded: false,
+                    isHidden: hiddenSet.has(phrase.id),
+                }));
+
+                // Mark user phrases
+                const userWithSource: PhraseWithSource[] = userPhrases.map(phrase => ({
+                    ...phrase,
+                    isUserAdded: true,
+                }));
+
+                result[phase] = [...builtInWithSource, ...userWithSource];
+            }
+
+            setPhrases(result);
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Failed to load phrases';
             console.warn('Failed to load phrases:', err);
             setError(errorMessage);
-            setPhrases([]);
+            setPhrases({ preparation: [], confrontation: [], reinforcement: [] });
         } finally {
             setIsLoading(false);
         }

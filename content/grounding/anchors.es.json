@@ -1,31 +1,57 @@
-[
-    
-    {
-        "id": "phrase1",
-        "text": "Siente tus pies en el suelo."
-    },
-    {
-        "id": "phrase2",
-        "text": "Haz una respiración profunda."
-    },
-    {
-        "id": "phrase3",
-        "text": "Dime 5 cosas que puedas ver."
-    },
-    {
-        "id": "phrase4",
-        "text": "Dime 4 cosas que puedas oír."
-    },
-    {
-        "id": "phrase5",
-        "text": "Dime 3 cosas que puedas tocar."
-    },
-    {
-        "id": "phrase6",
-        "text": "Dime 2 cosas que puedas oler."
-    },
-    {
-        "id": "phrase7",
-        "text": "Dime 1 cosa que puedas saborear."
-    }
-]
+{
+    "preparation": [
+        {
+            "id": "prep1",
+            "text": "Vamos a traerte de vuelta al momento presente."
+        },
+        {
+            "id": "prep2",
+            "text": "Estás aquí, ahora mismo.",
+            "subphrase": "Eso es todo lo que importa."
+        }
+    ],
+    "confrontation": [
+        {
+            "id": "conf1",
+            "text": "Siente tus pies en el suelo."
+        },
+        {
+            "id": "conf2",
+            "text": "Haz una respiración profunda."
+        },
+        {
+            "id": "conf3",
+            "text": "Dime 5 cosas que puedas ver."
+        },
+        {
+            "id": "conf4",
+            "text": "Dime 4 cosas que puedas oír."
+        },
+        {
+            "id": "conf5",
+            "text": "Dime 3 cosas que puedas tocar."
+        },
+        {
+            "id": "conf6",
+            "text": "Dime 2 cosas que puedas oler."
+        },
+        {
+            "id": "conf7",
+            "text": "Dime 1 cosa que puedas saborear."
+        }
+    ],
+    "reinforcement": [
+        {
+            "id": "reinf1",
+            "text": "Volviste. Tú te trajiste aquí."
+        },
+        {
+            "id": "reinf2",
+            "text": "Te conectaste con el presente. Esa es una habilidad tuya."
+        },
+        {
+            "id": "reinf3",
+            "text": "Siempre puedes volver al momento presente."
+        }
+    ]
+}

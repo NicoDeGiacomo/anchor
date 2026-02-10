@@ -8,10 +8,20 @@ export type Mode = BuiltInMode | string;
 
 export type Language = 'en' | 'es' | 'pt';
 
+export type PhrasePhase = 'preparation' | 'confrontation' | 'reinforcement';
+
+export const PHRASE_PHASES: PhrasePhase[] = ['preparation', 'confrontation', 'reinforcement'];
+
 export interface Phrase {
     id: string;
     text: string;
     subphrase?: string;
+}
+
+export interface PhasedPhrases {
+    preparation: Phrase[];
+    confrontation: Phrase[];
+    reinforcement: Phrase[];
 }
 
 export interface UserPhrase extends Phrase {
@@ -25,9 +35,9 @@ export interface CustomMode {
     createdAt: number;    // Timestamp for ordering
 }
 
-// Storage keys
-const getUserPhrasesKey = (mode: string, language: Language) => 
-    `user_phrases:${mode}:${language}`;
+// Storage keys -- user phrases are stored per phase
+const getUserPhrasesKey = (mode: string, language: Language, phase: PhrasePhase) => 
+    `user_phrases:${mode}:${language}:${phase}`;
 
 const getHiddenPhrasesKey = (mode: string, language: Language) => 
     `hidden_phrases:${mode}:${language}`;
@@ -42,11 +52,11 @@ export const generatePhraseId = (): string => {
 };
 
 /**
- * Get user-added phrases for a specific mode and language
+ * Get user-added phrases for a specific mode, language, and phase
  */
-export const getUserPhrases = async (mode: string, language: Language): Promise<UserPhrase[]> => {
+export const getUserPhrases = async (mode: string, language: Language, phase: PhrasePhase): Promise<UserPhrase[]> => {
     try {
-        const key = getUserPhrasesKey(mode, language);
+        const key = getUserPhrasesKey(mode, language, phase);
         const data = await AsyncStorage.getItem(key);
         return data ? JSON.parse(data) : [];
     } catch (error) {
@@ -56,15 +66,16 @@ export const getUserPhrases = async (mode: string, language: Language): Promise<
 };
 
 /**
- * Save user-added phrases for a specific mode and language
+ * Save user-added phrases for a specific mode, language, and phase
  */
 export const saveUserPhrases = async (
     mode: string, 
     language: Language, 
+    phase: PhrasePhase,
     phrases: UserPhrase[]
 ): Promise<void> => {
     try {
-        const key = getUserPhrasesKey(mode, language);
+        const key = getUserPhrasesKey(mode, language, phase);
         await AsyncStorage.setItem(key, JSON.stringify(phrases));
     } catch (error) {
         console.warn('Failed to save user phrases:', error);
@@ -73,11 +84,12 @@ export const saveUserPhrases = async (
 };
 
 /**
- * Add a new user phrase
+ * Add a new user phrase to a specific phase
  */
 export const addUserPhrase = async (
     mode: string,
     language: Language,
+    phase: PhrasePhase,
     text: string,
     subphrase?: string
 ): Promise<UserPhrase> => {
@@ -87,24 +99,25 @@ export const addUserPhrase = async (
         subphrase,
     };
 
-    const existingPhrases = await getUserPhrases(mode, language);
+    const existingPhrases = await getUserPhrases(mode, language, phase);
     const updatedPhrases = [...existingPhrases, newPhrase];
-    await saveUserPhrases(mode, language, updatedPhrases);
+    await saveUserPhrases(mode, language, phase, updatedPhrases);
 
     return newPhrase;
 };
 
 /**
- * Remove a user phrase by ID
+ * Remove a user phrase by ID from a specific phase
  */
 export const removeUserPhrase = async (
     mode: string,
     language: Language,
+    phase: PhrasePhase,
     phraseId: string
 ): Promise<void> => {
-    const existingPhrases = await getUserPhrases(mode, language);
+    const existingPhrases = await getUserPhrases(mode, language, phase);
     const updatedPhrases = existingPhrases.filter(p => p.id !== phraseId);
-    await saveUserPhrases(mode, language, updatedPhrases);
+    await saveUserPhrases(mode, language, phase, updatedPhrases);
 };
 
 /**
@@ -166,25 +179,38 @@ export const unhideBuiltInPhrase = async (
 };
 
 /**
- * Get all active phrases (built-in + user, excluding hidden)
+ * Get all active phrases grouped by phase (built-in + user, excluding hidden)
  */
 export const getActivePhrases = async (
     mode: string,
     language: Language,
-    builtInPhrases: Phrase[]
-): Promise<Phrase[]> => {
-    const [userPhrases, hiddenIds] = await Promise.all([
-        getUserPhrases(mode, language),
-        getHiddenPhrases(mode, language),
+    builtInPhrases: PhasedPhrases
+): Promise<PhasedPhrases> => {
+    const hiddenIds = await getHiddenPhrases(mode, language);
+
+    // Load user phrases for all three phases in parallel
+    const [userPrep, userConf, userReinf] = await Promise.all([
+        getUserPhrases(mode, language, 'preparation'),
+        getUserPhrases(mode, language, 'confrontation'),
+        getUserPhrases(mode, language, 'reinforcement'),
     ]);
 
-    // Filter out hidden built-in phrases
-    const visibleBuiltInPhrases = builtInPhrases.filter(
-        phrase => !hiddenIds.includes(phrase.id)
-    );
+    const hiddenSet = new Set(hiddenIds);
 
-    // Combine built-in and user phrases
-    return [...visibleBuiltInPhrases, ...userPhrases];
+    return {
+        preparation: [
+            ...builtInPhrases.preparation.filter(p => !hiddenSet.has(p.id)),
+            ...userPrep,
+        ],
+        confrontation: [
+            ...builtInPhrases.confrontation.filter(p => !hiddenSet.has(p.id)),
+            ...userConf,
+        ],
+        reinforcement: [
+            ...builtInPhrases.reinforcement.filter(p => !hiddenSet.has(p.id)),
+            ...userReinf,
+        ],
+    };
 };
 
 // ============================================
@@ -343,11 +369,13 @@ export const deleteCustomMode = async (id: string): Promise<void> => {
         await saveHiddenModes(hiddenModes.filter(m => m !== id));
     }
 
-    // Remove all phrases for this custom mode (all languages)
+    // Remove all phrases for this custom mode (all languages and phases)
     const ALL_LANGUAGES: Language[] = ['en', 'es', 'pt'];
     const keysToRemove: string[] = [];
     for (const language of ALL_LANGUAGES) {
-        keysToRemove.push(getUserPhrasesKey(id, language));
+        for (const phase of PHRASE_PHASES) {
+            keysToRemove.push(getUserPhrasesKey(id, language, phase));
+        }
         keysToRemove.push(getHiddenPhrasesKey(id, language));
     }
     await AsyncStorage.multiRemove(keysToRemove);
@@ -422,7 +450,9 @@ export const resetAllToDefaults = async (): Promise<void> => {
         // Collect all user phrases and hidden phrases keys for built-in modes
         for (const mode of BUILT_IN_MODES) {
             for (const language of ALL_LANGUAGES) {
-                keysToRemove.push(getUserPhrasesKey(mode, language));
+                for (const phase of PHRASE_PHASES) {
+                    keysToRemove.push(getUserPhrasesKey(mode, language, phase));
+                }
                 keysToRemove.push(getHiddenPhrasesKey(mode, language));
             }
         }
@@ -431,7 +461,9 @@ export const resetAllToDefaults = async (): Promise<void> => {
         const customModes = await getCustomModes();
         for (const mode of customModes) {
             for (const language of ALL_LANGUAGES) {
-                keysToRemove.push(getUserPhrasesKey(mode.id, language));
+                for (const phase of PHRASE_PHASES) {
+                    keysToRemove.push(getUserPhrasesKey(mode.id, language, phase));
+                }
                 keysToRemove.push(getHiddenPhrasesKey(mode.id, language));
             }
         }

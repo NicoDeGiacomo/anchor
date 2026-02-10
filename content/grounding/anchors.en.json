@@ -1,31 +1,57 @@
-[
-    
-    {
-        "id": "phrase1",
-        "text": "Feel your feet on the floor."
-    },
-    {
-        "id": "phrase2",
-        "text": "Take a deep breath."
-    },
-    {
-        "id": "phrase3",
-        "text": "Tel me 5 things you can see."
-    },
-    {
-        "id": "phrase4",
-        "text": "Tel me 4 things you can hear."
-    },
-    {
-        "id": "phrase5",
-        "text": "Tel me 3 things you can touch."
-    },
-    {
-        "id": "phrase6",
-        "text": "Tel me 2 things you can smell."
-    },
-    {
-        "id": "phrase7",
-        "text": "Tel me 1 thing you can taste."
-    }
-]
+{
+    "preparation": [
+        {
+            "id": "prep1",
+            "text": "Let's bring you back to the present moment."
+        },
+        {
+            "id": "prep2",
+            "text": "You are here, right now.",
+            "subphrase": "That is all that matters."
+        }
+    ],
+    "confrontation": [
+        {
+            "id": "conf1",
+            "text": "Feel your feet on the floor."
+        },
+        {
+            "id": "conf2",
+            "text": "Take a deep breath."
+        },
+        {
+            "id": "conf3",
+            "text": "Tell me 5 things you can see."
+        },
+        {
+            "id": "conf4",
+            "text": "Tell me 4 things you can hear."
+        },
+        {
+            "id": "conf5",
+            "text": "Tell me 3 things you can touch."
+        },
+        {
+            "id": "conf6",
+            "text": "Tell me 2 things you can smell."
+        },
+        {
+            "id": "conf7",
+            "text": "Tell me 1 thing you can taste."
+        }
+    ],
+    "reinforcement": [
+        {
+            "id": "reinf1",
+            "text": "You're back. You brought yourself here."
+        },
+        {
+            "id": "reinf2",
+            "text": "You grounded yourself. That's a skill you own."
+        },
+        {
+            "id": "reinf3",
+            "text": "You can always come back to the present."
+        }
+    ]
+}

@@ -1,13 +1,48 @@
-[
-    {
-        "id": "phrase1",
-        "text": "Strong feelings don't require immediate action.",
-        "subphrase": "Grab an ice cube and hold it in your hand as long as you can."
-    },
-    {
-        "id": "phrase2",
-        "text": "What you are feeling is an emotion like any other.",
-        "subphrase": "You can grab a pillow to scream into."
-    }
-]
-
+{
+    "preparation": [
+        {
+            "id": "prep1",
+            "text": "What you are feeling is an emotion like any other.",
+            "subphrase": "It is intense, but it will not last forever."
+        },
+        {
+            "id": "prep2",
+            "text": "Strong feelings don't require immediate action."
+        },
+        {
+            "id": "prep3",
+            "text": "Your anger is valid, but acting on it right now may not help."
+        }
+    ],
+    "confrontation": [
+        {
+            "id": "conf1",
+            "text": "Pause. You don't need to respond right now.",
+            "subphrase": "Grab an ice cube and hold it in your hand as long as you can."
+        },
+        {
+            "id": "conf2",
+            "text": "Take a slow breath before you do anything.",
+            "subphrase": "You can grab a pillow to scream into."
+        },
+        {
+            "id": "conf3",
+            "text": "Focus on your breathing. Let the heat pass."
+        }
+    ],
+    "reinforcement": [
+        {
+            "id": "reinf1",
+            "text": "You chose not to react impulsively.",
+            "subphrase": "That takes real strength."
+        },
+        {
+            "id": "reinf2",
+            "text": "You let the wave pass without letting it control you."
+        },
+        {
+            "id": "reinf3",
+            "text": "You can feel angry and still make good choices."
+        }
+    ]
+}

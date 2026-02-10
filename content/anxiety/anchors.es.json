@@ -1,17 +1,49 @@
-[
-    {
-        "id": "phrase1",
-        "text": "La ansiedad es un ciclo, subirá y bajará por sí sola.",
-        "subphrase": "Inhala."
-    },
-    {
-        "id": "phrase2",
-        "text": "Los escenarios que imaginas no reflejan necesariamente la realidad.",
-        "subphrase": "Mantén la respiración."
-    },
-    {
-        "id": "phrase3",
-        "text": "No intentes luchar contra tus pensamientos, solo déjalos pasar.",
-        "subphrase": "Exhala."
-    }
-]
+{
+    "preparation": [
+        {
+            "id": "prep1",
+            "text": "La ansiedad es el sistema de alarma de tu cuerpo.",
+            "subphrase": "Subirá y bajará por sí sola."
+        },
+        {
+            "id": "prep2",
+            "text": "Los escenarios que imaginas no reflejan necesariamente la realidad."
+        },
+        {
+            "id": "prep3",
+            "text": "Lo que estás sintiendo ahora mismo es temporal."
+        }
+    ],
+    "confrontation": [
+        {
+            "id": "conf1",
+            "text": "No intentes luchar contra tus pensamientos, solo déjalos pasar.",
+            "subphrase": "Inhala lentamente."
+        },
+        {
+            "id": "conf2",
+            "text": "Concéntrate en lo que es real ahora, no en lo que podría pasar.",
+            "subphrase": "Mantén la respiración suavemente."
+        },
+        {
+            "id": "conf3",
+            "text": "Un paso a la vez. Solo este momento.",
+            "subphrase": "Exhala lentamente."
+        }
+    ],
+    "reinforcement": [
+        {
+            "id": "reinf1",
+            "text": "Te quedaste con ello, y pasó."
+        },
+        {
+            "id": "reinf2",
+            "text": "Preocuparte no ayudó, pero tú sí.",
+            "subphrase": "Lo manejaste bien."
+        },
+        {
+            "id": "reinf3",
+            "text": "Puedes manejar más de lo que crees."
+        }
+    ]
+}

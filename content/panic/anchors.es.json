@@ -1,22 +1,54 @@
-[
-    {
-        "id": "phrase1",
-        "text": "Esto es incómodo, no peligroso.",
-        "subphrase": "Inhala"
-    },
-    {
-        "id": "phrase2",
-        "text": "Lo estás haciendo bien.",
-        "subphrase": "Sostén la respiración"
-    },
-    {
-        "id": "phrase3",
-        "text": "Estás a salvo.",
-        "subphrase": "Exhala"
-    },
-    {
-        "id": "phrase4",
-        "text": "Esta emoción pasará.",
-        "subphrase": "Sostén la respiración"
-    }
-]
+{
+    "preparation": [
+        {
+            "id": "prep1",
+            "text": "Esto es un ataque de pánico.",
+            "subphrase": "Se siente terrible, pero no es peligroso."
+        },
+        {
+            "id": "prep2",
+            "text": "Tu cuerpo activó su sistema de alarma.",
+            "subphrase": "Se apagará por sí solo."
+        },
+        {
+            "id": "prep3",
+            "text": "Esto es incómodo, no peligroso."
+        }
+    ],
+    "confrontation": [
+        {
+            "id": "conf1",
+            "text": "Concéntrate en este momento.",
+            "subphrase": "Inhala lentamente por la nariz."
+        },
+        {
+            "id": "conf2",
+            "text": "Has sobrevivido a todos los ataques de pánico anteriores.",
+            "subphrase": "Sostén la respiración suavemente."
+        },
+        {
+            "id": "conf3",
+            "text": "Esta emoción pasará.",
+            "subphrase": "Ahora exhala lentamente por la boca."
+        },
+        {
+            "id": "conf4",
+            "text": "Estás a salvo en este momento."
+        }
+    ],
+    "reinforcement": [
+        {
+            "id": "reinf1",
+            "text": "Lo manejaste.",
+            "subphrase": "Eres más fuerte de lo que crees."
+        },
+        {
+            "id": "reinf2",
+            "text": "Cada vez que enfrentas esto, se vuelve un poco más fácil."
+        },
+        {
+            "id": "reinf3",
+            "text": "Lo superaste. Recuerda esta sensación de control."
+        }
+    ]
+}

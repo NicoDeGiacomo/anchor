@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, Pressable, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,7 +9,7 @@ import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useColor } from '@/hooks/useColor';
 import { usePhrases } from '@/hooks/usePhrases';
-import { hasSeenNavigationHint, markNavigationHintSeen } from '@/utils/phraseStorage';
+import { hasSeenNavigationHint, markNavigationHintSeen, Phrase } from '@/utils/phraseStorage';
 
 const FALLBACK_TRANSLATIONS = {
     en: {
@@ -17,37 +17,55 @@ const FALLBACK_TRANSLATIONS = {
         notAvailable: 'Content not yet available in this language.',
         error: 'Something went wrong. Please try again.',
         tapHint: 'tap anywhere to continue',
+        feelingBetter: "I'm feeling better",
     },
     es: {
         noContent: 'No hay frases disponibles para este modo.',
         notAvailable: 'Contenido aún no disponible en este idioma.',
         error: 'Algo salió mal. Por favor, inténtelo de nuevo.',
         tapHint: 'toca en cualquier lugar para continuar',
+        feelingBetter: 'Me siento mejor',
     },
     pt: {
         noContent: 'Nenhuma frase disponível para este modo.',
         notAvailable: 'Conteúdo ainda não disponível neste idioma.',
         error: 'Algo deu errado. Por favor, tente novamente.',
         tapHint: 'toque em qualquer lugar para continuar',
+        feelingBetter: 'Estou me sentindo melhor',
     },
 };
+
+type PhaseState = 'looping' | 'reinforcement';
 
 export default function ModeScreen() {
     const { mode } = useLocalSearchParams<{ mode: string }>();
     const { language } = useLanguage();
     const insets = useSafeAreaInsets();
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [phase, setPhase] = useState<PhaseState>('looping');
     const [showHint, setShowHint] = useState(false);
     const hintOpacity = useSharedValue(1);
     const secondaryTextColor = useColor('textSecondary');
     const iconColor = useColor('icon');
 
     // Accept any non-empty mode string (built-in or custom mode ID)
-    // The usePhrases hook will handle invalid modes gracefully
     const validMode = mode || 'panic';
 
-    // Load phrases using custom hook
+    // Load phrases using custom hook (now returns phased data)
     const { phrases, isLoading, error } = usePhrases(validMode);
+
+    // Build the looping array (preparation + confrontation)
+    const loopingPhrases = useMemo<Phrase[]>(() => 
+        [...phrases.preparation, ...phrases.confrontation],
+        [phrases.preparation, phrases.confrontation]
+    );
+
+    const reinforcementPhrases = phrases.reinforcement;
+
+    // The currently active list depends on the phase
+    const activePhrases = phase === 'looping' ? loopingPhrases : reinforcementPhrases;
+
+    const hasContent = loopingPhrases.length > 0 || reinforcementPhrases.length > 0;
 
     // Check if user has seen the navigation hint
     useEffect(() => {
@@ -58,9 +76,10 @@ export default function ModeScreen() {
         });
     }, []);
 
-    // Reset index when mode or language changes
+    // Reset index and phase when mode or language changes
     useEffect(() => {
         setCurrentIndex(0);
+        setPhase('looping');
     }, [mode, language]);
 
     // Hide hint with animation
@@ -80,14 +99,30 @@ export default function ModeScreen() {
         opacity: hintOpacity.value,
     }));
 
-    // Advance to next phrase with looping
+    // Handle "I'm feeling better" button press
+    const handleFeelingBetter = useCallback(() => {
+        setPhase('reinforcement');
+        setCurrentIndex(0);
+    }, []);
+
+    // Advance to next phrase with looping (for looping phase) or navigate back (for reinforcement)
     const nextPhrase = useCallback(() => {
-        if (phrases.length > 0) {
-            setCurrentIndex((prev) => (prev + 1) % phrases.length);
+        if (phase === 'reinforcement') {
+            // In reinforcement phase, advance through phrases then go home
+            if (currentIndex >= reinforcementPhrases.length - 1) {
+                router.back();
+                return;
+            }
+            setCurrentIndex(prev => prev + 1);
+        } else {
+            // In looping phase, cycle through preparation + confrontation
+            if (loopingPhrases.length > 0) {
+                setCurrentIndex(prev => (prev + 1) % loopingPhrases.length);
+            }
         }
         // Hide hint on first tap
         hideHint();
-    }, [phrases.length, hideHint]);
+    }, [phase, currentIndex, reinforcementPhrases.length, loopingPhrases.length, hideHint]);
 
     // Keep a ref to the latest nextPhrase to avoid stale closures in event listener
     const nextPhraseRef = useRef(nextPhrase);
@@ -118,7 +153,7 @@ export default function ModeScreen() {
     }, []); // No dependencies needed - uses ref for latest function
 
     // Show fallback if loading, error, or no phrases available
-    if (isLoading || error || phrases.length === 0) {
+    if (isLoading || error || !hasContent) {
         const fallback = FALLBACK_TRANSLATIONS[language];
         let message = '';
         if (isLoading) {
@@ -148,7 +183,7 @@ export default function ModeScreen() {
         );
     }
 
-    const currentPhrase = phrases[currentIndex];
+    const currentPhrase = activePhrases[currentIndex] || activePhrases[0];
     const fallback = FALLBACK_TRANSLATIONS[language];
 
     return (
@@ -161,25 +196,43 @@ export default function ModeScreen() {
             >
                 <Ionicons name="chevron-back" size={24} color={iconColor} />
             </TouchableOpacity>
-            {/* Tap-to-advance wrapper */}
-            <Pressable style={styles.phraseWrapper} onPress={nextPhrase}>
-                <Text style={styles.phraseText}>
-                    {currentPhrase.text}
-                </Text>
-                {currentPhrase.subphrase && (
-                    <Text style={[styles.subphraseText, { color: secondaryTextColor }]}>
-                        {currentPhrase.subphrase}
+
+            {/* "I'm feeling better" button - only visible during looping phase */}
+            {phase === 'looping' ? (
+                <TouchableOpacity
+                    onPress={handleFeelingBetter}
+                    hitSlop={{ top: 12, right: 12, bottom: 12, left: 12 }}
+                    style={[styles.feelingBetterButton, { top: insets.top + 16 }]}
+                    activeOpacity={0.6}
+                >
+                    <Text style={[styles.feelingBetterText, { color: secondaryTextColor }]}>
+                        {fallback.feelingBetter}
                     </Text>
-                )}
-            </Pressable>
+                </TouchableOpacity>
+            ) : null}
+
+            {/* Tap-to-advance wrapper */}
+            {currentPhrase ? (
+                <Pressable style={styles.phraseWrapper} onPress={nextPhrase}>
+                    <Text style={styles.phraseText}>
+                        {currentPhrase.text}
+                    </Text>
+                    {currentPhrase.subphrase ? (
+                        <Text style={[styles.subphraseText, { color: secondaryTextColor }]}>
+                            {currentPhrase.subphrase}
+                        </Text>
+                    ) : null}
+                </Pressable>
+            ) : null}
+
             {/* Navigation hint - shown only on first use */}
-            {showHint && (
+            {showHint ? (
                 <Animated.View style={[styles.hintContainer, { bottom: insets.bottom + 32 }, hintAnimatedStyle]}>
                     <Text style={[styles.hintText, { color: secondaryTextColor }]}>
                         {fallback.tapHint}
                     </Text>
                 </Animated.View>
-            )}
+            ) : null}
         </View>
     );
 }
@@ -195,6 +248,16 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: 16,
         zIndex: 1,
+    },
+    feelingBetterButton: {
+        position: 'absolute',
+        right: 16,
+        zIndex: 1,
+    },
+    feelingBetterText: {
+        fontSize: 14,
+        fontWeight: '300',
+        opacity: 0.6,
     },
     phraseWrapper: {
         flex: 1,
@@ -227,4 +290,3 @@ const styles = StyleSheet.create({
         opacity: 0.7,
     },
 });
-

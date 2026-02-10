@@ -1,14 +1,46 @@
-[
-    {
-        "id": "phrase1",
-        "text": "Tienes permitido sentir esto."
-    },
-    {
-        "id": "phrase2",
-        "text": "No necesitas decidir nada ahora mismo."
-    },
-    {
-        "id": "phrase3",
-        "text": "Puedes ser amable contigo mismo."
-    }
-]
+{
+    "preparation": [
+        {
+            "id": "prep1",
+            "text": "Tienes permitido sentir esto."
+        },
+        {
+            "id": "prep2",
+            "text": "La tristeza es una respuesta natural.",
+            "subphrase": "Significa que algo te importa."
+        },
+        {
+            "id": "prep3",
+            "text": "No necesitas decidir nada ahora mismo."
+        }
+    ],
+    "confrontation": [
+        {
+            "id": "conf1",
+            "text": "Puedes ser amable contigo mismo."
+        },
+        {
+            "id": "conf2",
+            "text": "Toma una respiración lenta y profunda.",
+            "subphrase": "Déjala salir suavemente."
+        },
+        {
+            "id": "conf3",
+            "text": "No tienes que cargar con todo a la vez."
+        }
+    ],
+    "reinforcement": [
+        {
+            "id": "reinf1",
+            "text": "Te quedaste con un sentimiento difícil, y sigues aquí."
+        },
+        {
+            "id": "reinf2",
+            "text": "Ser amable contigo mismo es fortaleza, no debilidad."
+        },
+        {
+            "id": "reinf3",
+            "text": "Mereces la misma compasión que le das a los demás."
+        }
+    ]
+}

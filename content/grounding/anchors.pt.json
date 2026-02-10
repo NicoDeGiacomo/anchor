@@ -1,31 +1,57 @@
-[
-    
-    {
-        "id": "phrase1",
-        "text": "Sinta seus pés no chão."
-    },
-    {
-        "id": "phrase2",
-        "text": "Faz uma respiração profunda."
-    },
-    {
-        "id": "phrase3",
-        "text": "Me diga 5 coisas que você possa ver."
-    },
-    {
-        "id": "phrase4",
-        "text": "Me diga 4 coisas que você possa ouvir."
-    },
-    {
-        "id": "phrase5",
-        "text": "Me diga 3 coisas que você possa tocar."
-    },
-    {
-        "id": "phrase6",
-        "text": "Me diga 2 coisas que você possa cheirar."
-    },
-    {
-        "id": "phrase7",
-        "text": "Me diga 1 coisa que você possa saborear."
-    }
-]
+{
+    "preparation": [
+        {
+            "id": "prep1",
+            "text": "Vamos te trazer de volta ao momento presente."
+        },
+        {
+            "id": "prep2",
+            "text": "Você está aqui, agora.",
+            "subphrase": "Isso é tudo o que importa."
+        }
+    ],
+    "confrontation": [
+        {
+            "id": "conf1",
+            "text": "Sinta seus pés no chão."
+        },
+        {
+            "id": "conf2",
+            "text": "Faça uma respiração profunda."
+        },
+        {
+            "id": "conf3",
+            "text": "Me diga 5 coisas que você possa ver."
+        },
+        {
+            "id": "conf4",
+            "text": "Me diga 4 coisas que você possa ouvir."
+        },
+        {
+            "id": "conf5",
+            "text": "Me diga 3 coisas que você possa tocar."
+        },
+        {
+            "id": "conf6",
+            "text": "Me diga 2 coisas que você possa cheirar."
+        },
+        {
+            "id": "conf7",
+            "text": "Me diga 1 coisa que você possa saborear."
+        }
+    ],
+    "reinforcement": [
+        {
+            "id": "reinf1",
+            "text": "Você voltou. Você se trouxe até aqui."
+        },
+        {
+            "id": "reinf2",
+            "text": "Você se conectou com o presente. Essa é uma habilidade sua."
+        },
+        {
+            "id": "reinf3",
+            "text": "Você sempre pode voltar ao momento presente."
+        }
+    ]
+}

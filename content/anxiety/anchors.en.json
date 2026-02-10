@@ -1,18 +1,49 @@
-[
-    {
-        "id": "phrase1",
-        "text": "Anxiety will raise and fall on its own.",
-        "subphrase": "Breathe in"
-    },
-    {
-        "id": "phrase2",
-        "text": "The scenarios you imagine do not necessarily reflect reality.",
-        "subphrase": "Hold your breath"
-    },
-    {
-        "id": "phrase3",
-        "text": "Dont try to fight your thoughts, just let them pass.",
-        "subphrase": "Breathe out"
-    }
-]
-
+{
+    "preparation": [
+        {
+            "id": "prep1",
+            "text": "Anxiety is your body's alarm system.",
+            "subphrase": "It will rise and fall on its own."
+        },
+        {
+            "id": "prep2",
+            "text": "The scenarios you imagine do not necessarily reflect reality."
+        },
+        {
+            "id": "prep3",
+            "text": "What you are feeling right now is temporary."
+        }
+    ],
+    "confrontation": [
+        {
+            "id": "conf1",
+            "text": "Don't try to fight your thoughts, just let them pass.",
+            "subphrase": "Breathe in slowly."
+        },
+        {
+            "id": "conf2",
+            "text": "Focus on what is real right now, not what might happen.",
+            "subphrase": "Hold your breath gently."
+        },
+        {
+            "id": "conf3",
+            "text": "One step at a time. Just this moment.",
+            "subphrase": "Breathe out slowly."
+        }
+    ],
+    "reinforcement": [
+        {
+            "id": "reinf1",
+            "text": "You stayed with it, and it passed."
+        },
+        {
+            "id": "reinf2",
+            "text": "Worrying didn't help, but you did.",
+            "subphrase": "You handled this well."
+        },
+        {
+            "id": "reinf3",
+            "text": "You can manage more than you think."
+        }
+    ]
+}
