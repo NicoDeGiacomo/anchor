@@ -2,7 +2,7 @@ import Constants from 'expo-constants';
 import { useCallback } from 'react';
 import { Linking, ScrollView, StyleSheet } from 'react-native';
 
-import { Logo } from '@/components/Logo';
+import { LogoWithName } from '@/components/LogoWithName';
 import PressableFeedback from '@/components/PressableFeedback';
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -96,8 +96,7 @@ export default function AboutScreen() {
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.header}>
-                    <Logo size={80} />
-                    <Text style={styles.title}>{t.title}</Text>
+                    <LogoWithName width={120} />
                     <Text style={styles.tagline}>{t.tagline}</Text>
                     <Text style={styles.version}>v{appVersion}</Text>
                 </View>
@@ -184,11 +183,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 48,
         gap: 16,
-    },
-    title: {
-        fontSize: 36,
-        fontWeight: '300',
-        marginTop: 8,
     },
     tagline: {
         fontSize: 16,

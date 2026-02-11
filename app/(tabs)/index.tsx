@@ -3,6 +3,7 @@ import { Link } from 'expo-router';
 import { useCallback, useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 
+import { LogoWithName } from '@/components/LogoWithName';
 import PressableFeedback from '@/components/PressableFeedback';
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -76,7 +77,9 @@ export default function MainScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{t.title}</Text>
+      <View style={styles.logo}>
+        <LogoWithName width={200} />
+      </View>
 
       <View style={styles.buttonContainer}>
         <View style={styles.modeButtons}>
@@ -130,9 +133,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
   },
-  title: {
-    fontSize: 36,
-    fontWeight: '300',
+  logo: {
     marginBottom: 60,
   },
   buttonContainer: {
