@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Anchor",
+    "name": "Anchor - Grounding App",
     "slug": "anchor",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -20,7 +20,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.nicodegiacomo.anchor",
-      "buildNumber": "1"
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.nicodegiacomo.anchor",
