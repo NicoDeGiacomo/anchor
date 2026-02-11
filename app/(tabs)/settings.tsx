@@ -14,6 +14,7 @@ import {
     CustomMode,
     deleteCustomMode,
     hideMode,
+    ModeMethod,
     resetAllToDefaults,
     unhideMode,
     updateCustomMode,
@@ -65,6 +66,13 @@ const TRANSLATIONS = {
         sadness: 'Sadness',
         anger: 'Anger',
         grounding: 'Grounding',
+        methodSection: 'Method',
+        methodSit: 'SIT',
+        methodSitDesc: 'Preparation, confrontation, reinforcement',
+        methodRandom: 'Random',
+        methodRandomDesc: 'Randomly picks one phrase each time',
+        methodSeeAll: 'See all',
+        methodSeeAllDesc: 'Shows all phrases in sequence',
         resetSection: 'Reset',
         resetButton: 'Reset to defaults',
         resetConfirmTitle: 'Reset to defaults?',
@@ -103,6 +111,13 @@ const TRANSLATIONS = {
         sadness: 'Tristeza',
         anger: 'Ira',
         grounding: 'Conexión',
+        methodSection: 'Método',
+        methodSit: 'SIT',
+        methodSitDesc: 'Preparación, confrontación, refuerzo',
+        methodRandom: 'Aleatorio',
+        methodRandomDesc: 'Elige una frase al azar cada vez',
+        methodSeeAll: 'Ver todo',
+        methodSeeAllDesc: 'Muestra todas las frases en secuencia',
         resetSection: 'Restablecer',
         resetButton: 'Restablecer valores predeterminados',
         resetConfirmTitle: '¿Restablecer valores predeterminados?',
@@ -141,6 +156,13 @@ const TRANSLATIONS = {
         sadness: 'Tristeza',
         anger: 'Raiva',
         grounding: 'Aterramento',
+        methodSection: 'Método',
+        methodSit: 'SIT',
+        methodSitDesc: 'Preparação, confrontação, reforço',
+        methodRandom: 'Aleatório',
+        methodRandomDesc: 'Escolhe uma frase aleatória a cada vez',
+        methodSeeAll: 'Ver tudo',
+        methodSeeAllDesc: 'Mostra todas as frases em sequência',
         resetSection: 'Redefinir',
         resetButton: 'Redefinir para padrões',
         resetConfirmTitle: 'Redefinir para padrões?',
@@ -171,6 +193,7 @@ export default function SettingsScreen() {
     const [showRenameModal, setShowRenameModal] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [newModeName, setNewModeName] = useState('');
+    const [newModeMethod, setNewModeMethod] = useState<ModeMethod>('sit');
     const [editingMode, setEditingMode] = useState<CustomMode | null>(null);
     const [modeToDelete, setModeToDelete] = useState<CustomMode | null>(null);
 
@@ -224,14 +247,15 @@ export default function SettingsScreen() {
             return;
         }
         try {
-            await addCustomMode(newModeName.trim());
+            await addCustomMode(newModeName.trim(), newModeMethod);
             setNewModeName('');
+            setNewModeMethod('sit');
             setShowCreateModal(false);
             await refetchModes();
         } catch (error) {
             console.warn('Failed to create custom mode:', error);
         }
-    }, [newModeName, refetchModes]);
+    }, [newModeName, newModeMethod, refetchModes]);
 
     // Handle rename custom mode
     const handleRenameMode = useCallback(async () => {
@@ -536,6 +560,7 @@ export default function SettingsScreen() {
                 onRequestClose={() => {
                     setShowCreateModal(false);
                     setNewModeName('');
+                    setNewModeMethod('sit');
                 }}
             >
                 <View style={[styles.modalOverlay, { backgroundColor: overlayColor }]}>
@@ -558,12 +583,52 @@ export default function SettingsScreen() {
                             autoFocus
                         />
 
+                        <View>
+                            <Text style={styles.methodSectionLabel}>{t.methodSection}</Text>
+                            <View style={styles.methodOptions}>
+                                {(['sit', 'random', 'seeAll'] as ModeMethod[]).map((method) => {
+                                    const isSelected = newModeMethod === method;
+                                    const label = method === 'sit' ? t.methodSit
+                                        : method === 'random' ? t.methodRandom
+                                        : t.methodSeeAll;
+                                    const desc = method === 'sit' ? t.methodSitDesc
+                                        : method === 'random' ? t.methodRandomDesc
+                                        : t.methodSeeAllDesc;
+                                    return (
+                                        <Pressable
+                                            key={method}
+                                            style={[
+                                                styles.methodOption,
+                                                { borderColor: isSelected ? borderSelectedColor : borderColor },
+                                                isSelected && styles.methodOptionSelected,
+                                            ]}
+                                            onPress={() => setNewModeMethod(method)}
+                                            accessibilityRole="radio"
+                                            accessibilityLabel={label}
+                                            accessibilityState={{ selected: isSelected }}
+                                        >
+                                            <Text style={[
+                                                styles.methodOptionLabel,
+                                                isSelected && styles.methodOptionLabelSelected,
+                                            ]}>
+                                                {label}
+                                            </Text>
+                                            <Text style={[styles.methodOptionDesc, { color: secondaryTextColor }]}>
+                                                {desc}
+                                            </Text>
+                                        </Pressable>
+                                    );
+                                })}
+                            </View>
+                        </View>
+
                         <View style={styles.modalButtons}>
                             <Pressable
                                 style={[styles.modalButton, { borderColor }]}
                                 onPress={() => {
                                     setShowCreateModal(false);
                                     setNewModeName('');
+                                    setNewModeMethod('sit');
                                 }}
                             >
                                 <Text style={styles.modalButtonText}>
@@ -844,5 +909,34 @@ const styles = StyleSheet.create({
     },
     modalButtonTextPrimary: {
         fontWeight: '500',
+    },
+    methodSectionLabel: {
+        fontSize: 14,
+        fontWeight: '400',
+        marginBottom: 8,
+    },
+    methodOptions: {
+        gap: 8,
+    },
+    methodOption: {
+        paddingVertical: 10,
+        paddingHorizontal: 14,
+        borderRadius: 8,
+        borderWidth: 1,
+    },
+    methodOptionSelected: {
+        borderWidth: 2,
+    },
+    methodOptionLabel: {
+        fontSize: 15,
+        fontWeight: '300',
+    },
+    methodOptionLabelSelected: {
+        fontWeight: '400',
+    },
+    methodOptionDesc: {
+        fontSize: 12,
+        fontWeight: '300',
+        marginTop: 2,
     },
 });

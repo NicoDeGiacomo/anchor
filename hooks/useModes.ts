@@ -6,8 +6,10 @@ import {
     CustomMode,
     getCustomModes,
     getHiddenModes,
+    getModeMethod,
     getVisibleCustomModes,
     getVisibleModes,
+    ModeMethod,
 } from '@/utils/phraseStorage';
 
 // A display mode can be either a built-in mode ID or a custom mode object
@@ -176,4 +178,33 @@ export function useCustomModes(): UseCustomModesResult {
         isLoading,
         refetch: loadCustomModes,
     };
+}
+
+interface UseModeMethodResult {
+    method: ModeMethod;
+    isLoading: boolean;
+}
+
+/**
+ * Hook to get the method for a specific mode (built-in or custom)
+ */
+export function useModeMethod(modeId: string): UseModeMethodResult {
+    const [method, setMethod] = useState<ModeMethod>('sit');
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        let cancelled = false;
+        setIsLoading(true);
+
+        getModeMethod(modeId).then(result => {
+            if (!cancelled) {
+                setMethod(result);
+                setIsLoading(false);
+            }
+        });
+
+        return () => { cancelled = true; };
+    }, [modeId]);
+
+    return { method, isLoading };
 }

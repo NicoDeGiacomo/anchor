@@ -1,5 +1,5 @@
 {
-    "preparation": [
+    "phrases": [
         {
             "id": "prep1",
             "text": "Let's bring you back to the present moment."
@@ -8,9 +8,7 @@
             "id": "prep2",
             "text": "You are here, right now.",
             "subphrase": "That is all that matters."
-        }
-    ],
-    "confrontation": [
+        },
         {
             "id": "conf1",
             "text": "Feel your feet on the floor."
@@ -38,9 +36,7 @@
         {
             "id": "conf7",
             "text": "Tell me 1 thing you can taste."
-        }
-    ],
-    "reinforcement": [
+        },
         {
             "id": "reinf1",
             "text": "You're back. You brought yourself here."

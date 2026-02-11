@@ -2,6 +2,8 @@ import { useNavigation } from '@react-navigation/native';
 import { useLocalSearchParams } from 'expo-router';
 import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import {
+    FlatList,
+    ListRenderItem,
     Modal,
     Pressable,
     SectionList,
@@ -13,10 +15,12 @@ import {
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useColors } from '@/hooks/useColor';
-import { PhraseWithSource, usePhrasesWithSource } from '@/hooks/usePhrases';
+import { useModeMethod } from '@/hooks/useModes';
+import { PhraseWithSource, useFlatPhrasesWithSource, usePhrasesWithSource } from '@/hooks/usePhrases';
 import {
     addUserPhrase,
     BuiltInMode,
+    FLAT_PHASE_KEY,
     getCustomModeById,
     hideBuiltInPhrase,
     isBuiltInMode,
@@ -157,6 +161,11 @@ const TRANSLATIONS = {
         preparation: 'Preparation',
         confrontation: 'Confrontation',
         reinforcement: 'Reinforcement',
+        phrasesHeader: 'Phrases',
+        methodLabel: 'Method',
+        methodSit: 'SIT',
+        methodRandom: 'Random',
+        methodSeeAll: 'See all',
     },
     es: {
         title: 'Editar frases',
@@ -184,6 +193,11 @@ const TRANSLATIONS = {
         preparation: 'Preparación',
         confrontation: 'Confrontación',
         reinforcement: 'Refuerzo',
+        phrasesHeader: 'Frases',
+        methodLabel: 'Método',
+        methodSit: 'SIT',
+        methodRandom: 'Aleatorio',
+        methodSeeAll: 'Ver todo',
     },
     pt: {
         title: 'Editar frases',
@@ -211,6 +225,11 @@ const TRANSLATIONS = {
         preparation: 'Preparação',
         confrontation: 'Confrontação',
         reinforcement: 'Reforço',
+        phrasesHeader: 'Frases',
+        methodLabel: 'Método',
+        methodSit: 'SIT',
+        methodRandom: 'Aleatório',
+        methodSeeAll: 'Ver tudo',
     },
 };
 
@@ -227,10 +246,23 @@ export default function EditPhrasesScreen() {
     // Accept any non-empty mode string (built-in or custom mode ID)
     const validMode = mode || 'panic';
 
-    // Use the phrases hook for loading data (now returns phased data)
-    const { phrases, isLoading, error, refetch, isCustomMode } = usePhrasesWithSource(validMode);
-    
-    const [addModalPhase, setAddModalPhase] = useState<PhrasePhase | null>(null);
+    // Load the mode's method
+    const { method } = useModeMethod(validMode);
+    const isSit = method === 'sit';
+
+    // Load phrases - call both hooks (hooks can't be conditional)
+    const { phrases: phasedPhrases, isLoading: phasedLoading, error: phasedError, refetch: phasedRefetch, isCustomMode: phasedIsCustom } = usePhrasesWithSource(validMode);
+    const { phrases: flatPhrases, isLoading: flatLoading, error: flatError, refetch: flatRefetch, isCustomMode: flatIsCustom } = useFlatPhrasesWithSource(validMode);
+
+    // Use the right data based on method
+    const isLoading = isSit ? phasedLoading : flatLoading;
+    const error = isSit ? phasedError : flatError;
+    const refetch = isSit ? phasedRefetch : flatRefetch;
+    const isCustomMode = isSit ? phasedIsCustom : flatIsCustom;
+
+    // State for add modal - for SIT modes, tracks the phase; for flat modes, always 'general'
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [addModalPhase, setAddModalPhase] = useState<PhrasePhase | typeof FLAT_PHASE_KEY | null>(null);
     const [newPhraseText, setNewPhraseText] = useState('');
     const [newSubphrase, setNewSubphrase] = useState('');
     const [customModeName, setCustomModeName] = useState<string | null>(null);
@@ -259,6 +291,11 @@ export default function EditPhrasesScreen() {
     } = useColors('background', 'text', 'textSecondary', 'border', 'danger', 'overlay');
 
     const t = TRANSLATIONS[language];
+
+    // Method label for display
+    const methodLabel = method === 'sit' ? t.methodSit
+        : method === 'random' ? t.methodRandom
+        : t.methodSeeAll;
 
     // Load custom mode name if this is a custom mode
     useEffect(() => {
@@ -289,17 +326,23 @@ export default function EditPhrasesScreen() {
         });
     }, [navigation, modeTitle, t.title]);
 
-    // Build SectionList sections from phased data
+    // Build SectionList sections from phased data (SIT only)
     const sections: PhraseSection[] = useMemo(() => 
         PHRASE_PHASES.map(phase => ({
             phase,
             title: t[phase],
-            data: phrases[phase],
+            data: phasedPhrases[phase],
         })),
-        [phrases, t]
+        [phasedPhrases, t]
     );
 
-    // Add new phrase (scoped to the phase selected via the modal)
+    // Open the add modal
+    const openAddModal = useCallback((phase: PhrasePhase | typeof FLAT_PHASE_KEY) => {
+        setAddModalPhase(phase);
+        setShowAddModal(true);
+    }, []);
+
+    // Add new phrase
     const handleAddPhrase = useCallback(async () => {
         if (!newPhraseText.trim()) {
             setConfirmDialog({
@@ -325,6 +368,7 @@ export default function EditPhrasesScreen() {
             
             setNewPhraseText('');
             setNewSubphrase('');
+            setShowAddModal(false);
             setAddModalPhase(null);
             await refetch();
         } catch (err) {
@@ -332,8 +376,8 @@ export default function EditPhrasesScreen() {
         }
     }, [newPhraseText, newSubphrase, validMode, language, addModalPhase, refetch, t.emptyMainPhraseError]);
 
-    // Delete user phrase (needs the phase to know which storage key to use)
-    const handleDeletePhrase = useCallback((phraseId: string, phase: PhrasePhase) => {
+    // Delete user phrase
+    const handleDeletePhrase = useCallback((phraseId: string, phase: PhrasePhase | typeof FLAT_PHASE_KEY) => {
         setConfirmDialog({
             visible: true,
             title: t.deleteConfirmTitle,
@@ -372,8 +416,9 @@ export default function EditPhrasesScreen() {
         }
     }, [validMode, language, refetch]);
 
-    // SectionList renderItem - need to determine the phase from the section
-    const renderPhraseItem: SectionListRenderItem<PhraseWithSource, PhraseSection> = useCallback(({ item, section }) => (
+    // ---- SIT-specific renderers ----
+
+    const renderPhasedItem: SectionListRenderItem<PhraseWithSource, PhraseSection> = useCallback(({ item, section }) => (
         <PhraseItem
             phrase={item}
             borderColor={borderColor}
@@ -386,26 +431,74 @@ export default function EditPhrasesScreen() {
         />
     ), [borderColor, secondaryTextColor, dangerColor, t, handleDeletePhrase, handleHidePhrase, handleUnhidePhrase]);
 
-    // Section header
     const renderSectionHeader = useCallback(({ section }: { section: PhraseSection }) => (
         <View style={styles.sectionHeader}>
             <Text style={styles.sectionHeaderText}>{section.title}</Text>
         </View>
     ), []);
 
-    // Section footer with "Add phrase" button for each phase
     const renderSectionFooter = useCallback(({ section }: { section: PhraseSection }) => (
         <Pressable
             style={[styles.addPhraseButton, { borderColor }]}
-            onPress={() => setAddModalPhase(section.phase)}
+            onPress={() => openAddModal(section.phase)}
             accessibilityRole="button"
             accessibilityLabel={`${t.addButton} — ${section.title}`}
         >
             <Text style={styles.addPhraseButtonText}>+ {t.addButton}</Text>
         </Pressable>
-    ), [borderColor, t.addButton]);
+    ), [borderColor, t.addButton, openAddModal]);
+
+    // ---- Flat-specific renderers ----
+
+    const renderFlatItem: ListRenderItem<PhraseWithSource> = useCallback(({ item }) => (
+        <PhraseItem
+            phrase={item}
+            borderColor={borderColor}
+            secondaryTextColor={secondaryTextColor}
+            dangerColor={dangerColor}
+            t={t}
+            onDelete={(id) => handleDeletePhrase(id, FLAT_PHASE_KEY)}
+            onHide={handleHidePhrase}
+            onUnhide={handleUnhidePhrase}
+        />
+    ), [borderColor, secondaryTextColor, dangerColor, t, handleDeletePhrase, handleHidePhrase, handleUnhidePhrase]);
+
+    const flatListHeader = useMemo(() => (
+        <View>
+            <View style={styles.methodBadge}>
+                <Text style={[styles.methodBadgeText, { color: secondaryTextColor }]}>
+                    {t.methodLabel}: {methodLabel}
+                </Text>
+            </View>
+            <View style={styles.sectionHeader}>
+                <Text style={styles.sectionHeaderText}>{t.phrasesHeader}</Text>
+            </View>
+        </View>
+    ), [secondaryTextColor, t.methodLabel, methodLabel, t.phrasesHeader]);
+
+    const flatListFooter = useMemo(() => (
+        <Pressable
+            style={[styles.addPhraseButton, { borderColor }]}
+            onPress={() => openAddModal(FLAT_PHASE_KEY)}
+            accessibilityRole="button"
+            accessibilityLabel={t.addButton}
+        >
+            <Text style={styles.addPhraseButtonText}>+ {t.addButton}</Text>
+        </Pressable>
+    ), [borderColor, t.addButton, openAddModal]);
 
     const keyExtractor = useCallback((item: PhraseWithSource) => item.id, []);
+
+    // Modal title for add phrase
+    const addModalTitle = useMemo(() => {
+        if (!isSit) {
+            return t.modalTitle;
+        }
+        const phaseLabel = addModalPhase && addModalPhase !== FLAT_PHASE_KEY
+            ? t[addModalPhase as PhrasePhase]
+            : '';
+        return phaseLabel ? `${t.modalTitle} — ${phaseLabel}` : t.modalTitle;
+    }, [isSit, addModalPhase, t]);
 
     return (
         <View style={styles.container}>
@@ -418,29 +511,45 @@ export default function EditPhrasesScreen() {
                 </View>
             )}
 
-            {/* Phrase list grouped by phase */}
-            <SectionList
-                sections={sections}
-                renderItem={renderPhraseItem}
-                renderSectionHeader={renderSectionHeader}
-                renderSectionFooter={renderSectionFooter}
-                keyExtractor={keyExtractor}
-                style={styles.scrollView}
-                contentContainerStyle={styles.scrollContent}
-                stickySectionHeadersEnabled={false}
-            />
+            {/* SIT mode: SectionList grouped by phase */}
+            {isSit ? (
+                <SectionList
+                    sections={sections}
+                    renderItem={renderPhasedItem}
+                    renderSectionHeader={renderSectionHeader}
+                    renderSectionFooter={renderSectionFooter}
+                    keyExtractor={keyExtractor}
+                    style={styles.scrollView}
+                    contentContainerStyle={styles.scrollContent}
+                    stickySectionHeadersEnabled={false}
+                />
+            ) : (
+                /* Non-SIT mode: FlatList with flat phrase list */
+                <FlatList
+                    data={flatPhrases}
+                    renderItem={renderFlatItem}
+                    ListHeaderComponent={flatListHeader}
+                    ListFooterComponent={flatListFooter}
+                    keyExtractor={keyExtractor}
+                    style={styles.scrollView}
+                    contentContainerStyle={styles.scrollContent}
+                />
+            )}
 
             {/* Add phrase modal */}
             <Modal
-                visible={addModalPhase !== null}
+                visible={showAddModal}
                 transparent
                 animationType="fade"
-                onRequestClose={() => setAddModalPhase(null)}
+                onRequestClose={() => {
+                    setShowAddModal(false);
+                    setAddModalPhase(null);
+                }}
             >
                 <View style={[styles.modalOverlay, { backgroundColor: overlayColor }]}>
                     <View style={[styles.modalContent, { backgroundColor }]}>
                         <Text style={styles.modalTitle}>
-                            {t.modalTitle} — {addModalPhase ? t[addModalPhase] : ''}
+                            {addModalTitle}
                         </Text>
 
                         <TextInput
@@ -480,6 +589,7 @@ export default function EditPhrasesScreen() {
                             <Pressable
                                 style={[styles.modalButton, { borderColor }]}
                                 onPress={() => {
+                                    setShowAddModal(false);
                                     setAddModalPhase(null);
                                     setNewPhraseText('');
                                     setNewSubphrase('');
@@ -575,6 +685,14 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         letterSpacing: 1,
         opacity: 0.7,
+    },
+    methodBadge: {
+        paddingTop: 4,
+        paddingBottom: 4,
+    },
+    methodBadgeText: {
+        fontSize: 13,
+        fontWeight: '300',
     },
     addPhraseButton: {
         paddingVertical: 16,

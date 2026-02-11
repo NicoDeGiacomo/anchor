@@ -8,7 +8,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, View } from '@/components/Themed';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useColor } from '@/hooks/useColor';
-import { usePhrases } from '@/hooks/usePhrases';
+import { useModeMethod } from '@/hooks/useModes';
+import { useFlatPhrases, usePhrases } from '@/hooks/usePhrases';
 import { hasSeenNavigationHint, markNavigationHintSeen, Phrase } from '@/utils/phraseStorage';
 
 const FALLBACK_TRANSLATIONS = {
@@ -43,6 +44,18 @@ const FALLBACK_TRANSLATIONS = {
 
 type PhaseState = 'looping' | 'reinforcement';
 
+/**
+ * Pick a random index from a list, avoiding the previous index if possible
+ */
+function pickRandomIndex(length: number, previousIndex: number): number {
+    if (length <= 1) return 0;
+    let next: number;
+    do {
+        next = Math.floor(Math.random() * length);
+    } while (next === previousIndex);
+    return next;
+}
+
 export default function ModeScreen() {
     const { mode } = useLocalSearchParams<{ mode: string }>();
     const { language } = useLanguage();
@@ -57,21 +70,44 @@ export default function ModeScreen() {
     // Accept any non-empty mode string (built-in or custom mode ID)
     const validMode = mode || 'panic';
 
-    // Load phrases using custom hook (now returns phased data)
-    const { phrases, isLoading, error } = usePhrases(validMode);
+    // Load the mode's method
+    const { method, isLoading: methodLoading } = useModeMethod(validMode);
 
-    // Build the looping array (preparation + confrontation)
+    // Load phrases - both hooks are called (hooks can't be conditional),
+    // but only the relevant one will have data
+    const { phrases: phasedPhrases, isLoading: phasedLoading, error: phasedError } = usePhrases(validMode);
+    const { phrases: flatPhrases, isLoading: flatLoading, error: flatError } = useFlatPhrases(validMode);
+
+    const isSit = method === 'sit';
+
+    // SIT: Build the looping array (preparation + confrontation)
     const loopingPhrases = useMemo<Phrase[]>(() => 
-        [...phrases.preparation, ...phrases.confrontation],
-        [phrases.preparation, phrases.confrontation]
+        [...phasedPhrases.preparation, ...phasedPhrases.confrontation],
+        [phasedPhrases.preparation, phasedPhrases.confrontation]
     );
+    const reinforcementPhrases = phasedPhrases.reinforcement;
 
-    const reinforcementPhrases = phrases.reinforcement;
+    // Determine loading / error / content states based on method
+    const isLoading = methodLoading || (isSit ? phasedLoading : flatLoading);
+    const error = isSit ? phasedError : flatError;
+    const hasContent = isSit
+        ? (loopingPhrases.length > 0 || reinforcementPhrases.length > 0)
+        : flatPhrases.length > 0;
 
-    // The currently active list depends on the phase
-    const activePhrases = phase === 'looping' ? loopingPhrases : reinforcementPhrases;
+    // For SIT: the active list depends on the phase
+    // For flat methods: always the flat list
+    const activePhrases = isSit
+        ? (phase === 'looping' ? loopingPhrases : reinforcementPhrases)
+        : flatPhrases;
 
-    const hasContent = loopingPhrases.length > 0 || reinforcementPhrases.length > 0;
+    // For random method: initialize with a random index once phrases load
+    const hasInitializedRandom = useRef(false);
+    useEffect(() => {
+        if (method === 'random' && flatPhrases.length > 0 && !hasInitializedRandom.current) {
+            hasInitializedRandom.current = true;
+            setCurrentIndex(Math.floor(Math.random() * flatPhrases.length));
+        }
+    }, [method, flatPhrases.length]);
 
     // Check if user has seen the navigation hint
     useEffect(() => {
@@ -86,6 +122,7 @@ export default function ModeScreen() {
     useEffect(() => {
         setCurrentIndex(0);
         setPhase('looping');
+        hasInitializedRandom.current = false;
     }, [mode, language]);
 
     // Hide hint with animation
@@ -105,30 +142,40 @@ export default function ModeScreen() {
         opacity: hintOpacity.value,
     }));
 
-    // Handle "I'm feeling better" button press
+    // Handle "I'm feeling better" button press (SIT only)
     const handleFeelingBetter = useCallback(() => {
         setPhase('reinforcement');
         setCurrentIndex(0);
     }, []);
 
-    // Advance to next phrase with looping (for looping phase) or navigate back (for reinforcement)
+    // Advance to next phrase - behavior depends on method
     const nextPhrase = useCallback(() => {
-        if (phase === 'reinforcement') {
-            // In reinforcement phase, advance through phrases then go home
-            if (currentIndex >= reinforcementPhrases.length - 1) {
-                router.back();
-                return;
+        if (method === 'sit') {
+            // SIT: current behavior
+            if (phase === 'reinforcement') {
+                if (currentIndex >= reinforcementPhrases.length - 1) {
+                    router.back();
+                    return;
+                }
+                setCurrentIndex(prev => prev + 1);
+            } else {
+                if (loopingPhrases.length > 0) {
+                    setCurrentIndex(prev => (prev + 1) % loopingPhrases.length);
+                }
             }
-            setCurrentIndex(prev => prev + 1);
+        } else if (method === 'random') {
+            // Random: pick a different random phrase
+            if (flatPhrases.length > 0) {
+                setCurrentIndex(prev => pickRandomIndex(flatPhrases.length, prev));
+            }
         } else {
-            // In looping phase, cycle through preparation + confrontation
-            if (loopingPhrases.length > 0) {
-                setCurrentIndex(prev => (prev + 1) % loopingPhrases.length);
+            // See All: sequential loop
+            if (flatPhrases.length > 0) {
+                setCurrentIndex(prev => (prev + 1) % flatPhrases.length);
             }
         }
-        // Hide hint on first tap
         hideHint();
-    }, [phase, currentIndex, reinforcementPhrases.length, loopingPhrases.length, hideHint]);
+    }, [method, phase, currentIndex, reinforcementPhrases.length, loopingPhrases.length, flatPhrases.length, hideHint]);
 
     // Keep a ref to the latest nextPhrase to avoid stale closures in event listener
     const nextPhraseRef = useRef(nextPhrase);
@@ -178,7 +225,7 @@ export default function ModeScreen() {
                     style={[styles.backButton, { top: insets.top + 16 }]}
                     activeOpacity={0.6}
                     accessibilityRole="button"
-                    accessibilityLabel={fallback.backLabel}
+                    accessibilityLabel={FALLBACK_TRANSLATIONS[language].backLabel}
                 >
                     <Ionicons name="chevron-back" size={24} color={iconColor} />
                 </TouchableOpacity>
@@ -207,8 +254,8 @@ export default function ModeScreen() {
                 <Ionicons name="chevron-back" size={24} color={iconColor} />
             </TouchableOpacity>
 
-            {/* "I'm feeling better" button - only visible during looping phase */}
-            {phase === 'looping' ? (
+            {/* "I'm feeling better" button - only visible during SIT looping phase */}
+            {isSit && phase === 'looping' ? (
                 <TouchableOpacity
                     onPress={handleFeelingBetter}
                     hitSlop={{ top: 12, right: 12, bottom: 12, left: 12 }}
