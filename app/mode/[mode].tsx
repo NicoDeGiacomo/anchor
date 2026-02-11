@@ -44,18 +44,6 @@ const FALLBACK_TRANSLATIONS = {
 
 type PhaseState = 'looping' | 'reinforcement';
 
-/**
- * Pick a random index from a list, avoiding the previous index if possible
- */
-function pickRandomIndex(length: number, previousIndex: number): number {
-    if (length <= 1) return 0;
-    let next: number;
-    do {
-        next = Math.floor(Math.random() * length);
-    } while (next === previousIndex);
-    return next;
-}
-
 export default function ModeScreen() {
     const { mode } = useLocalSearchParams<{ mode: string }>();
     const { language } = useLanguage();
@@ -149,7 +137,10 @@ export default function ModeScreen() {
     }, []);
 
     // Advance to next phrase - behavior depends on method
+    // Random mode does not advance; the phrase is static
     const nextPhrase = useCallback(() => {
+        if (method === 'random') return;
+
         if (method === 'sit') {
             // SIT: current behavior
             if (phase === 'reinforcement') {
@@ -162,11 +153,6 @@ export default function ModeScreen() {
                 if (loopingPhrases.length > 0) {
                     setCurrentIndex(prev => (prev + 1) % loopingPhrases.length);
                 }
-            }
-        } else if (method === 'random') {
-            // Random: pick a different random phrase
-            if (flatPhrases.length > 0) {
-                setCurrentIndex(prev => pickRandomIndex(flatPhrases.length, prev));
             }
         } else {
             // See All: sequential loop
@@ -270,28 +256,41 @@ export default function ModeScreen() {
                 </TouchableOpacity>
             ) : null}
 
-            {/* Tap-to-advance wrapper */}
+            {/* Phrase display - tappable for SIT/See All, static for Random */}
             {currentPhrase ? (
-                <Pressable
-                    style={styles.phraseWrapper}
-                    onPress={nextPhrase}
-                    accessibilityRole="button"
-                    accessibilityLabel={currentPhrase.text}
-                    accessibilityHint={fallback.nextPhraseHint}
-                >
-                    <Text style={styles.phraseText}>
-                        {currentPhrase.text}
-                    </Text>
-                    {currentPhrase.subphrase ? (
-                        <Text style={[styles.subphraseText, { color: secondaryTextColor }]}>
-                            {currentPhrase.subphrase}
+                method === 'random' ? (
+                    <View style={styles.phraseWrapper}>
+                        <Text style={styles.phraseText}>
+                            {currentPhrase.text}
                         </Text>
-                    ) : null}
-                </Pressable>
+                        {currentPhrase.subphrase ? (
+                            <Text style={[styles.subphraseText, { color: secondaryTextColor }]}>
+                                {currentPhrase.subphrase}
+                            </Text>
+                        ) : null}
+                    </View>
+                ) : (
+                    <Pressable
+                        style={styles.phraseWrapper}
+                        onPress={nextPhrase}
+                        accessibilityRole="button"
+                        accessibilityLabel={currentPhrase.text}
+                        accessibilityHint={fallback.nextPhraseHint}
+                    >
+                        <Text style={styles.phraseText}>
+                            {currentPhrase.text}
+                        </Text>
+                        {currentPhrase.subphrase ? (
+                            <Text style={[styles.subphraseText, { color: secondaryTextColor }]}>
+                                {currentPhrase.subphrase}
+                            </Text>
+                        ) : null}
+                    </Pressable>
+                )
             ) : null}
 
-            {/* Navigation hint - shown only on first use */}
-            {showHint ? (
+            {/* Navigation hint - shown only on first use, not for random mode */}
+            {showHint && method !== 'random' ? (
                 <Animated.View style={[styles.hintContainer, { bottom: insets.bottom + 32 }, hintAnimatedStyle]}>
                     <Text style={[styles.hintText, { color: secondaryTextColor }]}>
                         {fallback.tapHint}
