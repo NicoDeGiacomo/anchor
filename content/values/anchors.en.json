@@ -1,0 +1,36 @@
+{
+    "phrases": [
+        {
+            "id": "val1",
+            "text": "What is important?"
+        },
+        {
+            "id": "val2",
+            "text": "What value would you like to put into play today?"
+        },
+        {
+            "id": "val3",
+            "text": "What is valuable in your life?"
+        },
+        {
+            "id": "val4",
+            "text": "What steps would you take right now if you chose to be your best version?"
+        },
+        {
+            "id": "val5",
+            "text": "What quality or direction would you like to deliberately cultivate today?"
+        },
+        {
+            "id": "val6",
+            "text": "What vital qualities would you like to sustain today?"
+        },
+        {
+            "id": "val7",
+            "text": "Right now, are you moving away from discomfort or moving toward what is valuable in your life?"
+        },
+        {
+            "id": "val8",
+            "text": "What valuable qualities would you like to embody right now?"
+        }
+    ]
+}

@@ -1,53 +1,116 @@
 {
     "phrases": [
         {
-            "id": "prep1",
-            "text": "Let's bring you back to the present moment."
+            "id": "act1",
+            "text": "Notice the soles of your feet."
         },
         {
-            "id": "prep2",
-            "text": "You are here, right now.",
-            "subphrase": "That is all that matters."
+            "id": "act2",
+            "text": "What sensations are in your body right now?"
         },
         {
-            "id": "conf1",
-            "text": "Feel your feet on the floor."
+            "id": "act3",
+            "text": "How does your body feel?",
+            "subphrase": "What is your posture like right now?"
         },
         {
-            "id": "conf2",
-            "text": "Take a deep breath."
+            "id": "act4",
+            "text": "Pause. Notice 5 things you can see. Notice 5 things you can hear. Notice 5 things you can feel.",
+            "subphrase": "Now try to notice them all together."
         },
         {
-            "id": "conf3",
-            "text": "Tell me 5 things you can see."
+            "id": "act5",
+            "text": "Press your feet firmly into the floor. Push down, noticing how it supports you.",
+            "subphrase": "Notice your body and the force of gravity moving through it. Notice what your five senses are picking up right now."
         },
         {
-            "id": "conf4",
-            "text": "Tell me 4 things you can hear."
+            "id": "act6",
+            "text": "Notice anything blue you can see around you."
         },
         {
-            "id": "conf5",
-            "text": "Tell me 3 things you can touch."
+            "id": "act7",
+            "text": "Notice your body now. Release any tension you can.",
+            "subphrase": "Hold the rest with compassion."
         },
         {
-            "id": "conf6",
-            "text": "Tell me 2 things you can smell."
+            "id": "act8",
+            "text": "Notice what your five senses are picking up right now."
         },
         {
-            "id": "conf7",
-            "text": "Tell me 1 thing you can taste."
+            "id": "act9",
+            "text": "Inhale for 4 counts. Hold for 4 counts. Exhale for 4 counts. Hold for 4 counts."
         },
         {
-            "id": "reinf1",
-            "text": "You're back. You brought yourself here."
+            "id": "act10",
+            "text": "Breathe slowly 3 times. Exhale slowly.",
+            "subphrase": "Notice your lungs emptying and filling again. Notice your shoulders rising and falling. Let your thoughts go."
         },
         {
-            "id": "reinf2",
-            "text": "You grounded yourself. That's a skill you own."
+            "id": "act11",
+            "text": "Breathe consciously, counting ten breaths, focusing on bringing your attention to the present moment.",
+            "subphrase": "Observe how your body feels. Let the parts of your face that may be tense relax. Drop your shoulders, loosen your limbs, your abdomen, your chest, your back."
         },
         {
-            "id": "reinf3",
-            "text": "You can always come back to the present."
+            "id": "act12",
+            "text": "You are not your thoughts."
+        },
+        {
+            "id": "act13",
+            "text": "What thoughts are present right now?"
+        },
+        {
+            "id": "act14",
+            "text": "Your mind is not your friend.",
+            "subphrase": "Don't let it choose for you."
+        },
+        {
+            "id": "act15",
+            "text": "What does your mind sound like right now?"
+        },
+        {
+            "id": "act16",
+            "text": "Identify the thoughts appearing right now.",
+            "subphrase": "Hooking into those thoughts right now, does it bring you closer to what matters in your life?"
+        },
+        {
+            "id": "act17",
+            "text": "Notice what your mind is telling you right now."
+        },
+        {
+            "id": "act18",
+            "text": "What emotions or feelings are present right now?"
+        },
+        {
+            "id": "act19",
+            "text": "How are you treating yourself right now?"
+        },
+        {
+            "id": "act20",
+            "text": "Do the next activity at half speed.",
+            "subphrase": "Notice what comes up when you do."
+        },
+        {
+            "id": "act21",
+            "text": "Breathe. Notice what you're feeling right now. Make space for it.",
+            "subphrase": "Notice what your mind is saying. Acknowledge it. Notice what is valuable right now. Come back to this moment."
+        },
+        {
+            "id": "act22",
+            "text": "What are you doing right now?",
+            "subphrase": "From 1 to 10, how important is this for your life? From 1 to 10, how enjoyable is this activity?"
+        },
+        {
+            "id": "act23",
+            "text": "Where has your attention been in the last few minutes?"
+        },
+        {
+            "id": "act24",
+            "text": "What is there to be grateful for right now?"
+        },
+        {
+            "id": "act25",
+            "text": "What thoughts and feelings were present the last time you read these lines?",
+            "subphrase": "What thoughts and feelings are present now?"
         }
     ]
 }

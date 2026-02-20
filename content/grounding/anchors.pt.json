@@ -1,53 +1,116 @@
 {
     "phrases": [
         {
-            "id": "prep1",
-            "text": "Vamos te trazer de volta ao momento presente."
+            "id": "act1",
+            "text": "Note as plantas dos seus pés."
         },
         {
-            "id": "prep2",
-            "text": "Você está aqui, agora.",
-            "subphrase": "Isso é tudo o que importa."
+            "id": "act2",
+            "text": "Que sensações existem no seu corpo neste momento?"
         },
         {
-            "id": "conf1",
-            "text": "Sinta seus pés no chão."
+            "id": "act3",
+            "text": "Como o seu corpo se sente?",
+            "subphrase": "Qual é a sua postura corporal neste momento?"
         },
         {
-            "id": "conf2",
-            "text": "Faça uma respiração profunda."
+            "id": "act4",
+            "text": "Pausa. Note 5 coisas que você pode ver. Note 5 coisas que você pode ouvir. Note 5 coisas que você pode sentir.",
+            "subphrase": "Agora tente notá-las todas juntas."
         },
         {
-            "id": "conf3",
-            "text": "Me diga 5 coisas que você possa ver."
+            "id": "act5",
+            "text": "Apoie seus pés firmemente no chão. Empurre para baixo, notando como ele te sustenta.",
+            "subphrase": "Note seu corpo e a força da gravidade que o atravessa. Note o que seus cinco sentidos captam agora."
         },
         {
-            "id": "conf4",
-            "text": "Me diga 4 coisas que você possa ouvir."
+            "id": "act6",
+            "text": "Note o que você pode ver de cor azul ao seu redor."
         },
         {
-            "id": "conf5",
-            "text": "Me diga 3 coisas que você possa tocar."
+            "id": "act7",
+            "text": "Note seu corpo agora. Solte qualquer tensão que puder.",
+            "subphrase": "Sustente o resto com compaixão."
         },
         {
-            "id": "conf6",
-            "text": "Me diga 2 coisas que você possa cheirar."
+            "id": "act8",
+            "text": "Note o que seus cinco sentidos registram neste momento."
         },
         {
-            "id": "conf7",
-            "text": "Me diga 1 coisa que você possa saborear."
+            "id": "act9",
+            "text": "Inspire em 4 tempos. Segure em 4 tempos. Expire em 4 tempos. Segure em 4 tempos."
         },
         {
-            "id": "reinf1",
-            "text": "Você voltou. Você se trouxe até aqui."
+            "id": "act10",
+            "text": "Respire lentamente 3 vezes. Expire lentamente.",
+            "subphrase": "Note seus pulmões se esvaziando e se enchendo novamente. Note o descanso e a descida dos seus ombros. Deixe seus pensamentos irem."
         },
         {
-            "id": "reinf2",
-            "text": "Você se conectou com o presente. Essa é uma habilidade sua."
+            "id": "act11",
+            "text": "Respire conscientemente contando dez respirações, com o foco em trazer sua atenção ao momento presente.",
+            "subphrase": "Observe como está seu corpo. Permita que as partes do seu rosto que possam estar contraídas relaxem. Deixe cair os ombros, solte as extremidades, o abdômen, o peito, as costas."
         },
         {
-            "id": "reinf3",
-            "text": "Você sempre pode voltar ao momento presente."
+            "id": "act12",
+            "text": "Você não é seus pensamentos."
+        },
+        {
+            "id": "act13",
+            "text": "Que pensamentos estão presentes neste momento?"
+        },
+        {
+            "id": "act14",
+            "text": "Sua mente não é sua amiga.",
+            "subphrase": "Não deixe que ela escolha por você."
+        },
+        {
+            "id": "act15",
+            "text": "Como soa sua mente neste momento?"
+        },
+        {
+            "id": "act16",
+            "text": "Identifique os pensamentos que estão aparecendo agora.",
+            "subphrase": "Se envolver com esses pensamentos neste momento te aproxima do que é valioso para sua vida?"
+        },
+        {
+            "id": "act17",
+            "text": "Note o que sua mente está dizendo neste momento."
+        },
+        {
+            "id": "act18",
+            "text": "Que emoções ou sentimentos estão presentes neste momento?"
+        },
+        {
+            "id": "act19",
+            "text": "Como você está se tratando neste momento?"
+        },
+        {
+            "id": "act20",
+            "text": "Faça a próxima atividade na metade da velocidade.",
+            "subphrase": "Note o que surge ao fazê-la assim."
+        },
+        {
+            "id": "act21",
+            "text": "Respire. Note o que você está sentindo agora. Dê espaço.",
+            "subphrase": "Note o que sua mente está dizendo. Agradeça. Note o que é valioso neste momento. Volte a este momento."
+        },
+        {
+            "id": "act22",
+            "text": "O que você está fazendo neste momento?",
+            "subphrase": "De 1 a 10, quão importante é para sua vida estar fazendo isso? De 1 a 10, quão agradável é esta atividade?"
+        },
+        {
+            "id": "act23",
+            "text": "Onde esteve sua atenção nos últimos minutos?"
+        },
+        {
+            "id": "act24",
+            "text": "O que há para agradecer neste momento?"
+        },
+        {
+            "id": "act25",
+            "text": "Que pensamentos e sentimentos estavam presentes da última vez que você leu estas linhas?",
+            "subphrase": "Que pensamentos e sentimentos estão presentes agora?"
         }
     ]
 }

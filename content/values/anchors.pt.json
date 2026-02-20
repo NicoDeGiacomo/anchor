@@ -1,0 +1,36 @@
+{
+    "phrases": [
+        {
+            "id": "val1",
+            "text": "O que é importante?"
+        },
+        {
+            "id": "val2",
+            "text": "Que valor você gostaria de colocar em prática hoje?"
+        },
+        {
+            "id": "val3",
+            "text": "O que é valioso na sua vida?"
+        },
+        {
+            "id": "val4",
+            "text": "Que passos você daria agora se escolhesse ser a sua melhor versão?"
+        },
+        {
+            "id": "val5",
+            "text": "Que qualidade ou direção você gostaria de cultivar deliberadamente hoje?"
+        },
+        {
+            "id": "val6",
+            "text": "Que qualidades vitais você gostaria de sustentar hoje?"
+        },
+        {
+            "id": "val7",
+            "text": "Neste momento, você está se afastando do desconforto ou se aproximando do que é valioso na sua vida?"
+        },
+        {
+            "id": "val8",
+            "text": "Que qualidades valiosas você gostaria de encarnar neste momento?"
+        }
+    ]
+}

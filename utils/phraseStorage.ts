@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Built-in mode type (the 5 predefined modes)
-export type BuiltInMode = 'panic' | 'anxiety' | 'sadness' | 'anger' | 'grounding';
+export type BuiltInMode = 'panic' | 'anxiety' | 'sadness' | 'anger' | 'grounding' | 'values';
 
 // Mode can be either a built-in mode or a custom mode ID (string)
 export type Mode = BuiltInMode | string;
@@ -32,6 +32,7 @@ export const BUILT_IN_MODE_METHODS: Record<BuiltInMode, ModeMethod> = {
     sadness: 'sit',
     anger: 'sit',
     grounding: 'random',
+    values: 'random',
 };
 
 export interface Phrase {
@@ -262,7 +263,7 @@ export const getActiveFlatPhrases = async (
 /**
  * All built-in modes (the 5 predefined modes)
  */
-export const BUILT_IN_MODES: BuiltInMode[] = ['panic', 'anxiety', 'sadness', 'anger', 'grounding'];
+export const BUILT_IN_MODES: BuiltInMode[] = ['panic', 'anxiety', 'sadness', 'anger', 'grounding', 'values'];
 
 /**
  * Check if a mode ID is a built-in mode

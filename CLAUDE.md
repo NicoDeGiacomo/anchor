@@ -1,0 +1,1 @@
+Always update LEDGER.md after development. Mark completed items, add anything you discover (warnings, bugs, incomplete work), and let the user know when you edit it. Use this file to keep track of the project status.

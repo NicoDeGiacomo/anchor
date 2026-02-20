@@ -51,6 +51,11 @@ const FLAT_PHRASES_MAP: Partial<Record<BuiltInMode, Record<Language, FlatPhraseC
         es: require('@/content/grounding/anchors.es.json'),
         pt: require('@/content/grounding/anchors.pt.json'),
     },
+    values: {
+        en: require('@/content/values/anchors.en.json'),
+        es: require('@/content/values/anchors.es.json'),
+        pt: require('@/content/values/anchors.pt.json'),
+    },
 };
 
 const EMPTY_PHASED: PhasedPhrases = {

@@ -104,6 +104,12 @@ This document describes all the logo assets needed for the Anchor app.
 
 ---
 
+## Open Graph Image
+
+The Open Graph image was created using [OG Image Maker](https://ogimagemaker.com/?l=react&tt=Anchor&ts=Grounding+app+for+overwhelming+moments&bc=236c7a&g1=8EC5FC&g2=E0C3FC&g3=FBC2EB&pt=0&sc=2B6CB0&cc=1). Use this link to edit or regenerate the image.
+
+---
+
 ## Recommended Tool
 
 **Figma** (free, web-based): [figma.com](https://figma.com)
