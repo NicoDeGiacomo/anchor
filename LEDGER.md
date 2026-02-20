@@ -1,5 +1,5 @@
 TODO:
-- NTH: Frontend tests
+- ~~NTH: Frontend tests~~ Done. 85 tests across 6 suites (phraseStorage, useModes, usePhrases, ThemeContext, LanguageContext, Themed). jest-expo + @testing-library/react-native. Coverage: utils 89%, contexts 91%, hooks 80-87%, Themed 100%.
 - Readme with updated screenshots
 - ~~Fix problems found with app store~~ Accepted! v1.0.0 live on App Store.
 - ~~Check phrases inside grounding~~ Added 25 new phrases from Grupo ACT resources (breathing, body awareness, defusion, mindfulness, gratitude). All 3 languages.
