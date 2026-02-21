@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { useLocalSearchParams } from 'expo-router';
-import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useState } from 'react';
 import {
     FlatList,
     ListRenderItem,
@@ -32,17 +32,19 @@ import {
 
 type PhraseItemProps = {
     phrase: PhraseWithSource;
+    phase: PhrasePhase | typeof FLAT_PHASE_KEY;
     borderColor: string;
     secondaryTextColor: string;
     dangerColor: string;
     t: typeof TRANSLATIONS['en'];
-    onDelete: (id: string) => void;
+    onDelete: (id: string, phase: PhrasePhase | typeof FLAT_PHASE_KEY) => void;
     onHide: (id: string) => void;
     onUnhide: (id: string) => void;
 };
 
 const PhraseItem = memo(function PhraseItem({
     phrase,
+    phase,
     borderColor,
     secondaryTextColor,
     dangerColor,
@@ -98,7 +100,7 @@ const PhraseItem = memo(function PhraseItem({
                 {phrase.isUserAdded ? (
                     <Pressable
                         style={styles.actionButton}
-                        onPress={() => onDelete(phrase.id)}
+                        onPress={() => onDelete(phrase.id, phase)}
                         accessibilityRole="button"
                         accessibilityLabel={t.deleteButton}
                     >
@@ -242,6 +244,63 @@ type PhraseSection = {
     data: PhraseWithSource[];
 };
 
+type EditPhrasesState = {
+    showAddModal: boolean;
+    addModalPhase: PhrasePhase | typeof FLAT_PHASE_KEY | null;
+    newPhraseText: string;
+    newSubphrase: string;
+    confirmDialog: {
+        visible: boolean;
+        title: string;
+        message: string;
+        onConfirm: () => void;
+        confirmText: string;
+        isDanger?: boolean;
+    };
+};
+
+type EditPhrasesAction =
+    | { type: 'OPEN_ADD_MODAL'; phase: PhrasePhase | typeof FLAT_PHASE_KEY }
+    | { type: 'CLOSE_ADD_MODAL' }
+    | { type: 'SET_PHRASE_TEXT'; text: string }
+    | { type: 'SET_SUBPHRASE'; text: string }
+    | { type: 'ADD_SUCCESS' }
+    | { type: 'SHOW_CONFIRM'; dialog: EditPhrasesState['confirmDialog'] }
+    | { type: 'CLOSE_CONFIRM' };
+
+const initialEditPhrasesState: EditPhrasesState = {
+    showAddModal: false,
+    addModalPhase: null,
+    newPhraseText: '',
+    newSubphrase: '',
+    confirmDialog: {
+        visible: false,
+        title: '',
+        message: '',
+        onConfirm: () => {},
+        confirmText: '',
+    },
+};
+
+function editPhrasesReducer(state: EditPhrasesState, action: EditPhrasesAction): EditPhrasesState {
+    switch (action.type) {
+        case 'OPEN_ADD_MODAL':
+            return { ...state, showAddModal: true, addModalPhase: action.phase };
+        case 'CLOSE_ADD_MODAL':
+            return { ...state, showAddModal: false, addModalPhase: null, newPhraseText: '', newSubphrase: '' };
+        case 'SET_PHRASE_TEXT':
+            return { ...state, newPhraseText: action.text };
+        case 'SET_SUBPHRASE':
+            return { ...state, newSubphrase: action.text };
+        case 'ADD_SUCCESS':
+            return { ...state, showAddModal: false, addModalPhase: null, newPhraseText: '', newSubphrase: '' };
+        case 'SHOW_CONFIRM':
+            return { ...state, confirmDialog: action.dialog };
+        case 'CLOSE_CONFIRM':
+            return { ...state, confirmDialog: { ...state.confirmDialog, visible: false } };
+    }
+}
+
 export default function EditPhrasesScreen() {
     const { mode } = useLocalSearchParams<{ mode: string }>();
     const { language } = useLanguage();
@@ -263,26 +322,8 @@ export default function EditPhrasesScreen() {
     const refetch = isSit ? phasedRefetch : flatRefetch;
     const isCustomMode = isSit ? phasedIsCustom : flatIsCustom;
 
-    // State for add modal - for SIT modes, tracks the phase; for flat modes, always 'general'
-    const [showAddModal, setShowAddModal] = useState(false);
-    const [addModalPhase, setAddModalPhase] = useState<PhrasePhase | typeof FLAT_PHASE_KEY | null>(null);
-    const [newPhraseText, setNewPhraseText] = useState('');
-    const [newSubphrase, setNewSubphrase] = useState('');
+    const [ep, epDispatch] = useReducer(editPhrasesReducer, initialEditPhrasesState);
     const [customModeName, setCustomModeName] = useState<string | null>(null);
-    const [confirmDialog, setConfirmDialog] = useState<{
-        visible: boolean;
-        title: string;
-        message: string;
-        onConfirm: () => void;
-        confirmText: string;
-        isDanger?: boolean;
-    }>({
-        visible: false,
-        title: '',
-        message: '',
-        onConfirm: () => {},
-        confirmText: '',
-    });
     
     const {
         background: backgroundColor,
@@ -341,60 +382,62 @@ export default function EditPhrasesScreen() {
 
     // Open the add modal
     const openAddModal = useCallback((phase: PhrasePhase | typeof FLAT_PHASE_KEY) => {
-        setAddModalPhase(phase);
-        setShowAddModal(true);
+        epDispatch({ type: 'OPEN_ADD_MODAL', phase });
     }, []);
 
     // Add new phrase
     const handleAddPhrase = useCallback(async () => {
-        if (!newPhraseText.trim()) {
-            setConfirmDialog({
-                visible: true,
-                title: t.emptyMainPhraseError,
-                message: '',
-                onConfirm: () => setConfirmDialog(prev => ({ ...prev, visible: false })),
-                confirmText: 'OK',
+        if (!ep.newPhraseText.trim()) {
+            epDispatch({
+                type: 'SHOW_CONFIRM',
+                dialog: {
+                    visible: true,
+                    title: t.emptyMainPhraseError,
+                    message: '',
+                    onConfirm: () => epDispatch({ type: 'CLOSE_CONFIRM' }),
+                    confirmText: 'OK',
+                },
             });
             return;
         }
 
-        if (!addModalPhase) return;
+        if (!ep.addModalPhase) return;
 
         try {
             await addUserPhrase(
                 validMode,
                 language,
-                addModalPhase,
-                newPhraseText.trim(),
-                newSubphrase.trim() || undefined
+                ep.addModalPhase,
+                ep.newPhraseText.trim(),
+                ep.newSubphrase.trim() || undefined
             );
-            
-            setNewPhraseText('');
-            setNewSubphrase('');
-            setShowAddModal(false);
-            setAddModalPhase(null);
+
+            epDispatch({ type: 'ADD_SUCCESS' });
             await refetch();
         } catch (err) {
             console.warn('Failed to add phrase:', err);
         }
-    }, [newPhraseText, newSubphrase, validMode, language, addModalPhase, refetch, t.emptyMainPhraseError]);
+    }, [ep.newPhraseText, ep.newSubphrase, ep.addModalPhase, validMode, language, refetch, t.emptyMainPhraseError]);
 
     // Delete user phrase
     const handleDeletePhrase = useCallback((phraseId: string, phase: PhrasePhase | typeof FLAT_PHASE_KEY) => {
-        setConfirmDialog({
-            visible: true,
-            title: t.deleteConfirmTitle,
-            message: t.deleteConfirmMessage,
-            confirmText: t.deleteButton,
-            isDanger: true,
-            onConfirm: async () => {
-                try {
-                    await removeUserPhrase(validMode, language, phase, phraseId);
-                    await refetch();
-                } catch (err) {
-                    console.warn('Failed to delete phrase:', err);
-                }
-                setConfirmDialog(prev => ({ ...prev, visible: false }));
+        epDispatch({
+            type: 'SHOW_CONFIRM',
+            dialog: {
+                visible: true,
+                title: t.deleteConfirmTitle,
+                message: t.deleteConfirmMessage,
+                confirmText: t.deleteButton,
+                isDanger: true,
+                onConfirm: async () => {
+                    try {
+                        await removeUserPhrase(validMode, language, phase, phraseId);
+                        await refetch();
+                    } catch (err) {
+                        console.warn('Failed to delete phrase:', err);
+                    }
+                    epDispatch({ type: 'CLOSE_CONFIRM' });
+                },
             },
         });
     }, [t.deleteConfirmTitle, t.deleteConfirmMessage, t.deleteButton, validMode, language, refetch]);
@@ -424,11 +467,12 @@ export default function EditPhrasesScreen() {
     const renderPhasedItem: SectionListRenderItem<PhraseWithSource, PhraseSection> = useCallback(({ item, section }) => (
         <PhraseItem
             phrase={item}
+            phase={section.phase}
             borderColor={borderColor}
             secondaryTextColor={secondaryTextColor}
             dangerColor={dangerColor}
             t={t}
-            onDelete={(id) => handleDeletePhrase(id, section.phase)}
+            onDelete={handleDeletePhrase}
             onHide={handleHidePhrase}
             onUnhide={handleUnhidePhrase}
         />
@@ -456,11 +500,12 @@ export default function EditPhrasesScreen() {
     const renderFlatItem: ListRenderItem<PhraseWithSource> = useCallback(({ item }) => (
         <PhraseItem
             phrase={item}
+            phase={FLAT_PHASE_KEY}
             borderColor={borderColor}
             secondaryTextColor={secondaryTextColor}
             dangerColor={dangerColor}
             t={t}
-            onDelete={(id) => handleDeletePhrase(id, FLAT_PHASE_KEY)}
+            onDelete={handleDeletePhrase}
             onHide={handleHidePhrase}
             onUnhide={handleUnhidePhrase}
         />
@@ -497,11 +542,11 @@ export default function EditPhrasesScreen() {
         if (!isSit) {
             return t.modalTitle;
         }
-        const phaseLabel = addModalPhase && addModalPhase !== FLAT_PHASE_KEY
-            ? t[addModalPhase as PhrasePhase]
+        const phaseLabel = ep.addModalPhase && ep.addModalPhase !== FLAT_PHASE_KEY
+            ? t[ep.addModalPhase as PhrasePhase]
             : '';
         return phaseLabel ? `${t.modalTitle} — ${phaseLabel}` : t.modalTitle;
-    }, [isSit, addModalPhase, t]);
+    }, [isSit, ep.addModalPhase, t]);
 
     return (
         <View style={styles.container}>
@@ -541,13 +586,10 @@ export default function EditPhrasesScreen() {
 
             {/* Add phrase modal */}
             <Modal
-                visible={showAddModal}
+                visible={ep.showAddModal}
                 transparent
                 animationType="fade"
-                onRequestClose={() => {
-                    setShowAddModal(false);
-                    setAddModalPhase(null);
-                }}
+                onRequestClose={() => epDispatch({ type: 'CLOSE_ADD_MODAL' })}
             >
                 <View style={[styles.modalOverlay, { backgroundColor: overlayColor }]}>
                     <View style={[styles.modalContent, { backgroundColor }]}>
@@ -558,7 +600,7 @@ export default function EditPhrasesScreen() {
                         <TextInput
                             style={[
                                 styles.input,
-                                { 
+                                {
                                     borderColor,
                                     color: textColor,
                                     backgroundColor,
@@ -566,16 +608,15 @@ export default function EditPhrasesScreen() {
                             ]}
                             placeholder={t.mainPhrasePlaceholder}
                             placeholderTextColor={secondaryTextColor}
-                            value={newPhraseText}
-                            onChangeText={setNewPhraseText}
+                            value={ep.newPhraseText}
+                            onChangeText={(text) => epDispatch({ type: 'SET_PHRASE_TEXT', text })}
                             multiline
-                            autoFocus
                         />
 
                         <TextInput
                             style={[
                                 styles.input,
-                                { 
+                                {
                                     borderColor,
                                     color: textColor,
                                     backgroundColor,
@@ -583,20 +624,15 @@ export default function EditPhrasesScreen() {
                             ]}
                             placeholder={t.subphrasePlaceholder}
                             placeholderTextColor={secondaryTextColor}
-                            value={newSubphrase}
-                            onChangeText={setNewSubphrase}
+                            value={ep.newSubphrase}
+                            onChangeText={(text) => epDispatch({ type: 'SET_SUBPHRASE', text })}
                             multiline
                         />
 
                         <View style={styles.modalButtons}>
                             <Pressable
                                 style={[styles.modalButton, { borderColor }]}
-                                onPress={() => {
-                                    setShowAddModal(false);
-                                    setAddModalPhase(null);
-                                    setNewPhraseText('');
-                                    setNewSubphrase('');
-                                }}
+                                onPress={() => epDispatch({ type: 'CLOSE_ADD_MODAL' })}
                             >
                                 <Text style={styles.modalButtonText}>
                                     {t.cancelButton}
@@ -617,25 +653,25 @@ export default function EditPhrasesScreen() {
 
             {/* Confirmation dialog modal */}
             <Modal
-                visible={confirmDialog.visible}
+                visible={ep.confirmDialog.visible}
                 transparent
                 animationType="fade"
-                onRequestClose={() => setConfirmDialog(prev => ({ ...prev, visible: false }))}
+                onRequestClose={() => epDispatch({ type: 'CLOSE_CONFIRM' })}
             >
                 <View style={[styles.modalOverlay, { backgroundColor: overlayColor }]}>
                     <View style={[styles.modalContent, { backgroundColor }]}>
-                        <Text style={styles.modalTitle}>{confirmDialog.title}</Text>
-                        {confirmDialog.message ? (
+                        <Text style={styles.modalTitle}>{ep.confirmDialog.title}</Text>
+                        {ep.confirmDialog.message ? (
                             <Text style={[styles.confirmMessage, { color: secondaryTextColor }]}>
-                                {confirmDialog.message}
+                                {ep.confirmDialog.message}
                             </Text>
                         ) : null}
 
                         <View style={styles.modalButtons}>
-                            {confirmDialog.message ? (
+                            {ep.confirmDialog.message ? (
                                 <Pressable
                                     style={[styles.modalButton, { borderColor }]}
-                                    onPress={() => setConfirmDialog(prev => ({ ...prev, visible: false }))}
+                                    onPress={() => epDispatch({ type: 'CLOSE_CONFIRM' })}
                                 >
                                     <Text style={styles.modalButtonText}>
                                         {t.cancelButton}
@@ -645,18 +681,18 @@ export default function EditPhrasesScreen() {
                             <Pressable
                                 style={[
                                     styles.modalButton,
-                                    confirmDialog.isDanger ? styles.modalButtonDanger : styles.modalButtonPrimary,
-                                    { borderColor: confirmDialog.isDanger ? dangerColor : borderColor },
-                                    !confirmDialog.message && { flex: 1 },
+                                    ep.confirmDialog.isDanger ? styles.modalButtonDanger : styles.modalButtonPrimary,
+                                    { borderColor: ep.confirmDialog.isDanger ? dangerColor : borderColor },
+                                    !ep.confirmDialog.message && { flex: 1 },
                                 ]}
-                                onPress={confirmDialog.onConfirm}
+                                onPress={ep.confirmDialog.onConfirm}
                             >
                                 <Text style={[
                                     styles.modalButtonText,
-                                    confirmDialog.isDanger && { color: dangerColor },
-                                    !confirmDialog.isDanger && styles.modalButtonTextPrimary,
+                                    ep.confirmDialog.isDanger && { color: dangerColor },
+                                    !ep.confirmDialog.isDanger && styles.modalButtonTextPrimary,
                                 ]}>
-                                    {confirmDialog.confirmText}
+                                    {ep.confirmDialog.confirmText}
                                 </Text>
                             </Pressable>
                         </View>

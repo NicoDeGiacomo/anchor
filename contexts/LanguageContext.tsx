@@ -30,8 +30,10 @@ const detectSystemLanguage = (): Language => {
 };
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-    const [language, setLanguageState] = useState<Language>('en');
-    const [isInitialized, setIsInitialized] = useState(false);
+    const [state, setState] = useState<{ language: Language; isInitialized: boolean }>({
+        language: 'en',
+        isInitialized: false,
+    });
 
     useEffect(() => {
         const initializeLanguage = async () => {
@@ -39,17 +41,15 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
                 const storedLanguage = await AsyncStorage.getItem(STORAGE_KEY);
 
                 if (storedLanguage && SUPPORTED_LANGUAGES.includes(storedLanguage as Language)) {
-                    setLanguageState(storedLanguage as Language);
+                    setState({ language: storedLanguage as Language, isInitialized: true });
                 } else {
                     const detectedLanguage = detectSystemLanguage();
-                    setLanguageState(detectedLanguage);
+                    setState({ language: detectedLanguage, isInitialized: true });
                     await AsyncStorage.setItem(STORAGE_KEY, detectedLanguage);
                 }
             } catch (error) {
                 console.warn('Failed to load language preference:', error);
-                setLanguageState('en');
-            } finally {
-                setIsInitialized(true);
+                setState({ language: 'en', isInitialized: true });
             }
         };
 
@@ -59,18 +59,18 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     const setLanguage = useCallback(async (lang: Language) => {
         try {
             await AsyncStorage.setItem(STORAGE_KEY, lang);
-            setLanguageState(lang);
+            setState(prev => ({ ...prev, language: lang }));
         } catch (error) {
             console.warn('Failed to save language preference:', error);
         }
     }, []);
 
     const value = useMemo(() => ({
-        language,
+        language: state.language,
         setLanguage,
-    }), [language, setLanguage]);
+    }), [state.language, setLanguage]);
 
-    if (!isInitialized) {
+    if (!state.isInitialized) {
         return null; // Wait for initialization
     }
 

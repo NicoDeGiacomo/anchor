@@ -1,5 +1,5 @@
 import { Link } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useReducer } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, TextInput, ViewStyle } from 'react-native';
 
 import PressableFeedback from '@/components/PressableFeedback';
@@ -175,6 +175,74 @@ const TRANSLATIONS = {
     },
 };
 
+type ModalState = {
+    showResetConfirm: boolean;
+    showCreateModal: boolean;
+    showRenameModal: boolean;
+    showDeleteConfirm: boolean;
+    newModeName: string;
+    newModeMethod: ModeMethod;
+    editingMode: CustomMode | null;
+    modeToDelete: CustomMode | null;
+};
+
+type ModalAction =
+    | { type: 'OPEN_RESET' }
+    | { type: 'CLOSE_RESET' }
+    | { type: 'OPEN_CREATE' }
+    | { type: 'CLOSE_CREATE' }
+    | { type: 'OPEN_RENAME'; mode: CustomMode }
+    | { type: 'CLOSE_RENAME' }
+    | { type: 'OPEN_DELETE'; mode: CustomMode }
+    | { type: 'CLOSE_DELETE' }
+    | { type: 'SET_MODE_NAME'; name: string }
+    | { type: 'SET_MODE_METHOD'; method: ModeMethod }
+    | { type: 'CREATE_SUCCESS' }
+    | { type: 'RENAME_SUCCESS' }
+    | { type: 'DELETE_SUCCESS' };
+
+const initialModalState: ModalState = {
+    showResetConfirm: false,
+    showCreateModal: false,
+    showRenameModal: false,
+    showDeleteConfirm: false,
+    newModeName: '',
+    newModeMethod: 'sit',
+    editingMode: null,
+    modeToDelete: null,
+};
+
+function modalReducer(state: ModalState, action: ModalAction): ModalState {
+    switch (action.type) {
+        case 'OPEN_RESET':
+            return { ...state, showResetConfirm: true };
+        case 'CLOSE_RESET':
+            return { ...state, showResetConfirm: false };
+        case 'OPEN_CREATE':
+            return { ...state, showCreateModal: true };
+        case 'CLOSE_CREATE':
+            return { ...state, showCreateModal: false, newModeName: '', newModeMethod: 'sit' };
+        case 'OPEN_RENAME':
+            return { ...state, showRenameModal: true, editingMode: action.mode, newModeName: action.mode.name };
+        case 'CLOSE_RENAME':
+            return { ...state, showRenameModal: false, editingMode: null, newModeName: '' };
+        case 'OPEN_DELETE':
+            return { ...state, showDeleteConfirm: true, modeToDelete: action.mode };
+        case 'CLOSE_DELETE':
+            return { ...state, showDeleteConfirm: false, modeToDelete: null };
+        case 'SET_MODE_NAME':
+            return { ...state, newModeName: action.name };
+        case 'SET_MODE_METHOD':
+            return { ...state, newModeMethod: action.method };
+        case 'CREATE_SUCCESS':
+            return { ...state, showCreateModal: false, newModeName: '', newModeMethod: 'sit' };
+        case 'RENAME_SUCCESS':
+            return { ...state, showRenameModal: false, editingMode: null, newModeName: '' };
+        case 'DELETE_SUCCESS':
+            return { ...state, showDeleteConfirm: false, modeToDelete: null };
+    }
+}
+
 export default function SettingsScreen() {
     const { language, setLanguage } = useLanguage();
     const { themeMode, setThemeMode } = useTheme();
@@ -189,16 +257,7 @@ export default function SettingsScreen() {
         overlay: overlayColor,
     } = useColors('background', 'text', 'textSecondary', 'border', 'borderSelected', 'danger', 'overlay');
     const { modes: modesWithVisibility, refetch: refetchModes } = useModesWithVisibility();
-    const [showResetConfirm, setShowResetConfirm] = useState(false);
-    
-    // Custom mode management state
-    const [showCreateModal, setShowCreateModal] = useState(false);
-    const [showRenameModal, setShowRenameModal] = useState(false);
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-    const [newModeName, setNewModeName] = useState('');
-    const [newModeMethod, setNewModeMethod] = useState<ModeMethod>('sit');
-    const [editingMode, setEditingMode] = useState<CustomMode | null>(null);
-    const [modeToDelete, setModeToDelete] = useState<CustomMode | null>(null);
+    const [modal, dispatch] = useReducer(modalReducer, initialModalState);
 
     const getThemeName = useCallback((themeKey: string) => {
         switch (themeKey) {
@@ -246,70 +305,52 @@ export default function SettingsScreen() {
 
     // Handle create custom mode
     const handleCreateMode = useCallback(async () => {
-        if (!newModeName.trim()) {
+        if (!modal.newModeName.trim()) {
             return;
         }
         try {
-            await addCustomMode(newModeName.trim(), newModeMethod);
-            setNewModeName('');
-            setNewModeMethod('sit');
-            setShowCreateModal(false);
+            await addCustomMode(modal.newModeName.trim(), modal.newModeMethod);
+            dispatch({ type: 'CREATE_SUCCESS' });
             await refetchModes();
         } catch (error) {
             console.warn('Failed to create custom mode:', error);
         }
-    }, [newModeName, newModeMethod, refetchModes]);
+    }, [modal.newModeName, modal.newModeMethod, refetchModes]);
 
     // Handle rename custom mode
     const handleRenameMode = useCallback(async () => {
-        if (!editingMode || !newModeName.trim()) {
+        if (!modal.editingMode || !modal.newModeName.trim()) {
             return;
         }
         try {
-            await updateCustomMode(editingMode.id, newModeName.trim());
-            setNewModeName('');
-            setEditingMode(null);
-            setShowRenameModal(false);
+            await updateCustomMode(modal.editingMode.id, modal.newModeName.trim());
+            dispatch({ type: 'RENAME_SUCCESS' });
             await refetchModes();
         } catch (error) {
             console.warn('Failed to rename custom mode:', error);
         }
-    }, [editingMode, newModeName, refetchModes]);
+    }, [modal.editingMode, modal.newModeName, refetchModes]);
 
     // Handle delete custom mode
     const handleDeleteMode = useCallback(async () => {
-        if (!modeToDelete) {
+        if (!modal.modeToDelete) {
             return;
         }
         try {
-            await deleteCustomMode(modeToDelete.id);
-            setModeToDelete(null);
-            setShowDeleteConfirm(false);
+            await deleteCustomMode(modal.modeToDelete.id);
+            dispatch({ type: 'DELETE_SUCCESS' });
             await refetchModes();
         } catch (error) {
             console.warn('Failed to delete custom mode:', error);
         }
-    }, [modeToDelete, refetchModes]);
-
-    // Open rename modal
-    const openRenameModal = useCallback((mode: CustomMode) => {
-        setEditingMode(mode);
-        setNewModeName(mode.name);
-        setShowRenameModal(true);
-    }, []);
-
-    // Open delete confirmation
-    const openDeleteConfirm = useCallback((mode: CustomMode) => {
-        setModeToDelete(mode);
-        setShowDeleteConfirm(true);
-    }, []);
+    }, [modal.modeToDelete, refetchModes]);
 
     // Handle reset to defaults
     const handleReset = useCallback(async () => {
         try {
             await resetAllToDefaults();
             await refetchModes();
-            setShowResetConfirm(false);
+            dispatch({ type: 'CLOSE_RESET' });
         } catch (error) {
             console.warn('Failed to reset to defaults:', error);
         }
@@ -428,7 +469,7 @@ export default function SettingsScreen() {
                                         <>
                                             <PressableFeedback
                                                 style={styles.toggleButton}
-                                                onPress={() => openRenameModal(mode)}
+                                                onPress={() => dispatch({ type: 'OPEN_RENAME', mode })}
                                                 accessibilityRole="button"
                                                 accessibilityLabel={`${t.renameButton} ${getModeLabel(mode)}`}
                                             >
@@ -438,7 +479,7 @@ export default function SettingsScreen() {
                                             </PressableFeedback>
                                             <PressableFeedback
                                                 style={styles.toggleButton}
-                                                onPress={() => openDeleteConfirm(mode)}
+                                                onPress={() => dispatch({ type: 'OPEN_DELETE', mode })}
                                                 accessibilityRole="button"
                                                 accessibilityLabel={`${t.deleteButton} ${getModeLabel(mode)}`}
                                             >
@@ -476,7 +517,7 @@ export default function SettingsScreen() {
                     {/* Create custom mode button */}
                     <PressableFeedback
                         style={[styles.createModeButton, { borderColor }]}
-                        onPress={() => setShowCreateModal(true)}
+                        onPress={() => dispatch({ type: 'OPEN_CREATE' })}
                         accessibilityRole="button"
                         accessibilityLabel={t.createCustomMode}
                     >
@@ -511,7 +552,7 @@ export default function SettingsScreen() {
 
                 <PressableFeedback
                     style={[styles.resetButton, { borderColor: dangerColor }]}
-                    onPress={() => setShowResetConfirm(true)}
+                    onPress={() => dispatch({ type: 'OPEN_RESET' })}
                     accessibilityRole="button"
                     accessibilityLabel={t.resetButton}
                 >
@@ -523,10 +564,10 @@ export default function SettingsScreen() {
 
             {/* Reset confirmation modal */}
             <Modal
-                visible={showResetConfirm}
+                visible={modal.showResetConfirm}
                 transparent
                 animationType="fade"
-                onRequestClose={() => setShowResetConfirm(false)}
+                onRequestClose={() => dispatch({ type: 'CLOSE_RESET' })}
             >
                 <View style={[styles.modalOverlay, { backgroundColor: overlayColor }]}>
                     <View style={[styles.modalContent, { backgroundColor }]}>
@@ -536,7 +577,7 @@ export default function SettingsScreen() {
                         <View style={styles.modalButtons}>
                             <Pressable
                                 style={[styles.modalButton, { borderColor }]}
-                                onPress={() => setShowResetConfirm(false)}
+                                onPress={() => dispatch({ type: 'CLOSE_RESET' })}
                             >
                                 <Text style={styles.modalButtonText}>
                                     {t.cancelButton}
@@ -557,14 +598,10 @@ export default function SettingsScreen() {
 
             {/* Create custom mode modal */}
             <Modal
-                visible={showCreateModal}
+                visible={modal.showCreateModal}
                 transparent
                 animationType="fade"
-                onRequestClose={() => {
-                    setShowCreateModal(false);
-                    setNewModeName('');
-                    setNewModeMethod('sit');
-                }}
+                onRequestClose={() => dispatch({ type: 'CLOSE_CREATE' })}
             >
                 <View style={[styles.modalOverlay, { backgroundColor: overlayColor }]}>
                     <View style={[styles.modalContent, { backgroundColor }]}>
@@ -581,16 +618,15 @@ export default function SettingsScreen() {
                             ]}
                             placeholder={t.modeNamePlaceholder}
                             placeholderTextColor={secondaryTextColor}
-                            value={newModeName}
-                            onChangeText={setNewModeName}
-                            autoFocus
+                            value={modal.newModeName}
+                            onChangeText={(name) => dispatch({ type: 'SET_MODE_NAME', name })}
                         />
 
                         <View>
                             <Text style={styles.methodSectionLabel}>{t.methodSection}</Text>
                             <View style={styles.methodOptions}>
                                 {(['sit', 'random', 'seeAll'] as ModeMethod[]).map((method) => {
-                                    const isSelected = newModeMethod === method;
+                                    const isSelected = modal.newModeMethod === method;
                                     const label = method === 'sit' ? t.methodSit
                                         : method === 'random' ? t.methodRandom
                                         : t.methodSeeAll;
@@ -605,7 +641,7 @@ export default function SettingsScreen() {
                                                 { borderColor: isSelected ? borderSelectedColor : borderColor },
                                                 isSelected && styles.methodOptionSelected,
                                             ]}
-                                            onPress={() => setNewModeMethod(method)}
+                                            onPress={() => dispatch({ type: 'SET_MODE_METHOD', method })}
                                             accessibilityRole="radio"
                                             accessibilityLabel={label}
                                             accessibilityState={{ selected: isSelected }}
@@ -628,11 +664,7 @@ export default function SettingsScreen() {
                         <View style={styles.modalButtons}>
                             <Pressable
                                 style={[styles.modalButton, { borderColor }]}
-                                onPress={() => {
-                                    setShowCreateModal(false);
-                                    setNewModeName('');
-                                    setNewModeMethod('sit');
-                                }}
+                                onPress={() => dispatch({ type: 'CLOSE_CREATE' })}
                             >
                                 <Text style={styles.modalButtonText}>
                                     {t.cancelButton}
@@ -653,14 +685,10 @@ export default function SettingsScreen() {
 
             {/* Rename custom mode modal */}
             <Modal
-                visible={showRenameModal}
+                visible={modal.showRenameModal}
                 transparent
                 animationType="fade"
-                onRequestClose={() => {
-                    setShowRenameModal(false);
-                    setEditingMode(null);
-                    setNewModeName('');
-                }}
+                onRequestClose={() => dispatch({ type: 'CLOSE_RENAME' })}
             >
                 <View style={[styles.modalOverlay, { backgroundColor: overlayColor }]}>
                     <View style={[styles.modalContent, { backgroundColor }]}>
@@ -677,19 +705,14 @@ export default function SettingsScreen() {
                             ]}
                             placeholder={t.modeNamePlaceholder}
                             placeholderTextColor={secondaryTextColor}
-                            value={newModeName}
-                            onChangeText={setNewModeName}
-                            autoFocus
+                            value={modal.newModeName}
+                            onChangeText={(name) => dispatch({ type: 'SET_MODE_NAME', name })}
                         />
 
                         <View style={styles.modalButtons}>
                             <Pressable
                                 style={[styles.modalButton, { borderColor }]}
-                                onPress={() => {
-                                    setShowRenameModal(false);
-                                    setEditingMode(null);
-                                    setNewModeName('');
-                                }}
+                                onPress={() => dispatch({ type: 'CLOSE_RENAME' })}
                             >
                                 <Text style={styles.modalButtonText}>
                                     {t.cancelButton}
@@ -710,13 +733,10 @@ export default function SettingsScreen() {
 
             {/* Delete custom mode confirmation modal */}
             <Modal
-                visible={showDeleteConfirm}
+                visible={modal.showDeleteConfirm}
                 transparent
                 animationType="fade"
-                onRequestClose={() => {
-                    setShowDeleteConfirm(false);
-                    setModeToDelete(null);
-                }}
+                onRequestClose={() => dispatch({ type: 'CLOSE_DELETE' })}
             >
                 <View style={[styles.modalOverlay, { backgroundColor: overlayColor }]}>
                     <View style={[styles.modalContent, { backgroundColor }]}>
@@ -726,10 +746,7 @@ export default function SettingsScreen() {
                         <View style={styles.modalButtons}>
                             <Pressable
                                 style={[styles.modalButton, { borderColor }]}
-                                onPress={() => {
-                                    setShowDeleteConfirm(false);
-                                    setModeToDelete(null);
-                                }}
+                                onPress={() => dispatch({ type: 'CLOSE_DELETE' })}
                             >
                                 <Text style={styles.modalButtonText}>
                                     {t.cancelButton}

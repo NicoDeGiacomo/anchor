@@ -49,7 +49,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <ScrollViewStyleReset />
 
         {/* Using raw CSS styles as an escape-hatch to ensure the background color never flickers in dark-mode. */}
-        <style dangerouslySetInnerHTML={{ __html: responsiveBackground }} />
+        <style>{responsiveBackground}</style>
       </head>
       <body>{children}</body>
     </html>

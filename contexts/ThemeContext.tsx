@@ -21,8 +21,10 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const STORAGE_KEY = '@anchor_theme';
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-    const [themeMode, setThemeModeState] = useState<ThemeMode>('auto');
-    const [isInitialized, setIsInitialized] = useState(false);
+    const [state, setState] = useState<{ themeMode: ThemeMode; isInitialized: boolean }>({
+        themeMode: 'auto',
+        isInitialized: false,
+    });
     const deviceColorScheme = useDeviceColorScheme();
 
     useEffect(() => {
@@ -31,17 +33,15 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
                 const storedTheme = await AsyncStorage.getItem(STORAGE_KEY);
 
                 if (storedTheme && VALID_THEME_MODES.includes(storedTheme as ThemeMode)) {
-                    setThemeModeState(storedTheme as ThemeMode);
+                    setState({ themeMode: storedTheme as ThemeMode, isInitialized: true });
                 } else {
                     // Default to auto (system preference)
-                    setThemeModeState('auto');
+                    setState({ themeMode: 'auto', isInitialized: true });
                     await AsyncStorage.setItem(STORAGE_KEY, 'auto');
                 }
             } catch (error) {
                 console.warn('Failed to load theme preference:', error);
-                setThemeModeState('auto');
-            } finally {
-                setIsInitialized(true);
+                setState({ themeMode: 'auto', isInitialized: true });
             }
         };
 
@@ -51,7 +51,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     const setThemeMode = useCallback(async (mode: ThemeMode) => {
         try {
             await AsyncStorage.setItem(STORAGE_KEY, mode);
-            setThemeModeState(mode);
+            setState(prev => ({ ...prev, themeMode: mode }));
         } catch (error) {
             console.warn('Failed to save theme preference:', error);
         }
@@ -61,21 +61,21 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     // - 'auto' uses the new blue themes (dark/light) based on system preference
     // - Other modes map directly to their color scheme
     const colorScheme: ColorScheme = useMemo(() => {
-        if (themeMode === 'auto') {
+        if (state.themeMode === 'auto') {
             // Auto mode uses the blue-themed dark/light based on system preference
             return deviceColorScheme === 'dark' ? 'dark' : 'light';
         }
         // Direct mapping for explicit theme selections
-        return themeMode;
-    }, [themeMode, deviceColorScheme]);
+        return state.themeMode;
+    }, [state.themeMode, deviceColorScheme]);
 
     const value = useMemo(() => ({
-        themeMode,
+        themeMode: state.themeMode,
         setThemeMode,
         colorScheme,
-    }), [themeMode, setThemeMode, colorScheme]);
+    }), [state.themeMode, setThemeMode, colorScheme]);
 
-    if (!isInitialized) {
+    if (!state.isInitialized) {
         return null; // Wait for initialization
     }
 

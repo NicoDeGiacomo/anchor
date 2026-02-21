@@ -6,6 +6,7 @@ TODO:
 - ~~Copy from resources from Rochi~~ Done. Extracted 36 images, categorized into grounding (25 phrases) and new Values mode (8 phrases). See docs/GRUPO_ACT_PHRASES.md.
 - Review Spanish translations of new grounding/values phrases (machine-translated EN/PT from ES originals)
 - New "Values" mode added (hidden by default) — 8 reflective ACT-based questions, random method. Existing users need to enable it in settings.
+- ~~React Doctor fixes (37 warnings)~~ Done. Deleted 3 unused files (ExternalLink, StyledText, Logo), removed unused exports from Themed.tsx, removed autoFocus from 3 TextInputs, replaced dangerouslySetInnerHTML in +html.tsx, consolidated context setState (LanguageContext/ThemeContext), moved error throw to render body in _layout.tsx, fixed inline functions in PhraseItem, replaced useState with useReducer in settings.tsx and edit-phrases/[mode].tsx. All 85 tests pass.
 
 FIX:
 - App Icon: Add padding. Remove top-down dark gradient.
