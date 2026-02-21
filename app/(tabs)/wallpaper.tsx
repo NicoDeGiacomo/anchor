@@ -2,11 +2,11 @@ import * as MediaLibrary from 'expo-media-library';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import {
   Alert,
-  Dimensions,
   ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  useWindowDimensions,
 } from 'react-native';
 import ViewShot from 'react-native-view-shot';
 
@@ -16,8 +16,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useColor } from '@/hooks/useColor';
 import { WALLPAPER_TEMPLATES, WallpaperTemplate } from '@/constants/wallpaperTemplates';
 import { getAllPhrases } from '@/utils/getAllPhrases';
-
-const SCREEN = Dimensions.get('screen');
 
 const TRANSLATIONS = {
   en: {
@@ -56,6 +54,7 @@ export default function WallpaperScreen() {
   const borderSelectedColor = useColor('borderSelected');
   const textColor = useColor('text');
   const textSecondaryColor = useColor('textSecondary');
+  const screen = useWindowDimensions();
 
   const [phrase, setPhrase] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState<WallpaperTemplate>(WALLPAPER_TEMPLATES[0]);
@@ -67,8 +66,8 @@ export default function WallpaperScreen() {
   const allPhrases = useMemo(() => getAllPhrases(language), [language]);
 
   // Preview dimensions: ~55% of screen width, proportional height
-  const previewWidth = Math.round(SCREEN.width * 0.55);
-  const previewHeight = Math.round(previewWidth * (SCREEN.height / SCREEN.width));
+  const previewWidth = Math.round(screen.width * 0.55);
+  const previewHeight = Math.round(previewWidth * (screen.height / screen.width));
 
   const handleSave = useCallback(async () => {
     if (!phrase.trim()) return;
@@ -128,9 +127,9 @@ export default function WallpaperScreen() {
           style={styles.chipScroll}
           contentContainerStyle={styles.chipScrollContent}
         >
-          {allPhrases.map((text, i) => (
+          {allPhrases.map((text) => (
             <TouchableOpacity
-              key={i}
+              key={text}
               style={chipStyle}
               onPress={() => setPhrase(text)}
               activeOpacity={0.6}
@@ -195,8 +194,8 @@ export default function WallpaperScreen() {
           ref={fullResRef}
           template={selectedTemplate}
           phrase={phrase}
-          width={SCREEN.width}
-          height={SCREEN.height}
+          width={screen.width}
+          height={screen.height}
         />
       </View>
     </View>
@@ -268,11 +267,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 12,
     overflow: 'hidden',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
+    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.15)',
   },
   saveButton: {
     marginTop: 24,
