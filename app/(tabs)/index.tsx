@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   logo: {
-    marginBottom: 60,
+    marginBottom: 20,
   },
   buttonContainer: {
     width: '100%',

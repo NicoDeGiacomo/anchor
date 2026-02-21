@@ -32,7 +32,7 @@ export const BUILT_IN_MODE_METHODS: Record<BuiltInMode, ModeMethod> = {
     sadness: 'sit',
     anger: 'sit',
     grounding: 'random',
-    values: 'random',
+    values: 'seeAll',
 };
 
 export interface Phrase {
