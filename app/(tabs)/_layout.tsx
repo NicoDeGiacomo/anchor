@@ -79,6 +79,14 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="wallpaper"
+        options={{
+          title: 'Wallpaper',
+          headerTintColor: textColor,
+          headerLeft: renderHeaderLeft,
+        }}
+      />
+      <Tabs.Screen
         name="edit-phrases/[mode]"
         options={{
           title: 'Edit phrases',

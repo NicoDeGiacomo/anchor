@@ -22,6 +22,7 @@ const TRANSLATIONS = {
     values: 'Values',
     settingsButton: 'Settings',
     aboutButton: 'About',
+    wallpaperButton: 'Wallpaper',
   },
   es: {
     title: 'Anchor',
@@ -33,6 +34,7 @@ const TRANSLATIONS = {
     values: 'Valores',
     settingsButton: 'Configuración',
     aboutButton: 'Acerca de',
+    wallpaperButton: 'Fondo',
   },
   pt: {
     title: 'Anchor',
@@ -44,6 +46,7 @@ const TRANSLATIONS = {
     values: 'Valores',
     settingsButton: 'Configurações',
     aboutButton: 'Sobre',
+    wallpaperButton: 'Papel de parede',
   },
 };
 
@@ -121,6 +124,16 @@ export default function MainScreen() {
               accessibilityLabel={t.aboutButton}
             >
               <Text style={styles.secondaryButtonText}>{t.aboutButton}</Text>
+            </PressableFeedback>
+          </Link>
+
+          <Link href="/wallpaper" asChild>
+            <PressableFeedback
+              style={secondaryButtonStyle}
+              accessibilityRole="button"
+              accessibilityLabel={t.wallpaperButton}
+            >
+              <Text style={styles.secondaryButtonText}>{t.wallpaperButton}</Text>
             </PressableFeedback>
           </Link>
         </View>

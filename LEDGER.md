@@ -1,16 +1,14 @@
 TODO:
-- [x] Readme with updated screenshots (3 side-by-side: home, panic, dark settings)
-- [x] Review English translations of grounding/values phrases — all 33 phrases accepted
-- Review Spanish translations of new grounding/values phrases (machine-translated EN/PT from ES originals)
-- [x] New "Values" mode added (hidden by default) — 8 reflective ACT-based questions, random method. Existing users need to enable it in settings.
+- Upload to google play
 
 FIX:
-- [x] App Icon: Added padding, removed dark gradient. Updated icon.png and adaptive-icon.png.
-- [x] App display name: changed expo.name to "Anchor", added CFBundleDisplayName to infoPlist. iOS build submitted to EAS.
+- [x] Main screen logo looking far too up — reduced marginBottom from 60 to 20
+- [x] Values should be "show all" type — changed method from random to seeAll
 
 FEATURES:
-- Wallpapers: Let users choose or write a phrase, generate a simple, calming, no-clutter wallpaper, and set it as home screen, lock screen, or both.
+- [x] Wallpapers: Let users choose or write a phrase, generate a simple, calming, no-clutter wallpaper, and save to Photos. New tab with phrase input/picker, template selector (solids + gradients), live preview, and full-res PNG capture via react-native-view-shot + expo-media-library.
 
 OTHER:
 - Threads, Twitter posts
 - Other websites (reddit, producthunt, famous threads/twitter accounts)
+
