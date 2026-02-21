@@ -10,11 +10,12 @@ interface WallpaperCanvasProps {
   phrase: string;
   width: number;
   height: number;
+  fontSize?: number;
 }
 
 const WallpaperCanvas = forwardRef<ViewShot, WallpaperCanvasProps>(
-  ({ template, phrase, width, height }, ref) => {
-    const fontSize = Math.round(width * 0.055);
+  ({ template, phrase, width, height, fontSize: fontSizeProp }, ref) => {
+    const fontSize = fontSizeProp ?? Math.round(width * 0.055);
 
     return (
       <ViewShot ref={ref} options={{ format: 'png', quality: 1 }} style={{ width, height }}>

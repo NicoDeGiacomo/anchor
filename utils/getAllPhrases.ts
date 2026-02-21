@@ -40,16 +40,28 @@ const FLAT_PHRASES_MAP: Record<string, Record<Language, FlatPhraseContent>> = {
   },
 };
 
+const MODE_LABELS: Record<string, Record<Language, string>> = {
+  panic: { en: 'Panic', es: 'Pánico', pt: 'Pânico' },
+  anxiety: { en: 'Anxiety', es: 'Ansiedad', pt: 'Ansiedade' },
+  sadness: { en: 'Sadness', es: 'Tristeza', pt: 'Tristeza' },
+  anger: { en: 'Anger', es: 'Ira', pt: 'Raiva' },
+  grounding: { en: 'Grounding', es: 'Grounding', pt: 'Grounding' },
+  values: { en: 'Values', es: 'Valores', pt: 'Valores' },
+};
+
+export type PhrasesByMode = { mode: string; label: string; phrases: string[] }[];
+
 /**
- * Returns all built-in phrase texts across every mode for the given language.
+ * Returns built-in phrases grouped by mode for the given language.
  * Falls back to English when a language has no content for a mode.
  */
-export function getAllPhrases(language: Language): string[] {
-  const texts: string[] = [];
+export function getPhrasesByMode(language: Language): PhrasesByMode {
+  const result: PhrasesByMode = [];
 
   // Phased modes (SIT)
   for (const mode of Object.keys(PHASED_PHRASES_MAP)) {
     const phased = PHASED_PHRASES_MAP[mode][language] ?? PHASED_PHRASES_MAP[mode].en;
+    const texts: string[] = [];
     if (phased) {
       for (const phase of ['preparation', 'confrontation', 'reinforcement'] as const) {
         for (const p of phased[phase] ?? []) {
@@ -57,17 +69,28 @@ export function getAllPhrases(language: Language): string[] {
         }
       }
     }
+    result.push({
+      mode,
+      label: MODE_LABELS[mode]?.[language] ?? MODE_LABELS[mode]?.en ?? mode,
+      phrases: texts,
+    });
   }
 
   // Flat modes
   for (const mode of Object.keys(FLAT_PHRASES_MAP)) {
     const content = FLAT_PHRASES_MAP[mode][language] ?? FLAT_PHRASES_MAP[mode].en;
+    const texts: string[] = [];
     if (content) {
       for (const p of content.phrases) {
         texts.push(p.text);
       }
     }
+    result.push({
+      mode,
+      label: MODE_LABELS[mode]?.[language] ?? MODE_LABELS[mode]?.en ?? mode,
+      phrases: texts,
+    });
   }
 
-  return texts;
+  return result;
 }

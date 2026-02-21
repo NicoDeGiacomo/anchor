@@ -73,6 +73,11 @@ export default function MainScreen() {
     borderColor,
   }), [borderColor]);
 
+  const wallpaperButtonStyle = useMemo(() => ({
+    ...styles.wallpaperButton,
+    borderColor,
+  }), [borderColor]);
+
   // Helper to get mode label (translated for built-in, custom name for custom)
   const getModeLabel = useCallback((mode: DisplayMode): string => {
     if (isCustomMode(mode)) {
@@ -107,35 +112,37 @@ export default function MainScreen() {
         </View>
 
         <View style={styles.secondaryButtons}>
-          <Link href="/settings" asChild>
-            <PressableFeedback
-              style={secondaryButtonStyle}
-              accessibilityRole="button"
-              accessibilityLabel={t.settingsButton}
-            >
-              <Text style={styles.secondaryButtonText}>{t.settingsButton}</Text>
-            </PressableFeedback>
-          </Link>
-
-          <Link href="/about" asChild>
-            <PressableFeedback
-              style={secondaryButtonStyle}
-              accessibilityRole="button"
-              accessibilityLabel={t.aboutButton}
-            >
-              <Text style={styles.secondaryButtonText}>{t.aboutButton}</Text>
-            </PressableFeedback>
-          </Link>
-
           <Link href="/wallpaper" asChild>
             <PressableFeedback
-              style={secondaryButtonStyle}
+              style={wallpaperButtonStyle}
               accessibilityRole="button"
               accessibilityLabel={t.wallpaperButton}
             >
               <Text style={styles.secondaryButtonText}>{t.wallpaperButton}</Text>
             </PressableFeedback>
           </Link>
+
+          <View style={styles.secondaryRow}>
+            <Link href="/settings" asChild>
+              <PressableFeedback
+                style={secondaryButtonStyle}
+                accessibilityRole="button"
+                accessibilityLabel={t.settingsButton}
+              >
+                <Text style={styles.secondaryButtonText}>{t.settingsButton}</Text>
+              </PressableFeedback>
+            </Link>
+
+            <Link href="/about" asChild>
+              <PressableFeedback
+                style={secondaryButtonStyle}
+                accessibilityRole="button"
+                accessibilityLabel={t.aboutButton}
+              >
+                <Text style={styles.secondaryButtonText}>{t.aboutButton}</Text>
+              </PressableFeedback>
+            </Link>
+          </View>
         </View>
       </View>
     </View>
@@ -172,8 +179,20 @@ const styles = StyleSheet.create({
     fontWeight: '300',
   },
   secondaryButtons: {
+    gap: 12,
+  },
+  secondaryRow: {
     flexDirection: 'row',
     gap: 12,
+  },
+  wallpaperButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderStyle: 'dashed' as const,
+    alignItems: 'center' as const,
+    opacity: 0.5,
   },
   secondaryButton: {
     flex: 1,
@@ -181,8 +200,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 6,
     borderWidth: 1,
-    alignItems: 'center',
-    opacity: 0.7,
+    borderStyle: 'dashed' as const,
+    alignItems: 'center' as const,
+    opacity: 0.5,
   },
   secondaryButtonText: {
     fontSize: 14,
