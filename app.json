@@ -22,7 +22,8 @@
       "bundleIdentifier": "com.nicodegiacomo.anchor",
       "buildNumber": "1",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleDisplayName": "Anchor"
       }
     },
     "android": {

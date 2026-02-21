@@ -5,7 +5,13 @@ A minimal, open-source grounding app for overwhelming moments.
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform: iOS | Android | Web](https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20%7C%20Web-lightgrey.svg)](#)
 
-![Anchor App Screenshot](assets/images/screenshot.png)
+<p align="center">
+  <img src="docs/screenshots/iphone/light_home_en.png" width="250" alt="Home Screen" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/iphone/light_panic_en.png" width="250" alt="Panic Mode" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/iphone/dark_settings_en.png" width="250" alt="Settings (Dark)" />
+</p>
 
 ## About
 
@@ -21,11 +27,11 @@ Anchor is a simple tool for when emotions feel overwhelming. It provides gentle 
 
 ## Features
 
-- **Five Built-in Modes** — Panic, Anxiety, Sadness, Anger, and Grounding
+- **Six Built-in Modes** — Panic, Anxiety, Sadness, Anger, Grounding, and Values
 - **Custom Modes** — Create your own modes with personalized names
 - **Custom Phrases** — Add, edit, or hide phrases for any mode
 - **Multi-language** — English, Spanish (Español), and Portuguese (Português)
-- **Themes** — Light, Dark, or Auto (follows system)
+- **Five Themes** — Black, Dark, Light, White, and Auto (follows system)
 - **Cross-platform** — iOS, Android, and Web
 - **Privacy-first** — No accounts, no analytics, no tracking
 - **Evidence-based** — Techniques backed by science and reviewed by mental health experts
@@ -75,7 +81,8 @@ anchor/
 │   ├── anxiety/
 │   ├── sadness/
 │   ├── anger/
-│   └── grounding/
+│   ├── grounding/
+│   └── values/
 ├── contexts/          # React Context providers (language, theme)
 ├── hooks/             # Custom React hooks
 ├── utils/             # Utility functions
@@ -102,7 +109,7 @@ anchor/
 
 In **Settings**, you can:
 - Switch between English, Spanish, and Portuguese
-- Choose Light, Dark, or Auto theme
+- Choose from five themes: Black, Dark, Light, White, or Auto
 
 ## Tech Stack
 
